@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enterprise Figma Board — 024-binance-mobile-20-screens (binance/DESIGN.md)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #ffffff;
+      --surface-warm: #f8fafc;
+      --fg: #0f172a;
+      --fg-2: #334155;
+      --muted: #64748b;
+      --meta: #94a3b8;
+      --border: #e2e8f0;
+      --border-soft: #f1f5f9;
+      --accent: #f0b90b;
+      --accent-on: #1e2026;
+      --accent-hover: #1eaedb;
+      --accent-active: #d0980b;
+      --success: #0ecb81;
+      --warn: #eab308;
+      --danger: #f6465d;
+      --font-display: 'Inter', BinancePlex, Arial, sans-serif;
+      --font-body: 'Inter', BinancePlex, Arial, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, SF Mono, monospace;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 24px;
+      --radius-pill: 9999px;
+      --elev-raised: 0 4px 16px rgba(15, 23, 42, 0.06);
+      --canvas-bg: #f8fafc;
+      --canvas-grid: #cbd5e1;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      font-family: var(--font-body);
+      background-color: var(--canvas-bg);
+      background-image: radial-gradient(var(--canvas-grid) 1.5px, transparent 1.5px);
+      background-size: 24px 24px;
+      color: var(--fg);
+      margin: 0; padding: 0;
+      width: 100vw; height: 100vh;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Navigation Bar */
+    .figma-top-bar {
+      height: 48px; background: #ffffff; color: var(--fg);
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0 20px; font-size: 13px; z-index: 1000;
+      position: fixed; top: 0; left: 0; right: 0;
+      border-bottom: 2px solid var(--accent);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    }
+
+    .figma-logo-group { display: flex; align-items: center; gap: 12px; font-weight: 700; }
+    .figma-badge { background: var(--accent); color: var(--accent-on); padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; font-family: var(--font-mono); }
+
+    .figma-btn {
+      background: #f1f5f9; color: var(--fg); border: 1px solid #cbd5e1; padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+    }
+    .figma-btn-primary { background: var(--accent); color: var(--accent-on); border-color: var(--accent); font-weight: 700; }
+
+    /* Canvas Viewport */
+    .canvas-viewport { position: absolute; top: 48px; bottom: 56px; left: 0; right: 0; overflow: hidden; cursor: grab; }
+    .canvas-viewport:active { cursor: grabbing; }
+    .canvas-world { position: absolute; top: 0; left: 0; width: 16000px; height: 8000px; transform-origin: 0 0; }
+    .svg-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+
+    /* Device Shell Artboards */
+    .artboard {
+      position: absolute; background: #ffffff; border-radius: 44px; box-shadow: 0 20px 35px -5px rgba(15, 23, 42, 0.1); border: 6px solid #0f172a; display: flex; flex-direction: column; z-index: 10; transition: outline 0.15s ease; width: 390px; height: 810px; overflow: hidden;
+    }
+
+    .spec-artboard {
+      position: absolute; background: #ffffff; color: var(--fg); border-radius: 16px; box-shadow: 0 20px 35px -5px rgba(15, 23, 42, 0.1); border: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; width: 640px; height: 810px; overflow: hidden;
+    }
+
+    .artboard.selected, .spec-artboard.selected { outline: 3px solid var(--accent); box-shadow: 0 0 0 6px rgba(240, 185, 11, 0.35), var(--elev-raised); z-index: 20; }
+
+    .mobile-header-handle {
+      height: 44px; background: #ffffff; border-bottom: 1px solid var(--border-soft); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; cursor: move; font-size: 11px; font-weight: 700; color: #0f172a; position: relative; flex-shrink: 0;
+    }
+
+    .dynamic-island { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); width: 96px; height: 22px; background: #000000; border-radius: 20px; }
+    .artboard-meta-label { position: absolute; top: -36px; left: 0; display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 700; color: #0f172a; white-space: nowrap; }
+
+    .mobile-body { flex: 1; background: #ffffff; display: flex; flex-direction: column; padding: 14px; position: relative; cursor: auto; gap: 10px; overflow-y: auto; color: var(--fg); }
+
+    .mobile-bottom-nav {
+      height: 54px; background: #ffffff; border-top: 1px solid var(--border-soft); display: flex; justify-content: space-around; align-items: center; flex-shrink: 0; padding: 0 8px; font-size: 10px; font-weight: 600; color: var(--muted);
+    }
+
+    .nav-tab-item { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; flex: 1; text-decoration: none; color: inherit; }
+    .nav-tab-item.active { color: #d0980b; font-weight: 700; }
+
+    .home-indicator-bar { height: 16px; background: #ffffff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .home-indicator { width: 120px; height: 4px; background: #0f172a; border-radius: 2px; }
+
+    .edge-alert-danger { background: #fef2f2; border: 1px solid #fca5a5; border-radius: 8px; padding: 8px 10px; font-size: 10px; color: #dc2626; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+    .edge-alert-warn { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 8px 10px; font-size: 10px; color: #b45309; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+
+    .btn-primary {
+      background: var(--accent); color: var(--accent-on); border-radius: var(--radius-pill); padding: 12px 20px; font-size: 13px; font-weight: 700; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: rgb(153, 153, 153) 0 2px 10px -3px; width: 100%; transition: background var(--motion-base);
+    }
+    .btn-primary:hover { background: var(--accent-hover); color: white; }
+
+    .ticker { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; }
+    .ticker-cell { background: #ffffff; padding: 8px 10px; display: flex; flex-direction: column; gap: 2px; font-variant-numeric: tabular-nums; }
+    .ticker-symbol { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+    .ticker-price { font-size: 13px; font-weight: 700; color: var(--fg); }
+    .ticker-change { font-size: 11px; font-weight: 700; }
+    .ticker-change.up { color: var(--success); }
+    .ticker-change.down { color: var(--danger); }
+
+    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: var(--radius-pill); font-size: 10px; font-weight: 700; }
+    .badge-success { color: var(--success); background: rgba(14, 203, 129, 0.12); }
+    .badge-danger { color: var(--danger); background: rgba(246, 70, 93, 0.12); }
+    .badge-accent { color: var(--accent-on); background: var(--accent); }
+
+    .card { background: #ffffff; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 10px; box-shadow: var(--elev-raised); display: flex; flex-direction: column; gap: 6px; }
+
+    .field-input { padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface-warm); font-size: 12px; color: var(--fg); font-weight: 500; outline: none; width: 100%; }
+
+    .figma-bottom-bar {
+      height: 56px; background: #ffffff; border-top: 1px solid #cbd5e1; position: fixed; bottom: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 0 24px; color: var(--fg); z-index: 1000; box-shadow: 0 -2px 8px rgba(15, 23, 42, 0.04);
+    }
+
+    .zoom-btn { background: #f1f5f9; color: var(--fg); border: 1px solid #cbd5e1; width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: 700; }
+  </style>
+</head>
+<body>
+
+  <div class="figma-top-bar">
+    <div class="figma-logo-group">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="#F0B90B"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      <span>Modular Autonomous Board Assembler — 024-binance-mobile-20-screens</span>
+      <span class="figma-badge">20 SCREENS MODULES</span>
+    </div>
+
+    <div style="display: flex; gap: 12px; align-items: center;">
+      <span style="color: var(--muted); font-size: 12px;">Active System: <strong style="color:var(--accent-active);">binance/DESIGN.md</strong></span>
+      <a href="prototype.html" class="figma-btn figma-btn-primary">📱 Play Interactive Prototype</a>
+      <a href="components.html" class="figma-btn">🧩 Component Spec</a>
+    </div>
+  </div>
+
+  <div class="canvas-viewport" id="viewport">
+    <div class="canvas-world" id="world">
+
+      <!-- Dynamic SVG Flow Overlay connecting ALL Nodes -->
+      <svg class="svg-overlay">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#f0b90b"/>
+          </marker>
+        </defs>
+        <path id="flow-line-1" stroke="#f0b90b" stroke-width="3" fill="none" marker-end="url(#arrow)" stroke-dasharray="6,4"/>
+        <path id="flow-line-2" stroke="#f0b90b" stroke-width="3" fill="none" marker-end="url(#arrow)" stroke-dasharray="6,4"/>
+        <path id="flow-line-3" stroke="#f0b90b" stroke-width="3" fill="none" marker-end="url(#arrow)" stroke-dasharray="6,4"/>
+        <path id="flow-line-4" stroke="#f0b90b" stroke-width="3" fill="none" marker-end="url(#arrow)" stroke-dasharray="6,4"/>
+        <path id="flow-line-5" stroke="#f0b90b" stroke-width="3" fill="none" marker-end="url(#arrow)" stroke-dasharray="6,4"/>
+        <path id="flow-line-6" stroke="#f0b90b" stroke-width="3" fill="none" marker-end="url(#arrow)" stroke-dasharray="6,4"/>
+        <path id="flow-line-7" stroke="#f0b90b" stroke-width="3" fill="none" marker-end="url(#arrow)" stroke-dasharray="6,4"/>
+        <path id="flow-line-8" stroke="#f0b90b" stroke-width="3" fill="none" marker-end="url(#arrow)" stroke-dasharray="6,4"/>
+        <path id="flow-line-9" stroke="#f0b90b" stroke-width="3" fill="none" marker-end="url(#arrow)" stroke-dasharray="6,4"/>
+        <path id="flow-line-10" stroke="#f0b90b" stroke-width="3" fill="none" marker-end="url(#arrow)" stroke-dasharray="6,4"/>
+        <path id="flow-line-11" stroke="#f0b90b" stroke-width="3" fill="none" marker-end="url(#arrow)" stroke-dasharray="6,4"/>
+        <path id="flow-line-12" stroke="#f0b90b" stroke-width="3" fill="none" marker-end="url(#arrow)" stroke-dasharray="6,4"/>
+        <path id="flow-line-13" stroke="#f0b90b" stroke-width="3" fill="none" marker-end="url(#arrow)" stroke-dasharray="6,4"/>
+        <path id="flow-line-14" stroke="#f0b90b" stroke-width="3" fill="none" marker-end="url(#arrow)" stroke-dasharray="6,4"/>
+        <path id="flow-line-15" stroke="#f0b90b" stroke-width="3" fill="none" marker-end="url(#arrow)" stroke-dasharray="6,4"/>
+        <path id="flow-line-16" stroke="#f0b90b" stroke-width="3" fill="none" marker-end="url(#arrow)" stroke-dasharray="6,4"/>
+        <path id="flow-line-17" stroke="#f0b90b" stroke-width="3" fill="none" marker-end="url(#arrow)" stroke-dasharray="6,4"/>
+        <path id="flow-line-18" stroke="#f0b90b" stroke-width="3" fill="none" marker-end="url(#arrow)" stroke-dasharray="6,4"/>
+        <path id="flow-line-19" stroke="#f0b90b" stroke-width="3" fill="none" marker-end="url(#arrow)" stroke-dasharray="6,4"/>
+        <path id="flow-line-20" stroke="#f0b90b" stroke-width="3" fill="none" marker-end="url(#arrow)" stroke-dasharray="6,4"/>
+      </svg>
+
+      <!-- Rendered Screen Artboards -->
+      
+      <div class="artboard selected" id="artboard-1" style="left: 100px; top: 100px;">
+        <div class="artboard-meta-label"><span>SCREEN_01: Screen 1</span></div>
+        <div class="mobile-header-handle" onmousedown="startDragArtboard(event, 'artboard-1')"><span>9:41</span><div class="dynamic-island"></div><span>5G 📶</span></div>
+        <div class="mobile-body" onmousedown="event.stopPropagation()">
+          <div style="text-align:center; justify-content:center; flex:1; display:flex; flex-direction:column; background: radial-gradient(circle at 50% 45%, #fffbeb 0%, #fef3c7 50%, #ffffff 100%); padding:20px; border-radius:16px;">
+  <div style="margin-bottom:14px;">
+    <svg width="64" height="64" viewBox="0 0 24 24" fill="#F0B90B"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+  </div>
+  <h1 style="font-size:28px; color:#1e2026; font-weight:800; margin:0 0 6px 0;">BINANCE</h1>
+  <p style="font-size:13px; color:#475569; font-weight:600; margin-bottom:24px;">The World's Leading Cryptocurrency Exchange</p>
+  <div style="display:flex; justify-content:center; gap:8px; margin-bottom:28px; font-size:10px; color:#1e2026; font-weight:700;">
+    <span style="background:rgba(240,185,11,0.25); padding:4px 10px; border-radius:12px;">350+ Spot Coins</span>
+    <span style="background:rgba(240,185,11,0.25); padding:4px 10px; border-radius:12px;">$76B 24h Vol</span>
+    <span style="background:rgba(240,185,11,0.25); padding:4px 10px; border-radius:12px;">150M+ Users</span>
+  </div>
+  <button class="btn-primary" onclick="highlightArtboard('artboard-2')">
+    Get Started Now
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+  </button>
+</div>
+        </div>
+        <div class="home-indicator-bar"><div class="home-indicator"></div></div>
+      </div>
+
+      <div class="artboard" id="artboard-2" style="left: 550px; top: 100px;">
+        <div class="artboard-meta-label"><span>SCREEN_02: Screen 2</span></div>
+        <div class="mobile-header-handle" onmousedown="startDragArtboard(event, 'artboard-2')"><span>9:41</span><div class="dynamic-island"></div><span>5G 📶</span></div>
+        <div class="mobile-body" onmousedown="event.stopPropagation()">
+          <div style="text-align:center; flex:1; display:flex; flex-direction:column;">
+  <div style="width:72px; height:72px; border-radius:50%; background:rgba(240,185,11,0.18); color:var(--accent-active); display:flex; align-items:center; justify-content:center; margin:24px auto 14px auto;">
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#d0980b" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+  </div>
+  <h2 style="font-size:22px; margin-bottom:6px;">Institutional SAFU Vault</h2>
+  <p style="font-size:12px; color:var(--muted); margin-bottom:18px;">Assets backed 1:1 by SAFU multi-sig cold storage reserves.</p>
+  <div class="card" style="text-align:left; margin-bottom:24px; font-size:11px; gap:10px; background:#f8fafc;">
+    <div style="display:flex; align-items:center; gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0ecb81" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg><span>100% Proof of Reserves (PoR) Audited Monthly</span></div>
+    <div style="display:flex; align-items:center; gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0ecb81" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg><span>ISO 27001 &amp; SOC 2 Type II Certified</span></div>
+    <div style="display:flex; align-items:center; gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0ecb81" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg><span>Hardware Security Module (HSM) Key Protection</span></div>
+  </div>
+  <button class="btn-primary" style="margin-top:auto;" onclick="highlightArtboard('artboard-3')">Next &rarr;</button>
+</div>
+        </div>
+        <div class="home-indicator-bar"><div class="home-indicator"></div></div>
+      </div>
+
+      <div class="artboard" id="artboard-3" style="left: 1000px; top: 100px;">
+        <div class="artboard-meta-label"><span>SCREEN_03: Screen 3</span></div>
+        <div class="mobile-header-handle" onmousedown="startDragArtboard(event, 'artboard-3')"><span>9:41</span><div class="dynamic-island"></div><span>5G 📶</span></div>
+        <div class="mobile-body" onmousedown="event.stopPropagation()">
+          <div style="text-align:center; flex:1; display:flex; flex-direction:column;">
+  <div style="width:72px; height:72px; border-radius:50%; background:rgba(240,185,11,0.18); display:flex; align-items:center; justify-content:center; margin:24px auto 14px auto;">
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#d0980b" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+  </div>
+  <h2 style="font-size:22px; margin-bottom:6px;">Ultra-Fast Trading Engine</h2>
+  <p style="font-size:12px; color:var(--muted); margin-bottom:16px;">Sub-millisecond trade execution across 350+ markets.</p>
+  <div class="ticker" style="margin-bottom:18px;">
+    <div class="ticker-cell"><span class="ticker-symbol">BTC/USDT</span><span class="ticker-price">$68,432.10</span><span class="ticker-change up">+2.41%</span></div>
+    <div class="ticker-cell"><span class="ticker-symbol">ETH/USDT</span><span class="ticker-price">$3,584.20</span><span class="ticker-change up">+1.18%</span></div>
+    <div class="ticker-cell"><span class="ticker-symbol">BNB/USDT</span><span class="ticker-price">$612.55</span><span class="ticker-change down">-0.73%</span></div>
+    <div class="ticker-cell"><span class="ticker-symbol">SOL/USDT</span><span class="ticker-price">$148.07</span><span class="ticker-change up">+4.92%</span></div>
+  </div>
+  <button class="btn-primary" style="margin-top:auto;" onclick="highlightArtboard('artboard-4')">Sign In to Account &rarr;</button>
+</div>
+        </div>
+        <div class="home-indicator-bar"><div class="home-indicator"></div></div>
+      </div>
+
+      <div class="artboard" id="artboard-4" style="left: 1450px; top: 100px;">
+        <div class="artboard-meta-label"><span>SCREEN_04: Screen 4</span></div>
+        <div class="mobile-header-handle" onmousedown="startDragArtboard(event, 'artboard-4')"><span>9:41</span><div class="dynamic-island"></div><span>5G 📶</span></div>
+        <div class="mobile-body" onmousedown="event.stopPropagation()">
+          <div style="flex:1; display:flex; flex-direction:column;">
+  <h2 style="font-size:22px; margin-bottom:6px;">Sign In to Binance</h2>
+  <p style="font-size:12px; color:var(--muted); margin-bottom:16px;">Enter registered credentials to access your spot wallet.</p>
+  <div style="display:flex; flex-direction:column; gap:6px; margin-bottom:12px;">
+    <label style="font-size:11px; font-weight:700; color:var(--muted);">EMAIL / PHONE NUMBER</label>
+    <input type="text" class="field-input" value="trader@binance.com">
+  </div>
+  <div style="display:flex; flex-direction:column; gap:6px; margin-bottom:16px;">
+    <label style="font-size:11px; font-weight:700; color:var(--muted);">PASSWORD</label>
+    <input type="password" class="field-input" value="••••••••••••">
+  </div>
+  <div style="text-align:center; padding:14px; background:var(--surface-warm); border-radius:12px; margin-bottom:20px; border:1px solid var(--border);">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f0b90b" stroke-width="2"><path d="M9 3H5a2 2 0 0 0-2 2v4m0 6v4a2 2 0 0 0 2 2h4m6 0h4a2 2 0 0 0 2-2v-4m0-6V5a2 2 0 0 0-2-2h-4"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="9" r="1"/><path d="M12 17v-2"/></svg>
+    <div style="font-size:11px; font-weight:700; color:var(--fg); margin-top:4px;">Biometric FaceID Ready</div>
+  </div>
+  <button class="btn-primary" style="margin-top:auto;" onclick="highlightArtboard('artboard-5')">Sign In with FaceID</button>
+</div>
+        </div>
+        <div class="home-indicator-bar"><div class="home-indicator"></div></div>
+      </div>
+
+      <div class="artboard" id="artboard-5" style="left: 1900px; top: 100px;">
+        <div class="artboard-meta-label"><span>SCREEN_05: Screen 5</span></div>
+        <div class="mobile-header-handle" onmousedown="startDragArtboard(event, 'artboard-5')"><span>9:41</span><div class="dynamic-island"></div><span>5G 📶</span></div>
+        <div class="mobile-body" onmousedown="event.stopPropagation()">
+          <div style="flex:1; display:flex; flex-direction:column; text-align:center;">
+  <div class="edge-alert-danger" style="text-align:left; margin-bottom:14px;">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span>🔒 Security Alert: Login attempt from Tokyo, JP (IP 210.140.10.5). 2FA + Email Confirmation Mandatory.</span>
+  </div>
+  <h3 style="font-size:18px; margin-bottom:4px;">Enter 6-Digit 2FA Code</h3>
+  <p style="font-size:11px; color:var(--muted); margin-bottom:18px;">Sent to Google Authenticator app (trader@binance.com)</p>
+  <div style="display:flex; justify-content:center; gap:8px; margin-bottom:24px;">
+    <input type="text" value="8" style="width:40px; height:48px; text-align:center; background:#ffffff; border:1px solid var(--accent); border-radius:8px; color:var(--accent-active); font-weight:700; font-size:18px;">
+    <input type="text" value="4" style="width:40px; height:48px; text-align:center; background:#ffffff; border:1px solid var(--accent); border-radius:8px; color:var(--accent-active); font-weight:700; font-size:18px;">
+    <input type="text" value="2" style="width:40px; height:48px; text-align:center; background:#ffffff; border:1px solid var(--accent); border-radius:8px; color:var(--accent-active); font-weight:700; font-size:18px;">
+    <input type="text" value="9" style="width:40px; height:48px; text-align:center; background:#ffffff; border:1px solid var(--accent); border-radius:8px; color:var(--accent-active); font-weight:700; font-size:18px;">
+    <input type="text" value="1" style="width:40px; height:48px; text-align:center; background:#ffffff; border:1px solid var(--accent); border-radius:8px; color:var(--accent-active); font-weight:700; font-size:18px;">
+    <input type="text" value="5" style="width:40px; height:48px; text-align:center; background:#ffffff; border:1px solid var(--accent); border-radius:8px; color:var(--accent-active); font-weight:700; font-size:18px;">
+  </div>
+  <button class="btn-primary" style="margin-top:auto;" onclick="highlightArtboard('artboard-6')">Verify Security Code &rarr;</button>
+</div>
+        </div>
+        <div class="home-indicator-bar"><div class="home-indicator"></div></div>
+      </div>
+
+      <div class="artboard" id="artboard-6" style="left: 100px; top: 980px;">
+        <div class="artboard-meta-label"><span>SCREEN_06: Screen 6</span></div>
+        <div class="mobile-header-handle" onmousedown="startDragArtboard(event, 'artboard-6')"><span>9:41</span><div class="dynamic-island"></div><span>5G 📶</span></div>
+        <div class="mobile-body" onmousedown="event.stopPropagation()">
+          <div style="flex:1; display:flex; flex-direction:column; text-align:center;">
+  <div class="edge-alert-danger" style="margin-bottom:12px; text-align:left;">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+    <span>❌ Passport Image Rejected: Direct light glare detected on MRZ barcode. Retake photo.</span>
+  </div>
+  <div style="height:140px; border:2px dashed var(--danger); border-radius:12px; display:flex; flex-direction:column; align-items:center; justify-content:center; margin-bottom:16px; background:#fef2f2; padding:12px;">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+    <span style="font-size:11px; color:var(--danger); font-weight:700; margin-top:6px;">📸 Retake Passport Photo (No Glare)</span>
+  </div>
+  <div class="card" style="text-align:left; font-size:11px; margin-bottom:16px; gap:6px;">
+    <div>🚫 Avoid direct overhead light or flash reflection</div>
+    <div>✔️ Ensure all 4 corners of identity page are visible</div>
+  </div>
+  <button class="btn-primary" style="margin-top:auto;" onclick="highlightArtboard('artboard-7')">Retake Photo under Direct Light</button>
+</div>
+        </div>
+        <div class="home-indicator-bar"><div class="home-indicator"></div></div>
+      </div>
+
+      <div class="artboard" id="artboard-7" style="left: 550px; top: 980px;">
+        <div class="artboard-meta-label"><span>SCREEN_07: Screen 7</span></div>
+        <div class="mobile-header-handle" onmousedown="startDragArtboard(event, 'artboard-7')"><span>9:41</span><div class="dynamic-island"></div><span>5G 📶</span></div>
+        <div class="mobile-body" onmousedown="event.stopPropagation()">
+          <div style="flex:1; display:flex; flex-direction:column;">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+    <div style="display:flex; align-items:center; gap:8px;">
+      <div style="width:32px; height:32px; border-radius:50%; background:#1e2026; color:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px;">B</div>
+      <span class="eyebrow">Binance Markets</span>
+    </div>
+    <span class="badge badge-accent">PRO Mode</span>
+  </div>
+  <div class="edge-alert-warn" style="margin-bottom:10px;">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    <span>⚠️ Websocket Connection Lost. Reconnecting (Attempt 2/5)...</span>
+  </div>
+  <div class="ticker" style="margin-bottom:10px;">
+    <div class="ticker-cell"><span class="ticker-symbol">BTC/USDT</span><span class="ticker-price">$68,432.10</span><span class="ticker-change up">+2.41%</span></div>
+    <div class="ticker-cell"><span class="ticker-symbol">ETH/USDT</span><span class="ticker-price">$3,584.20</span><span class="ticker-change up">+1.18%</span></div>
+  </div>
+  <div class="card" style="padding:10px;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div><strong>BTC/USDT</strong><br><span style="font-size:10px; color:var(--muted);">Vol 42.8K BTC</span></div>
+      <span class="ticker-price">$68,432.10</span>
+      <span class="badge badge-success">+2.41%</span>
+    </div>
+  </div>
+  <button class="btn-primary" style="margin-top:auto;" onclick="highlightArtboard('artboard-8')">Open Market Watchlist &rarr;</button>
+</div>
+<div class="mobile-bottom-nav">
+  <div class="nav-tab-item active"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Home</span></div>
+  <div class="nav-tab-item"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg><span>Trade</span></div>
+</div>
+        </div>
+        <div class="home-indicator-bar"><div class="home-indicator"></div></div>
+      </div>
+
+      <div class="artboard" id="artboard-8" style="left: 1000px; top: 980px;">
+        <div class="artboard-meta-label"><span>SCREEN_08: Screen 8</span></div>
+        <div class="mobile-header-handle" onmousedown="startDragArtboard(event, 'artboard-8')"><span>9:41</span><div class="dynamic-island"></div><span>5G 📶</span></div>
+        <div class="mobile-body" onmousedown="event.stopPropagation()">
+          <div style="flex:1; display:flex; flex-direction:column;">
+  <input type="text" class="field-input" value="BTC" style="margin-bottom:10px;">
+  <div style="font-size:10px; font-weight:700; color:var(--muted); margin-bottom:6px;">RECENT SEARCHES</div>
+  <div style="display:flex; gap:6px; margin-bottom:12px; font-size:11px;">
+    <span style="background:var(--surface-warm); padding:3px 8px; border-radius:4px;">BTC</span>
+    <span style="background:var(--surface-warm); padding:3px 8px; border-radius:4px;">ETH</span>
+    <span style="background:var(--surface-warm); padding:3px 8px; border-radius:4px;">SOL</span>
+    <span style="background:var(--surface-warm); padding:3px 8px; border-radius:4px;">PEPE</span>
+  </div>
+  <div class="card"><div style="display:flex; justify-content:space-between; align-items:center; font-size:12px;"><span>★ BTC/USDT</span><strong>$68,432.10</strong><span class="badge badge-success">+2.41%</span></div></div>
+  <div class="card" style="margin-top:6px;"><div style="display:flex; justify-content:space-between; align-items:center; font-size:12px;"><span>★ ETH/USDT</span><strong>$3,584.20</strong><span class="badge badge-success">+1.18%</span></div></div>
+  <button class="btn-primary" style="margin-top:auto;" onclick="highlightArtboard('artboard-9')">View BTC Chart &rarr;</button>
+</div>
+        </div>
+        <div class="home-indicator-bar"><div class="home-indicator"></div></div>
+      </div>
+
+      <div class="artboard" id="artboard-9" style="left: 1450px; top: 980px;">
+        <div class="artboard-meta-label"><span>SCREEN_09: Screen 9</span></div>
+        <div class="mobile-header-handle" onmousedown="startDragArtboard(event, 'artboard-9')"><span>9:41</span><div class="dynamic-island"></div><span>5G 📶</span></div>
+        <div class="mobile-body" onmousedown="event.stopPropagation()">
+          <div style="flex:1; display:flex; flex-direction:column;">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+    <div><h3 style="color:var(--fg); margin:0;">BTC/USDT</h3><span style="font-size:10px; color:var(--muted);">24h Vol 42.8K BTC | High $69,120</span></div>
+    <span class="badge badge-success" style="font-size:13px;">$68,432.10</span>
+  </div>
+  <div style="display:flex; gap:6px; font-size:10px; font-weight:700; color:var(--muted); margin-bottom:8px;">
+    <span style="background:var(--accent); color:var(--accent-on); padding:2px 8px; border-radius:4px;">15m</span>
+    <span style="padding:2px 8px;">1h</span><span style="padding:2px 8px;">4h</span><span style="padding:2px 8px;">1D</span>
+  </div>
+  <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px; height:180px; display:flex; flex-direction:column; justify-content:space-between;">
+    <svg width="100%" height="150" viewBox="0 0 300 150">
+      <path d="M 10 130 L 40 100 L 80 120 L 120 50 L 160 80 L 200 30 L 240 60 L 290 10" stroke="#0ECB81" stroke-width="2.5" fill="none"/>
+      <rect x="35" y="90" width="10" height="25" fill="#0ECB81"/>
+      <rect x="115" y="45" width="10" height="30" fill="#0ECB81"/>
+      <rect x="75" y="105" width="10" height="20" fill="#F6465D"/>
+    </svg>
+  </div>
+  <button class="btn-primary" style="margin-top:auto;" onclick="highlightArtboard('artboard-10')">Buy BTC (Market Order) &rarr;</button>
+</div>
+<div class="mobile-bottom-nav">
+  <div class="nav-tab-item active"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg><span>Trade</span></div>
+</div>
+        </div>
+        <div class="home-indicator-bar"><div class="home-indicator"></div></div>
+      </div>
+
+      <div class="artboard" id="artboard-10" style="left: 1900px; top: 980px;">
+        <div class="artboard-meta-label"><span>SCREEN_10: Screen 10</span></div>
+        <div class="mobile-header-handle" onmousedown="startDragArtboard(event, 'artboard-10')"><span>9:41</span><div class="dynamic-island"></div><span>5G 📶</span></div>
+        <div class="mobile-body" onmousedown="event.stopPropagation()">
+          <div style="flex:1; display:flex; flex-direction:column;">
+  <div class="edge-alert-warn" style="margin-bottom:8px;">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span>⚡ Slippage Warning: Volatility Slippage Estimated > 2.5%.</span>
+  </div>
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; font-size:11px;"><span>Avail Balance:</span><strong style="color:var(--accent-active);">1,250.00 USDT</strong></div>
+    <div style="display:flex; justify-content:space-between; font-size:11px;"><span>Slippage Range:</span><strong style="color:var(--danger);">$68,432 - $70,140</strong></div>
+  </div>
+  <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin:10px 0; font-size:11px;">
+    <button class="btn-secondary" style="padding:4px;">25%</button>
+    <button class="btn-secondary" style="padding:4px;">50%</button>
+    <button class="btn-primary" style="padding:4px;">75%</button>
+    <button class="btn-secondary" style="padding:4px;">100%</button>
+  </div>
+  <button class="btn-primary" style="margin-top:auto;" onclick="highlightArtboard('artboard-11')">Buy Fiat Instant &rarr;</button>
+</div>
+        </div>
+        <div class="home-indicator-bar"><div class="home-indicator"></div></div>
+      </div>
+
+      <div class="artboard" id="artboard-11" style="left: 100px; top: 1860px;">
+        <div class="artboard-meta-label"><span>SCREEN_11: Screen 11</span></div>
+        <div class="mobile-header-handle" onmousedown="startDragArtboard(event, 'artboard-11')"><span>9:41</span><div class="dynamic-island"></div><span>5G 📶</span></div>
+        <div class="mobile-body" onmousedown="event.stopPropagation()">
+          <div style="flex:1; display:flex; flex-direction:column;">
+  <h3 style="font-size:16px; margin:0 0 8px 0;">Buy Crypto with Credit Card</h3>
+  <div class="card"><strong>$500.00 USD &rarr; 0.00730 BTC</strong></div>
+  <div class="card" style="margin-top:6px; border-color:var(--accent);">
+    <div style="display:flex; justify-content:space-between; font-size:11px;"><span>Apple Pay (Instant)</span><strong style="color:var(--accent-active);">Selected ✔</strong></div>
+  </div>
+  <div class="card" style="margin-top:6px;">
+    <div style="display:flex; justify-content:space-between; font-size:11px;"><span>Visa / Mastercard</span><span>1.9% Fee</span></div>
+  </div>
+  <button class="btn-primary" style="margin-top:auto;" onclick="highlightArtboard('artboard-12')">Convert Swap &rarr;</button>
+</div>
+        </div>
+        <div class="home-indicator-bar"><div class="home-indicator"></div></div>
+      </div>
+
+      <div class="artboard" id="artboard-12" style="left: 550px; top: 1860px;">
+        <div class="artboard-meta-label"><span>SCREEN_12: Screen 12</span></div>
+        <div class="mobile-header-handle" onmousedown="startDragArtboard(event, 'artboard-12')"><span>9:41</span><div class="dynamic-island"></div><span>5G 📶</span></div>
+        <div class="mobile-body" onmousedown="event.stopPropagation()">
+          <div style="flex:1; display:flex; flex-direction:column;">
+  <h3 style="font-size:16px; margin:0 0 8px 0;">Binance Convert ($0 Fee)</h3>
+  <div class="card"><span>From: 1,000 USDT</span></div>
+  <div style="text-align:center; margin:6px 0;">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
+  </div>
+  <div class="card"><span>To: 0.2790 ETH</span></div>
+  <button class="btn-primary" style="margin-top:auto;" onclick="highlightArtboard('artboard-13')">Futures 125x &rarr;</button>
+</div>
+        </div>
+        <div class="home-indicator-bar"><div class="home-indicator"></div></div>
+      </div>
+
+      <div class="artboard" id="artboard-13" style="left: 1000px; top: 1860px;">
+        <div class="artboard-meta-label"><span>SCREEN_13: Screen 13</span></div>
+        <div class="mobile-header-handle" onmousedown="startDragArtboard(event, 'artboard-13')"><span>9:41</span><div class="dynamic-island"></div><span>5G 📶</span></div>
+        <div class="mobile-body" onmousedown="event.stopPropagation()">
+          <div style="flex:1; display:flex; flex-direction:column;">
+  <div class="edge-alert-danger" style="margin-bottom:8px;">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    <span>🚨 Liquidation Warning: Margin Ratio 112% (125x Leverage). Add Margin!</span>
+  </div>
+  <div class="card"><div style="display:flex; justify-content:space-between; font-size:11px;"><span>Liq Price:</span><strong style="color:var(--danger);">$67,950.00</strong></div></div>
+  <div class="card" style="margin-top:6px;"><div style="display:flex; justify-content:space-between; font-size:11px;"><span>PnL:</span><strong style="color:var(--success);">+$1,047.78 (+154.2%)</strong></div></div>
+  <button class="btn-primary" style="margin-top:auto;" onclick="highlightArtboard('artboard-14')">Earn Vaults &rarr;</button>
+</div>
+        </div>
+        <div class="home-indicator-bar"><div class="home-indicator"></div></div>
+      </div>
+
+      <div class="artboard" id="artboard-14" style="left: 1450px; top: 1860px;">
+        <div class="artboard-meta-label"><span>SCREEN_14: Screen 14</span></div>
+        <div class="mobile-header-handle" onmousedown="startDragArtboard(event, 'artboard-14')"><span>9:41</span><div class="dynamic-island"></div><span>5G 📶</span></div>
+        <div class="mobile-body" onmousedown="event.stopPropagation()">
+          <div style="flex:1; display:flex; flex-direction:column;">
+  <h3 style="font-size:16px; margin:0 0 8px 0;">Binance Earn Vaults</h3>
+  <div class="card"><span>USDT Flexible Staking: <strong style="color:var(--success);">7.2% APY</strong></span></div>
+  <div class="card" style="margin-top:6px;"><span>ETH 2.0 Staking: <strong style="color:var(--success);">4.5% APY</strong></span></div>
+  <div class="card" style="margin-top:6px;"><span>SOL Locked 30D: <strong style="color:var(--success);">9.8% APY</strong></span></div>
+  <button class="btn-primary" style="margin-top:auto;" onclick="highlightArtboard('artboard-15')">Spot Wallet Overview &rarr;</button>
+</div>
+        </div>
+        <div class="home-indicator-bar"><div class="home-indicator"></div></div>
+      </div>
+
+      <div class="artboard" id="artboard-15" style="left: 1900px; top: 1860px;">
+        <div class="artboard-meta-label"><span>SCREEN_15: Screen 15</span></div>
+        <div class="mobile-header-handle" onmousedown="startDragArtboard(event, 'artboard-15')"><span>9:41</span><div class="dynamic-island"></div><span>5G 📶</span></div>
+        <div class="mobile-body" onmousedown="event.stopPropagation()">
+          <div style="flex:1; display:flex; flex-direction:column;">
+  <span style="font-size:11px; color:var(--muted);">Total Wallet Portfolio Balance</span>
+  <h1 style="color:var(--fg); font-size:28px; margin:2px 0 12px 0;">$12,480.50</h1>
+  <div class="card"><div style="display:flex; justify-content:space-between; font-size:11px;"><span>BTC (Bitcoin)</span><strong>0.1824 BTC ($12,480)</strong></div></div>
+  <div class="card" style="margin-top:6px;"><div style="display:flex; justify-content:space-between; font-size:11px;"><span>ETH (Ethereum)</span><strong>0.4200 ETH ($1,505)</strong></div></div>
+  <button class="btn-primary" style="margin-top:auto;" onclick="highlightArtboard('artboard-16')">Deposit QR &rarr;</button>
+</div>
+<div class="mobile-bottom-nav">
+  <div class="nav-tab-item active"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg><span>Wallet</span></div>
+</div>
+        </div>
+        <div class="home-indicator-bar"><div class="home-indicator"></div></div>
+      </div>
+
+      <div class="artboard" id="artboard-16" style="left: 100px; top: 2740px;">
+        <div class="artboard-meta-label"><span>SCREEN_16: Screen 16</span></div>
+        <div class="mobile-header-handle" onmousedown="startDragArtboard(event, 'artboard-16')"><span>9:41</span><div class="dynamic-island"></div><span>5G 📶</span></div>
+        <div class="mobile-body" onmousedown="event.stopPropagation()">
+          <div style="flex:1; display:flex; flex-direction:column; text-align:center;">
+  <h3 style="font-size:16px; margin:0 0 6px 0;">BTC Deposit Address</h3>
+  <div style="width:140px; height:140px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; display:flex; align-items:center; justify-content:center; margin:10px auto; color:var(--fg); font-size:32px;">📱</div>
+  <div class="card" style="font-size:10px; font-family:var(--font-mono); margin-bottom:12px;">bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</div>
+  <button class="btn-primary" style="margin-top:auto;" onclick="highlightArtboard('artboard-17')">Withdraw Crypto &rarr;</button>
+</div>
+        </div>
+        <div class="home-indicator-bar"><div class="home-indicator"></div></div>
+      </div>
+
+      <div class="artboard" id="artboard-17" style="left: 550px; top: 2740px;">
+        <div class="artboard-meta-label"><span>SCREEN_17: Screen 17</span></div>
+        <div class="mobile-header-handle" onmousedown="startDragArtboard(event, 'artboard-17')"><span>9:41</span><div class="dynamic-island"></div><span>5G 📶</span></div>
+        <div class="mobile-body" onmousedown="event.stopPropagation()">
+          <div style="flex:1; display:flex; flex-direction:column;">
+  <h3 style="font-size:16px; margin:0 0 8px 0;">Withdraw BTC</h3>
+  <div style="display:flex; flex-direction:column; gap:4px; margin-bottom:10px;">
+    <label style="font-size:10px; font-weight:700; color:var(--muted);">RECIPIENT ADDRESS</label>
+    <input type="text" class="field-input" value="bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh">
+  </div>
+  <div class="card"><div style="display:flex; justify-content:space-between; font-size:11px;"><span>Network Fee:</span><strong>0.0005 BTC (~10 mins)</strong></div></div>
+  <button class="btn-primary" style="margin-top:auto;" onclick="highlightArtboard('artboard-18')">P2P Express &rarr;</button>
+</div>
+        </div>
+        <div class="home-indicator-bar"><div class="home-indicator"></div></div>
+      </div>
+
+      <div class="artboard" id="artboard-18" style="left: 1000px; top: 2740px;">
+        <div class="artboard-meta-label"><span>SCREEN_18: Screen 18</span></div>
+        <div class="mobile-header-handle" onmousedown="startDragArtboard(event, 'artboard-18')"><span>9:41</span><div class="dynamic-island"></div><span>5G 📶</span></div>
+        <div class="mobile-body" onmousedown="event.stopPropagation()">
+          <div style="flex:1; display:flex; flex-direction:column;">
+  <h3 style="font-size:16px; margin:0 0 8px 0;">P2P Merchant List</h3>
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; font-size:11px;">
+      <span>CryptoKing_Pro (99.8%)</span><strong style="color:var(--success);">25,420 VND</strong>
+    </div>
+    <div style="font-size:10px; color:var(--muted); margin-top:2px;">Limit: 1,000,000 - 50,000,000 VND</div>
+  </div>
+  <div class="card" style="margin-top:6px;">
+    <div style="display:flex; justify-content:space-between; font-size:11px;">
+      <span>FastPay_Express (99.4%)</span><strong style="color:var(--success);">25,430 VND</strong>
+    </div>
+    <div style="font-size:10px; color:var(--muted); margin-top:2px;">Limit: 500,000 - 20,000,000 VND</div>
+  </div>
+  <button class="btn-primary" style="margin-top:auto;" onclick="highlightArtboard('artboard-19')">Trade Logs &rarr;</button>
+</div>
+        </div>
+        <div class="home-indicator-bar"><div class="home-indicator"></div></div>
+      </div>
+
+      <div class="artboard" id="artboard-19" style="left: 1450px; top: 2740px;">
+        <div class="artboard-meta-label"><span>SCREEN_19: Screen 19</span></div>
+        <div class="mobile-header-handle" onmousedown="startDragArtboard(event, 'artboard-19')"><span>9:41</span><div class="dynamic-island"></div><span>5G 📶</span></div>
+        <div class="mobile-body" onmousedown="event.stopPropagation()">
+          <div style="flex:1; display:flex; flex-direction:column;">
+  <h3 style="font-size:16px; margin:0 0 8px 0;">Transaction History</h3>
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; font-size:11px;"><span>Market Buy BTC</span><strong>0.0146 BTC</strong></div>
+    <div style="font-size:10px; color:var(--muted);">Jul 29, 2026 | @ $68,432.10</div>
+  </div>
+  <div class="card" style="margin-top:6px;">
+    <div style="display:flex; justify-content:space-between; font-size:11px;"><span>Deposit USDT</span><strong>+1,250.00 USDT</strong></div>
+    <div style="font-size:10px; color:var(--muted);">Jul 28, 2026 | Completed</div>
+  </div>
+  <button class="btn-primary" style="margin-top:auto;" onclick="highlightArtboard('artboard-20')">Security Settings &rarr;</button>
+</div>
+        </div>
+        <div class="home-indicator-bar"><div class="home-indicator"></div></div>
+      </div>
+
+      <div class="artboard" id="artboard-20" style="left: 1900px; top: 2740px;">
+        <div class="artboard-meta-label"><span>SCREEN_20: Screen 20</span></div>
+        <div class="mobile-header-handle" onmousedown="startDragArtboard(event, 'artboard-20')"><span>9:41</span><div class="dynamic-island"></div><span>5G 📶</span></div>
+        <div class="mobile-body" onmousedown="event.stopPropagation()">
+          <div style="flex:1; display:flex; flex-direction:column;">
+  <h3 style="font-size:16px; margin:0 0 8px 0;">Security Settings</h3>
+  <div class="card"><div style="display:flex; justify-content:space-between; font-size:11px;"><span>2FA Google Authenticator</span><strong style="color:var(--success);">Enabled ✔</strong></div></div>
+  <div class="card" style="margin-top:6px;"><div style="display:flex; justify-content:space-between; font-size:11px;"><span>Anti-Phishing Code</span><strong style="color:var(--success);">Active ✔</strong></div></div>
+  <div class="card" style="margin-top:6px;"><div style="display:flex; justify-content:space-between; font-size:11px;"><span>Biometric FaceID</span><strong style="color:var(--success);">Enabled ✔</strong></div></div>
+  <button class="btn-primary" style="margin-top:auto;" onclick="highlightArtboard('artboard-spec')">System Specs Card &rarr;</button>
+</div>
+        </div>
+        <div class="home-indicator-bar"><div class="home-indicator"></div></div>
+      </div>
+
+      <!-- MANDATORY ARTBOARD: Design Tokens & System Specs -->
+      <div class="spec-artboard" id="artboard-spec" style="left: 2350px; top: 100px; width: 640px; height: 810px;">
+        <div class="mobile-header-handle" onmousedown="startDragArtboard(event, 'artboard-spec')">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#F0B90B"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            <strong style="font-size:13px; color:var(--fg);">Design Tokens &amp; System Specs</strong>
+            <span class="figma-badge">binance/DESIGN.md</span>
+          </div>
+          <span style="font-size:11px; color:var(--muted);">⋮⋮ Drag Handle</span>
+        </div>
+
+        <div style="padding:24px; background:#ffffff; color:var(--fg); flex:1; overflow-y:auto;" onmousedown="event.stopPropagation()">
+          <h4 style="margin-top:0; font-size:14px; color:var(--fg); border-bottom:1px solid #e2e8f0; padding-bottom:8px;">1. Modular Screen Generation Pipeline</h4>
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px; font-size:11px; margin-bottom:16px;">
+            <div>All 20 screen modules compiled dynamically from <code>screens/</code> directory into 1 master board.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="figma-bottom-bar">
+    <div style="display:flex; gap:16px; align-items:center;">
+      <span>Modular Pipeline: <strong>20 Screen Modules Compiled into Master Board</strong></span>
+      <span>System: <strong>binance/DESIGN.md</strong></span>
+    </div>
+
+    <div style="display:flex; gap:8px; align-items:center;">
+      <button class="zoom-btn" onclick="zoomOut()">-</button>
+      <span id="zoom-level" style="font-family: var(--font-mono); font-size: 12px; width: 44px; text-align: center;">100%</span>
+      <button class="zoom-btn" onclick="zoomIn()">+</button>
+      <button class="figma-btn" style="margin-left: 12px;" onclick="resetZoom()">Reset View</button>
+    </div>
+  </div>
+
+  <script>
+    let scale = 0.65, panX = 0, panY = 0, isPanning = false, isDraggingArtboard = false, activeArtboardId = null, startX, startY;
+    const viewport = document.getElementById('viewport');
+    const world = document.getElementById('world');
+
+    document.querySelectorAll('.artboard, .spec-artboard').forEach(card => {
+      card.addEventListener('mousedown', () => {
+        document.querySelectorAll('.artboard, .spec-artboard').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+      });
+    });
+
+    function startDragArtboard(e, id) {
+      e.stopPropagation(); isDraggingArtboard = true; activeArtboardId = id;
+      const el = document.getElementById(id);
+      startX = e.clientX - el.offsetLeft * scale; startY = e.clientY - el.offsetTop * scale;
+      document.addEventListener('mousemove', onDragArtboard); document.addEventListener('mouseup', stopDragArtboard);
+    }
+
+    function onDragArtboard(e) {
+      if (!isDraggingArtboard || !activeArtboardId) return;
+      const el = document.getElementById(activeArtboardId);
+      el.style.left = (e.clientX - startX) / scale + 'px';
+      el.style.top = (e.clientY - startY) / scale + 'px';
+      updateConnectors();
+    }
+
+    function stopDragArtboard() { isDraggingArtboard = false; activeArtboardId = null; document.removeEventListener('mousemove', onDragArtboard); document.removeEventListener('mouseup', stopDragArtboard); }
+
+    viewport.addEventListener('mousedown', (e) => { if (isDraggingArtboard) return; isPanning = true; startX = e.clientX - panX; startY = e.clientY - panY; });
+    window.addEventListener('mousemove', (e) => { if (!isPanning) return; panX = e.clientX - startX; panY = e.clientY - startY; updateTransform(); });
+    window.addEventListener('mouseup', () => { isPanning = false; });
+
+    viewport.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const delta = e.deltaY < 0 ? 0.08 : -0.08;
+      const newScale = Math.min(Math.max(0.2, scale + delta), 2.5);
+      const rect = viewport.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left, mouseY = e.clientY - rect.top;
+      panX = mouseX - (mouseX - panX) * (newScale / scale);
+      panY = mouseY - (mouseY - panY) * (newScale / scale);
+      scale = newScale; updateTransform();
+    }, { passive: false });
+
+    function updateTransform() { world.style.transform = 'translate(' + panX + 'px, ' + panY + 'px) scale(' + scale + ')'; document.getElementById('zoom-level').innerText = Math.round(scale * 100) + '%'; }
+    function zoomIn() { scale = Math.min(2.5, scale + 0.15); updateTransform(); }
+    function zoomOut() { scale = Math.max(0.2, scale - 0.15); updateTransform(); }
+    function resetZoom() { scale = 0.65; panX = 0; panY = 0; updateTransform(); }
+
+    function updateConnectors() {
+      const connections = [
+        ['artboard-1', 'artboard-2', 'flow-line-1'],
+        ['artboard-2', 'artboard-3', 'flow-line-2'],
+        ['artboard-3', 'artboard-4', 'flow-line-3'],
+        ['artboard-4', 'artboard-5', 'flow-line-4'],
+        ['artboard-5', 'artboard-6', 'flow-line-5'],
+        ['artboard-6', 'artboard-7', 'flow-line-6'],
+        ['artboard-7', 'artboard-8', 'flow-line-7'],
+        ['artboard-8', 'artboard-9', 'flow-line-8'],
+        ['artboard-9', 'artboard-10', 'flow-line-9'],
+        ['artboard-10', 'artboard-11', 'flow-line-10'],
+        ['artboard-11', 'artboard-12', 'flow-line-11'],
+        ['artboard-12', 'artboard-13', 'flow-line-12'],
+        ['artboard-13', 'artboard-14', 'flow-line-13'],
+        ['artboard-14', 'artboard-15', 'flow-line-14'],
+        ['artboard-15', 'artboard-16', 'flow-line-15'],
+        ['artboard-16', 'artboard-17', 'flow-line-16'],
+        ['artboard-17', 'artboard-18', 'flow-line-17'],
+        ['artboard-18', 'artboard-19', 'flow-line-18'],
+        ['artboard-19', 'artboard-20', 'flow-line-19'],
+        ['artboard-20', 'artboard-spec', 'flow-line-20']
+      ];
+
+      connections.forEach(([fromId, toId, lineId]) => {
+        const fromEl = document.getElementById(fromId);
+        const toEl = document.getElementById(toId);
+        const pathEl = document.getElementById(lineId);
+        if (fromEl && toEl && pathEl) {
+          const x1 = fromEl.offsetLeft + fromEl.offsetWidth;
+          const y1 = fromEl.offsetTop + 200;
+          const x2 = toEl.offsetLeft;
+          const y2 = toEl.offsetTop + 200;
+          const dx = Math.abs(x2 - x1) / 2 || 60;
+          pathEl.setAttribute('d', 'M ' + x1 + ' ' + y1 + ' C ' + (x1 + dx) + ' ' + y1 + ', ' + (x2 - dx) + ' ' + y2 + ', ' + x2 + ' ' + y2);
+        }
+      });
+    }
+
+    function highlightArtboard(id) {
+      document.querySelectorAll('.artboard, .spec-artboard').forEach(c => c.classList.remove('selected'));
+      const target = document.getElementById(id);
+      if (target) target.classList.add('selected');
+    }
+
+    window.addEventListener('load', () => { resetZoom(); updateConnectors(); });
+  </script>
+
+</body>
+</html>

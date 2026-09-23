@@ -1,0 +1,39 @@
+{
+  "mcpServers": {
+    "figma": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@figma/mcp"
+      ],
+      "env": {
+        "FIGMA_ACCESS_TOKEN": "<S\u1ebeP_L\u1ea4Y_PERSONAL_ACCESS_TOKEN_TR\u00caN_FIGMA_D\u00c1N_V\u00c0O_\u0110\u00c2Y>"
+      }
+    },
+    "stitch": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@custom/stitch-mcp"
+      ],
+      "env": {}
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@latest",
+        "--headless"
+      ],
+      "env": {}
+    },
+    "drawio": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@mermaid-js/drawio-mcp-server"
+      ],
+      "env": {}
+    }
+  }
+}

@@ -1,0 +1,118 @@
+# 🛸 ANTIGRAVITY SUPREME CODING DIRECTIVE: V30.0 (THE ENTERPRISE MASTER MATRIX)
+
+> **[ABSOLUTE DIRECTIVE: THE ZERO-DOWNTIME MANDATE]**  
+> Under no circumstances may code be written "blindly". When developing Frontend or Backend architecture, you are mathematically required to spin up the localized dev server (`npm run dev --port 3000`). Upon completing a logic block, execute OS Terminal calls (`curl`, `playwright`, or `vitest`) to validate the live DOM. A blank screen or 500 Error triggers an immediate Terminal repair loop. You must pass local testing before proceeding to subsequent tasks. The Simulated Runtime Environment is the boundary of Reality.
+
+> **[THE ANTI-AMNESIA & KNOWLEDGE INJECTION PROTOCOL]**  
+> - **Identity Instantiation:** BEFORE executing any node, invoke `view_file` upon `.agents/skills/<agent_name>/SKILL.md` to internalize your Cognitive Identity.
+> - **State Inheritance:** YOU MUST explicitly read the approved planning handoff (`/docs/prd.md`, `/docs/tasks.md`, `/docs/knowledge.md`, `/docs/decisions.md`, `/docs/memory.md`, `/docs/planning/flows.md`, `/docs/planning/screens.md`, `/docs/planning/diagrams.md`), `agents.md`, and any relevant `.agents/specs/<feature-id>/` workspace BEFORE writing code. If `/docs/research/` exists, ingest its claims, evidence, contradictions, and manifest before deriving implementation logic. Operating without ingesting the Workspace Context Graph is categorized as an illegal memory drift.
+> - **Code Phase Knowledge Ledger:** BEFORE material code edits in `/develop`, initialize or update `/docs/development/` using `.agents/scripts/create_development_docs.py`. Each epic, module, feature, page, and task touched by the code phase must have a traceable Markdown note with `owner_skill`, `source_trace`, code/write scope, and verification evidence.
+> - **Continuous Documentation Sync:** AFTER every material code slice, create or update a `/docs/development/sync/*.md` note using `.agents/scripts/create_doc_sync_note.py`, then patch only affected planning/development docs. Do not replace historical documents wholesale. Use append-only additions for new facts and targeted edits for facts that truly changed.
+> - **Substantive Documentation Gate:** Documentation that still contains placeholders, `TBD`, `pending`, unchecked boxes, generic bullets, or template prose is invalid. `/develop` completion requires concrete code paths, PM-visible impact, rationale, tradeoffs, evidence, and risk. Read `.agents/DEVELOPMENT_DOCS_QUALITY_RUBRIC.md` before closing code-phase docs.
+> - **UML & Diagrams:** System Design Documents (SDD) MUST contain Mermaid Charts (e.g. `classDef Pastel`). You are strictly mandated to execute the physical CLI generator `npx @mermaid-js/mermaid-cli -i file.mmd -o img.png` to materialize diagrams alongside your PDFs.
+
+You are operating within the highest echelon of the **Marcus Fleet** Autonomous Engineering Ecosystem.
+
+### 🌟 [V29.1] THE AGENTIC DESIGN PATTERNS MATRIX
+You must synthesize architecture adhering to the Canonical 4 Pillars of Agentic Software:
+1. **Human-In-The-Loop (HITL)**: All destructive actions (DB drops, Major Merges, Deployment configs) must architect a "Pending State" explicitly requesting Operator Approval.
+2. **Explainable AI (Reflection UI)**: UX components are strictly forbidden from utilizing perpetual "Loading Spinners." Expose the Machine's cognitive state via Ghost Text, Shimmer Skeletons, or Log Streamers. Implement autonomous Try/Catch Self-Healing loops prior to application crashes.
+3. **Prompt Chaining**: Deconstruct monolithic UX/API flows into sequential Stepper Pipelines (Extract $\rightarrow$ Transform $\rightarrow$ Load) driven by decoupled microservices.
+4. **Multi-Agent Orchestration**: Abstract long-term context memory into localized `/docs` or Database Nodes. Enforce hyper-modular Service-Oriented Architecture (SOA) to allow isolated Agent scaling.
+
+### 🎨 FRONTEND ENGINEERING (THE AESTHETIC IMPERATIVE)
+- **Glassmorphism Physics:** Utilize Neutral/Zinc-950 bases overlaid with backdrop-blur. Construct fluid Server-Side Event (SSE) Agentic Interfaces mapping pure Markdown streams.
+- **Typography Geometry:** Strictly bind font-rendering to 14px/16px root scales. Tracking and Leading must align geometrically to Linear/Vercel tolerances.
+- **Mathematical Spacing (4px Axis):** Margins, Padding, and Gaps MUST be multiples of 4 (e.g., 4, 8, 12, 16, 24). Arbitrary spacing numbers are classified as AI "Slop".
+- **Micro-Interactions:** Inject Framer Motion physics for state transitions (`stiffness:400, damping:30, scale:0.98`). Implement Optimistic Updates with instantaneous Rollback capabilities.
+
+### ⚙️ BACKEND & DATA STRUCTURE (THE ARCHITECT MANDATE)
+- **The Dictatorship of Typing:** The use of `any` in TypeScript is an excommunicable offense. Schemas must be bound to `Zod` or `Valibot`. API Responses must mathematically adhere to the RFC 7807 Error schema.
+- **Structural Integrity:** Enforce Feature-Sliced Design (FSD). Mitigate N+1 Query disasters using Batch Loaders. Wrap execution layers in Idempotency keys to eradicate SPAM transactions.
+
+### 🔍 DYNAMIC ECOSYSTEM SCALING (`find-skills`)
+- **Vercel Open Ecosystem Integration:** The Antigravity engine is no longer constrained by pre-coded boundaries. If a capability is lacking, execute `npx skills find [keywords]`.
+- Vet the output for Install Thresholds ($\ge 1000$) and Official Authors (`vercel-labs`, `anthropics`). Present the resulting `npx skills add -g -y` command to the Human Operator.
+
+### 📖 [V29.0] GITHUB SPEC-KIT GOVERNANCE MATRIX
+Implement "Spec-Driven Development":
+- Strictly classify the working environment as Greenfield (0-to-1 Origin) or Brownfield (Legacy Refactor). 
+- Every Architect's Implementation Plan MUST pass the Constitutional Check against `.clinerules`.
+- User Stories must represent 100% independent MVP nodes to prevent feature bloat. Abide by Cyclomatic Complexity thresholds.
+
+### 📖 [V30.0] DEEP RESEARCH PLANNING MATRIX
+`/planning` MUST preserve the legacy `/docs` output contract while adding research depth:
+- Keep the eight legacy files separate: `prd.md`, `tasks.md`, `knowledge.md`, `decisions.md`, `memory.md`, `planning/flows.md`, `planning/screens.md`, and `planning/diagrams.md`.
+- Add `/docs/research/sources.jsonl`, `evidence.jsonl`, `claims.jsonl`, `contradictions.md`, and `research_manifest.json` for major planning runs.
+- Major recommendations must trace to evidence or be explicitly marked as assumptions/accepted risks.
+- Contradictory sources must be recorded; do not flatten disagreement into confident prose.
+- Code generation remains blocked until the operator approves the planning package.
+
+### 📘 [V30.1] DEVELOP KNOWLEDGE LEDGER MATRIX
+`/develop` MUST preserve implementation knowledge as separate artifacts:
+- Create `/docs/development/development_manifest.json` and `/docs/development/index.md`.
+- Maintain bucketed notes under `epics/`, `modules/`, `features/`, `pages/`, and `tasks/`.
+- Each note must include YAML frontmatter with `id`, `type`, `status`, `owner_skill`, `source_trace`, and `verification`.
+- Backend-only work may set page `minimum_count` to `0` in the manifest, but must explain the absence of page notes in `index.md`.
+- Completion must run `python3 .agents/scripts/validate_development_docs.py --strict-counts` whenever `/docs/development/` exists.
+
+### 🔁 [V30.2] CONTINUOUS DOC SYNC MATRIX
+Code and documentation must advance together:
+- Every material code slice must have one sync note under `/docs/development/sync/`.
+- The sync note must reference changed source files and record which legacy docs were updated or intentionally left unchanged.
+- Changed code must be mapped to affected epic/module/feature/page/task notes.
+- Use `python3 .agents/scripts/validate_doc_sync.py --strict` before continuing to the next major code slice.
+- Whole-document replacement is forbidden unless the operator explicitly requests a rewrite or the file is a generated artifact with no meaningful history.
+
+### 📏 [V30.3] SUBSTANTIVE DOC QUALITY MATRIX
+Generated templates are not deliverables:
+- Every `/docs/development/**/*.md` artifact must replace all template residue with project-specific facts.
+- Development docs must contain PM-readable commentary, exact code paths, verification evidence, and residual risk.
+- Strict validation rejects placeholder text, `pending`, unchecked checklist items, shallow notes, missing rationale markers, and missing concrete code paths.
+- Sync notes must explain why docs changed or why each related doc was intentionally left unchanged.
+
+### 🗺️ [V30.4] FEATURE DOC DIAGRAM & GLOBAL DOC MATRIX
+Feature documentation must be visual and globally synchronized:
+- Every epic/module/feature/page/task note under `/docs/development/` must contain a useful Mermaid code fence.
+- Feature notes should prefer `sequenceDiagram` or `flowchart`; page notes should prefer `stateDiagram-v2`; module notes should show dependency/contract flow.
+- Every behavior-changing code slice must update at least one legacy global planning doc under `/docs`.
+- The sync note must include at least one `updated because` decision for a global doc.
+- Mermaid diagrams must explain behavior, state, data flow, dependency, or handoff. Decorative diagrams are invalid.
+
+### 🧬 [V31.0] EPIC-FIRST DEVELOPMENT LEDGER MATRIX
+`/develop` uses an epic-first documentation topology for all new code-phase work:
+- New development ledgers must use `/docs/development/E-###-description/` as the source of truth.
+- Canonical filenames are `E-001-description/epic.md`, `features/F-001-001-description.md`, `modules/M-001-001-description.md`, `pages/P-001-001-description.md`, and `tasks/T-001-001-001-description.md`.
+- Child frontmatter must include `parent_epic` matching the containing `E-###-*` directory; frontmatter `id` must equal the filename stem, or the epic directory name for `epic.md`.
+- Do not create flat bucket notes, `*-000` IDs, `epic-epic-*`, `feature-epic-*`, duplicate spelling variants like `E05` vs `E-05`, or orphan files outside the manifest.
+- Existing legacy-flat ledgers remain readable only when their manifest has not opted into `topology: epic_first`; migration must archive duplicates instead of silently deleting history.
+- Manifest and index must be reconciled whenever an epic child is added, renamed, archived, or moved.
+
+### 📚 [V31.1] PRODUCT-GRADE DOCS BEFORE CODE MATRIX
+Documentation leads implementation:
+- Before material code edits, update or confirm the owning epic/feature/module/page/task docs, append a Work Log entry, and review the Relationship Map.
+- Every epic/module/feature/page/task note must include `## Jira Story`, `## Priority`, `## Relationship Map`, `## Work Log`, and concrete non-template content.
+- Every epic must include `## Issues`; issues must be QA-detected or QA-reviewed with source, priority, status, owner, evidence, and resolution.
+- Relationship maps must use explicit labels: `DEPENDS_ON`, `BLOCKS`, `ENABLES`, `IMPLEMENTS`, `USES`, `EXTENDS`, `CONFLICTS_WITH`, `SUPERSEDES`, `DUPLICATES`, `RELATES_TO`.
+- Sync notes must include `## Docs Before Code` evidence: docs read, docs updated, relationship map reviewed, and related features checked.
+- Jira-style Story and Priority are mandatory product governance fields, not optional headings.
+
+### 🧹 [V31.2] BROWNFIELD DOC RECONCILIATION MATRIX
+Use `/doc_reconcile` for in-progress projects with stale or noncompliant docs:
+- Run `python3 .agents/scripts/audit_development_docs.py --root .` before restructuring docs.
+- Review the full source inventory and map code clusters to epics/features/modules/pages/tasks.
+- Migrate/enrich docs to V31.1 epic-first structure without silently deleting history.
+- Every epic directory must contain `issues.md` with QA-detected or QA-reviewed issues.
+- Update global planning docs from code reality and run both development-docs and doc-sync validators before resuming `/develop`.
+- Treat missing or misleading docs as a hard blocker, not a warning. If a brownfield project lacks any of `docs/prd.md`, `docs/tasks.md`, `docs/knowledge.md`, `docs/decisions.md`, `docs/memory.md`, `docs/planning/flows.md`, `docs/planning/screens.md`, `docs/planning/diagrams.md`, or a substantive `docs/development/` ledger, the agent MUST route to `/doc_reconcile` before any material code edits.
+- A default scaffold or boilerplate `README.md` is not accepted as a substitute for the planning package. Future workflows and skills must treat "docs missing", "docs stale", "docs template-only", and "code reality undocumented" as the same brownfield state.
+- Skills participating in implementation, QA, architecture, frontend, backend, or refactor work MUST refuse to proceed with behavior-changing edits until the brownfield reconcile gate has been satisfied or the operator explicitly accepts the risk.
+
+### 🌐 [V30.0] THE TRUSTGRAPH GRAPH-RAG COGNITIVE CORE
+1. **The Context Injection Mandate (Pre-Flight):** Absolute prohibition on executing major modifications (Refactoring, Structuring) without pulling Context. You MUST mathematically execute `python3 .agents/adapters/trustgraph_query.py --task "<objective>"` to inherit User Persona, Anti-Patterns, and historical Graph topologies.
+2. **The Memory Commit Mandate (Post-Flight):** Upon successfully neutralizing a bug or finalizing an AST shift, you MUST execute `python3 .agents/adapters/trustgraph_write.py --run_id "<ID>" --status "success/failed" --target "<Module>" --skills "<Used_Skills>" --score <0.0_to_1.0> --reasoning "<Explain your logic>"` to securely archive the Session Node into the Neo4j Long-Term Graph Database. A score >= 0.8 plots an OPTIMIZED green vector, while < 0.5 plots a CAUSED_ERROR red vector.
+3. **Fallback Brain (The Adapter Shield):** The TrustGraph Adapters are self-healing. If the Docker Database cluster is offline, the adapters will emit simulated/mock logs. Do NOT crash or halt execution. You MUST ingest this output and gracefully default to standard `.agents/agents.md` Appending (`>>`) fallback.
+
+### 🛑 [V30.0] THE CIRCUIT BREAKER & FALLBACK HEURISTICS
+1. **The Circuit Breaker Rule (Limit Exceeded):** The AI is algorithmically blocked from entering Infinite Try/Catch Terminal recursion. When leveraging an OS Shell to resolve a React/Build/Test exception, if the EXACT SAME class of failure persists after **3 CONSECUTIVE ATTEMPTS**, you MUST CEASE OPERATION IMMEDIATELY. Throw a Terminal Red-Flag (🚩) and demand Human-In-The-Loop arbitration. Resource burnout via blind-guessing is eradicated.
+2. **Fallback Dynamics:** A Master Agent NEVER freezes. If `drawio` MCP crashes, gracefully fallback to raw Markdown Mermaid injection. If `npx understand-anything` AST parsing fails, fallback to local CLI `grep`/`find` and manual AST traversal. Always calculate the Beta Route.

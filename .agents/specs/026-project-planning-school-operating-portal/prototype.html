@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Prototype — Tài Chính: Báo Cáo Học Phí (Collection Reports)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+Chettan+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --eco-blue: #2563eb;
+      --eco-yellow: #f0b90b;
+      --bg-dark: #0f172a;
+      --card-bg: #1e2026;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --border-dark: #383e4a;
+      --status-emerald: #10b981;
+      --status-amber: #f59e0b;
+      --status-cyan: #38bdf8;
+      --status-rose: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Quicksand', 'Inter', sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 24px;
+      min-height: 100vh;
+    }
+    .proto-container { max-width: 1280px; margin: 0 auto; }
+    .proto-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #383e4a;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .proto-title {
+      font-family: 'Baloo Chettan 2', cursive;
+      font-size: 26px;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+    .proto-subtitle {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+
+    /* 4-TAB URL SWITCHER */
+    .tab-nav {
+      display: flex;
+      gap: 8px;
+      background: #1e2026;
+      padding: 6px;
+      border-radius: 12px;
+      border: 1px solid #383e4a;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .tab-btn:hover { color: #f8fafc; background: rgba(255, 255, 255, 0.05); }
+    .tab-btn.active { background: #2563eb; color: #ffffff; }
+    .tab-badge {
+      background: rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      padding: 2px 7px;
+      border-radius: 9999px;
+      font-size: 11px;
+    }
+
+    /* KPI STRIP */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .kpi-card {
+      background: #1e2026;
+      border: 1px solid #383e4a;
+      border-radius: 12px;
+      padding: 16px;
+      position: relative;
+    }
+    .kpi-label { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 6px; }
+    .kpi-value { font-family: 'Baloo Chettan 2', cursive; font-size: 24px; font-weight: 700; color: #f8fafc; }
+    .kpi-sub { font-size: 12px; color: #94a3b8; margin-top: 4px; display: flex; align-items: center; gap: 6px; }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: #10b981;
+      border-radius: 3px;
+    }
+
+    /* TOOLBAR */
+    .toolbar {
+      background: #1e2026;
+      border: 1px solid #383e4a;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .input-field, .select-field {
+      background: #0f172a;
+      border: 1px solid #383e4a;
+      color: #f8fafc;
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: inherit;
+    }
+    .input-field:focus, .select-field:focus { outline: none; border-color: #2563eb; }
+    .btn {
+      padding: 7px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .btn-export { background: #10b981; color: #ffffff; border: 1px solid #10b981; }
+    .btn-export:disabled { background: #334155; color: #94a3b8; border-color: #383e4a; cursor: not-allowed; }
+    .btn-action { background: #2563eb; color: #ffffff; border: 1px solid #2563eb; }
+
+    /* TABLE */
+    .table-container {
+      background: #1e2026;
+      border: 1px solid #383e4a;
+      border-radius: 12px;
+      overflow-x: auto;
+      margin-bottom: 24px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+    th {
+      background: #0f172a;
+      color: #94a3b8;
+      font-weight: 700;
+      padding: 12px 14px;
+      border-bottom: 1px solid #383e4a;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #383e4a;
+      color: #f8fafc;
+    }
+    tr:hover td { background: rgba(255, 255, 255, 0.02); }
+    .tr-archived {
+      background: rgba(245, 158, 11, 0.05);
+      border-left: 3px solid #f59e0b;
+    }
+    .tr-footer {
+      background: #0f172a;
+      font-weight: 700;
+    }
+    .tr-footer td {
+      border-top: 2px solid #383e4a;
+      color: #f8fafc;
+    }
+
+    /* BADGES */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .badge-finviet { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; }
+    .badge-vietqr { background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid #38bdf8; }
+    .badge-cash { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid #10b981; }
+    .badge-pos { background: rgba(148, 163, 184, 0.2); color: #94a3b8; border: 1px solid #383e4a; }
+    .badge-overdue { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; }
+    .badge-sent { background: rgba(37, 99, 235, 0.2); color: #60a5fa; border: 1px solid #2563eb; }
+    .badge-draft { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid #383e4a; }
+
+    .stacked-amount {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      font-family: monospace;
+    }
+    .stacked-total { font-weight: 700; color: #2563eb; }
+    .stacked-remain { font-size: 11px; color: #ef4444; font-weight: 600; }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.85);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: #1e2026;
+      border: 1px solid #383e4a;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 760px;
+      padding: 24px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #383e4a;
+    }
+    .modal-title { font-size: 18px; font-weight: 700; color: #f8fafc; }
+    .close-btn { background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer; }
+    .close-btn:hover { color: #f8fafc; }
+  </style>
+</head>
+<body>
+  <div class="proto-container">
+    <header class="proto-header">
+      <div>
+        <h1 class="proto-title">Báo Cáo Học Phí & Phân Tích Thu (Fee Collection Analytics)</h1>
+        <p class="proto-subtitle">
+          Module 3: Tài Chính • Báo Cáo Thu Học Phí Toàn Trường • Phân Định 4 Nhóm Báo Cáo (BR01 - BR09)
+        </p>
+      </div>
+      <div>
+        <button id="exportExcelBtn" class="btn btn-export" onclick="alert('Đang xuất báo cáo Excel thành công!')">
+          📊 Xuất Báo Cáo Excel (<span id="exportCountBadge">5</span>)
+        </button>
+      </div>
+    </header>
+
+    <!-- 4 TABS NAVIGATION (BR01) -->
+    <nav class="tab-nav">
+      <button class="tab-btn active" onclick="switchTab('overview')">
+        🏢 Tổng quan theo lớp <span class="tab-badge">4 Lớp</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('paid')">
+        ✅ Hóa đơn đã thanh toán <span class="tab-badge" id="paidBadge">3</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('partial')">
+        ⏳ Hóa đơn thanh toán một phần <span class="tab-badge" id="partialBadge">3</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('unpaid')">
+        ⚠️ Hóa đơn chưa thanh toán <span class="tab-badge" id="unpaidBadge">5</span>
+      </button>
+    </nav>
+
+    <!-- SUMMARY KPI METRIC STRIP -->
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Tổng số tiền cần thu</div>
+        <div class="kpi-value" id="kpiTotal">120.450.000 Đ</div>
+        <div class="kpi-sub">Phiếu thu tháng 09/2026</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Đã thu hoàn tất</div>
+        <div class="kpi-value" style="color: #10b981;" id="kpiCollected">88.550.000 Đ</div>
+        <div class="kpi-sub" style="color: #10b981;">Đã ghi nhận kế toán</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Còn lại chưa thu</div>
+        <div class="kpi-value" style="color: #ef4444;" id="kpiRemaining">31.900.000 Đ</div>
+        <div class="kpi-sub" style="color: #ef4444;">Bao gồm 4 đơn trễ hạn</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Tỉ lệ hoàn thành thu</div>
+        <div class="kpi-value" style="color: #f0b90b;" id="kpiRate">73.5%</div>
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" style="width: 73.5%;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FILTER TOOLBAR -->
+    <div class="toolbar">
+      <div class="filter-group">
+        <div>
+          <label style="font-size: 11px; color: #94a3b8; display: block; margin-bottom: 4px;">Từ ngày</label>
+          <input type="date" id="filterStartDate" class="input-field" value="2026-09-01" onchange="filterData()">
+        </div>
+        <div>
+          <label style="font-size: 11px; color: #94a3b8; display: block; margin-bottom: 4px;">Đến ngày</label>
+          <input type="date" id="filterEndDate" class="input-field" value="2026-09-30" onchange="filterData()">
+        </div>
+        <div>
+          <label style="font-size: 11px; color: #94a3b8; display: block; margin-bottom: 4px;">Lớp học</label>
+          <select id="filterClass" class="select-field" onchange="filterData()">
+            <option value="all">Tất cả các lớp</option>
+            <option value="6A1">Lớp 6A1</option>
+            <option value="6A2">Lớp 6A2</option>
+            <option value="12A1">Lớp 12A1</option>
+            <option value="mam">Lớp Mầm Hoa Mai</option>
+          </select>
+        </div>
+
+        <!-- DYNAMIC CONTROL: PAYMENT METHOD FOR PAID TAB -->
+        <div id="methodFilterBox" style="display: none;">
+          <label style="font-size: 11px; color: #94a3b8; display: block; margin-bottom: 4px;">Phương thức</label>
+          <select id="filterMethod" class="select-field" onchange="filterData()">
+            <option value="all">Tất cả phương thức</option>
+            <option value="Ví FinViet / QR">Ví FinViet / QR</option>
+            <option value="VietQR">VietQR</option>
+            <option value="Tiền mặt">Tiền mặt</option>
+            <option value="Thẻ POS">Thẻ POS</option>
+          </select>
+        </div>
+
+        <!-- DYNAMIC CONTROL: STATUS & OVERDUE FOR UNPAID TAB (BR05) -->
+        <div id="unpaidStatusBox" style="display: none;">
+          <label style="font-size: 11px; color: #94a3b8; display: block; margin-bottom: 4px;">Trạng thái</label>
+          <select id="filterUnpaidStatus" class="select-field" onchange="filterData()">
+            <option value="all">Tất cả (Đã tạo / Đã gửi)</option>
+            <option value="da_gui">Đã gửi</option>
+            <option value="da_tao">Đã tạo</option>
+          </select>
+        </div>
+        <div id="overdueCheckboxBox" style="display: none; align-items: center; margin-top: 18px;">
+          <label style="font-size: 13px; color: #ef4444; font-weight: 700; display: flex; align-items: center; gap: 6px; cursor: pointer;">
+            <input type="checkbox" id="filterOverdue" onchange="filterData()"> Hóa đơn quá hạn
+          </label>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <input type="text" id="filterSearch" class="input-field" placeholder="Tìm theo tên HS, mã HĐ..." oninput="filterData()" style="width: 220px;">
+        <button class="btn btn-action" onclick="resetFilters()">↺ Đặt lại</button>
+      </div>
+    </div>
+
+    <!-- VIEW CONTAINER: TAB 1: OVERVIEW MATRIX (BR02) -->
+    <div id="viewOverview" class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th rowspan="2" style="text-align: center; width: 50px;">STT</th>
+            <th rowspan="2" style="min-width: 140px;">Lớp Học</th>
+            <th colspan="2" style="text-align: center; background: rgba(37, 99, 235, 0.1);">Phiếu Thu (Tổng)</th>
+            <th colspan="2" style="text-align: center; background: rgba(16, 185, 129, 0.1);">Đã Thu</th>
+            <th colspan="2" style="text-align: center; background: rgba(245, 158, 11, 0.1);">Đã Thu 1 Phần</th>
+            <th colspan="2" style="text-align: center; background: rgba(239, 68, 68, 0.1);">Chưa Thu</th>
+            <th rowspan="2" style="text-align: right; min-width: 120px;">Còn Lại</th>
+            <th rowspan="2" style="text-align: center; min-width: 100px;">Tỉ Lệ Thu</th>
+          </tr>
+          <tr>
+            <th style="text-align: center; font-size: 10px;">SL</th>
+            <th style="text-align: right; font-size: 10px;">Thành Tiền</th>
+            <th style="text-align: center; font-size: 10px;">SL</th>
+            <th style="text-align: right; font-size: 10px;">Thành Tiền</th>
+            <th style="text-align: center; font-size: 10px;">SL</th>
+            <th style="text-align: right; font-size: 10px;">Thành Tiền</th>
+            <th style="text-align: center; font-size: 10px;">SL</th>
+            <th style="text-align: right; font-size: 10px;">Thành Tiền</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="text-align: center; color: #94a3b8;">1</td>
+            <td><strong style="color: #2563eb;">6A1</strong></td>
+            <td style="text-align: center; font-family: monospace;">6</td>
+            <td style="text-align: right; font-family: monospace;">13.435.000 Đ</td>
+            <td style="text-align: center; font-family: monospace; color: #10b981;">2</td>
+            <td style="text-align: right; font-family: monospace; color: #10b981;">3.980.000 Đ</td>
+            <td style="text-align: center; font-family: monospace; color: #f59e0b;">1</td>
+            <td style="text-align: right; font-family: monospace; color: #f59e0b;">1.000.000 Đ</td>
+            <td style="text-align: center; font-family: monospace; color: #ef4444;">3</td>
+            <td style="text-align: right; font-family: monospace; color: #ef4444;">6.255.000 Đ</td>
+            <td style="text-align: right; font-family: monospace; font-weight: 700; color: #ef4444;">8.455.000 Đ</td>
+            <td style="text-align: center;"><strong style="color: #f59e0b;">37.1%</strong></td>
+          </tr>
+          <tr>
+            <td style="text-align: center; color: #94a3b8;">2</td>
+            <td><strong style="color: #2563eb;">6A2</strong></td>
+            <td style="text-align: center; font-family: monospace;">2</td>
+            <td style="text-align: right; font-family: monospace;">4.800.000 Đ</td>
+            <td style="text-align: center; font-family: monospace; color: #10b981;">1</td>
+            <td style="text-align: right; font-family: monospace; color: #10b981;">2.400.000 Đ</td>
+            <td style="text-align: center; font-family: monospace; color: #f59e0b;">1</td>
+            <td style="text-align: right; font-family: monospace; color: #f59e0b;">1.200.000 Đ</td>
+            <td style="text-align: center; font-family: monospace; color: #ef4444;">0</td>
+            <td style="text-align: right; font-family: monospace; color: #ef4444;">0 Đ</td>
+            <td style="text-align: right; font-family: monospace; font-weight: 700; color: #ef4444;">1.200.000 Đ</td>
+            <td style="text-align: center;"><strong style="color: #10b981;">75.0%</strong></td>
+          </tr>
+          <tr>
+            <td style="text-align: center; color: #94a3b8;">3</td>
+            <td><strong style="color: #2563eb;">12A1</strong></td>
+            <td style="text-align: center; font-family: monospace;">2</td>
+            <td style="text-align: right; font-family: monospace;">3.600.000 Đ</td>
+            <td style="text-align: center; font-family: monospace; color: #10b981;">0</td>
+            <td style="text-align: right; font-family: monospace; color: #10b981;">0 Đ</td>
+            <td style="text-align: center; font-family: monospace; color: #f59e0b;">1</td>
+            <td style="text-align: right; font-family: monospace; color: #f59e0b;">900.000 Đ</td>
+            <td style="text-align: center; font-family: monospace; color: #ef4444;">1</td>
+            <td style="text-align: right; font-family: monospace; color: #ef4444;">1.800.000 Đ</td>
+            <td style="text-align: right; font-family: monospace; font-weight: 700; color: #ef4444;">2.700.000 Đ</td>
+            <td style="text-align: center;"><strong style="color: #ef4444;">25.0%</strong></td>
+          </tr>
+          <tr>
+            <td style="text-align: center; color: #94a3b8;">4</td>
+            <td><strong style="color: #2563eb;">Mầm Hoa Mai</strong></td>
+            <td style="text-align: center; font-family: monospace;">1</td>
+            <td style="text-align: right; font-family: monospace;">1.850.000 Đ</td>
+            <td style="text-align: center; font-family: monospace; color: #10b981;">0</td>
+            <td style="text-align: right; font-family: monospace; color: #10b981;">0 Đ</td>
+            <td style="text-align: center; font-family: monospace; color: #f59e0b;">0</td>
+            <td style="text-align: right; font-family: monospace; color: #f59e0b;">0 Đ</td>
+            <td style="text-align: center; font-family: monospace; color: #ef4444;">1</td>
+            <td style="text-align: right; font-family: monospace; color: #ef4444;">1.850.000 Đ</td>
+            <td style="text-align: right; font-family: monospace; font-weight: 700; color: #ef4444;">1.850.000 Đ</td>
+            <td style="text-align: center;"><strong style="color: #ef4444;">0.0%</strong></td>
+          </tr>
+
+          <!-- DEDICATED ARCHIVED STUDENT ROW (BR02) -->
+          <tr class="tr-archived">
+            <td style="text-align: center; color: #f59e0b;">⚠️</td>
+            <td><strong style="color: #f59e0b;">Học sinh lưu trữ / đã xoá</strong><div style="font-size: 11px; color: #94a3b8;">Dữ liệu hóa đơn lịch sử HS chuyển trường</div></td>
+            <td style="text-align: center; font-family: monospace;">1</td>
+            <td style="text-align: right; font-family: monospace;">1.500.000 Đ</td>
+            <td style="text-align: center; font-family: monospace; color: #10b981;">1</td>
+            <td style="text-align: right; font-family: monospace; color: #10b981;">1.500.000 Đ</td>
+            <td style="text-align: center; font-family: monospace; color: #f59e0b;">0</td>
+            <td style="text-align: right; font-family: monospace; color: #f59e0b;">0 Đ</td>
+            <td style="text-align: center; font-family: monospace; color: #ef4444;">0</td>
+            <td style="text-align: right; font-family: monospace; color: #ef4444;">0 Đ</td>
+            <td style="text-align: right; font-family: monospace; font-weight: 700; color: #10b981;">0 Đ</td>
+            <td style="text-align: center;"><strong style="color: #10b981;">100.0%</strong></td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr class="tr-footer">
+            <td colspan="2" style="text-align: center; text-transform: uppercase;">Tổng Cộng (Toàn Trường)</td>
+            <td style="text-align: center; font-family: monospace;">12</td>
+            <td style="text-align: right; font-family: monospace;">25.185.000 Đ</td>
+            <td style="text-align: center; font-family: monospace; color: #10b981;">4</td>
+            <td style="text-align: right; font-family: monospace; color: #10b981;">8.880.000 Đ</td>
+            <td style="text-align: center; font-family: monospace; color: #f59e0b;">3</td>
+            <td style="text-align: right; font-family: monospace; color: #f59e0b;">3.100.000 Đ</td>
+            <td style="text-align: center; font-family: monospace; color: #ef4444;">5</td>
+            <td style="text-align: right; font-family: monospace; color: #ef4444;">9.905.000 Đ</td>
+            <td style="text-align: right; font-family: monospace; font-weight: 700; color: #ef4444;">14.205.000 Đ</td>
+            <td style="text-align: center;"><strong style="color: #f59e0b;">47.6%</strong></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <!-- VIEW CONTAINER: TAB 2: PAID INVOICES (BR03) -->
+    <div id="viewPaid" class="table-container" style="display: none;">
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 50px; text-align: center;">STT</th>
+            <th>Mã Hóa Đơn</th>
+            <th>Học Sinh</th>
+            <th>Lớp</th>
+            <th>Ngày Xác Nhận (paidAt)</th>
+            <th>Người Xác Nhận</th>
+            <th>Phương Thức</th>
+            <th style="text-align: right;">Số Tiền Đã Thu</th>
+          </tr>
+        </thead>
+        <tbody id="paidTableBody">
+          <tr>
+            <td style="text-align: center; color: #94a3b8;">1</td>
+            <td><strong style="color: #2563eb; font-family: monospace;">HD2609-001</strong></td>
+            <td><strong>Nguyễn Gia Huy</strong><div style="font-size: 11px; color: #94a3b8;">HS-601</div></td>
+            <td>6A1</td>
+            <td style="font-family: monospace; color: #10b981;">10/09/2026 14:20</td>
+            <td>KT. Nguyễn Thị Thu</td>
+            <td><span class="badge badge-finviet">Ví FinViet / QR</span></td>
+            <td style="text-align: right; font-family: monospace; font-weight: 700; color: #10b981;">2.150.000 Đ</td>
+          </tr>
+          <tr>
+            <td style="text-align: center; color: #94a3b8;">2</td>
+            <td><strong style="color: #2563eb; font-family: monospace;">HD2609-002</strong></td>
+            <td><strong>Trần Bảo An</strong><div style="font-size: 11px; color: #94a3b8;">HS-602</div></td>
+            <td>6A1</td>
+            <td style="font-family: monospace; color: #10b981;">11/09/2026 09:15</td>
+            <td>KT. Nguyễn Thị Thu</td>
+            <td><span class="badge badge-vietqr">VietQR</span></td>
+            <td style="text-align: right; font-family: monospace; font-weight: 700; color: #10b981;">1.830.000 Đ</td>
+          </tr>
+          <tr>
+            <td style="text-align: center; color: #94a3b8;">3</td>
+            <td><strong style="color: #2563eb; font-family: monospace;">HD2609-201</strong></td>
+            <td><strong>Trần Tuấn Kiệt</strong><div style="font-size: 11px; color: #94a3b8;">HS-621</div></td>
+            <td>6A2</td>
+            <td style="font-family: monospace; color: #10b981;">12/09/2026 16:40</td>
+            <td>KT. Trần Mai Anh</td>
+            <td><span class="badge badge-cash">Tiền mặt</span></td>
+            <td style="text-align: right; font-family: monospace; font-weight: 700; color: #10b981;">2.400.000 Đ</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- VIEW CONTAINER: TAB 3: PARTIAL INVOICES (BR04, BR06) -->
+    <div id="viewPartial" class="table-container" style="display: none;">
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 50px; text-align: center;">STT</th>
+            <th>Mã Hóa Đơn</th>
+            <th>Học Sinh</th>
+            <th>Lớp</th>
+            <th style="text-align: right;">Số Tiền Hóa Đơn (BR04)</th>
+            <th style="text-align: right;">Đã Thu</th>
+            <th>Ngày Thu Gần Nhất</th>
+            <th style="text-align: center;">Lịch Sử Thu (BR06)</th>
+          </tr>
+        </thead>
+        <tbody id="partialTableBody">
+          <tr>
+            <td style="text-align: center; color: #94a3b8;">1</td>
+            <td><strong style="color: #2563eb; font-family: monospace;">HD2609-007</strong></td>
+            <td><strong>Đỗ Mỹ Linh</strong><div style="font-size: 11px; color: #94a3b8;">HS-607</div></td>
+            <td>6A1</td>
+            <td style="text-align: right;">
+              <div class="stacked-amount">
+                <span class="stacked-total">2.200.000 Đ</span>
+                <span class="stacked-remain">Còn lại: 1.200.000 Đ</span>
+              </div>
+            </td>
+            <td style="text-align: right; font-family: monospace; font-weight: 700; color: #10b981;">1.000.000 Đ</td>
+            <td style="font-family: monospace;">05/09/2026</td>
+            <td style="text-align: center;">
+              <button class="btn btn-action" style="padding: 4px 10px; font-size: 11px;" onclick="openPaymentHistory('HD2609-007', 'Đỗ Mỹ Linh', '2.200.000 Đ', '1.000.000 Đ', '1.200.000 Đ')">
+                🔍 Chi tiết (1)
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center; color: #94a3b8;">2</td>
+            <td><strong style="color: #2563eb; font-family: monospace;">HD2609-202</strong></td>
+            <td><strong>Nguyễn Thu Trang</strong><div style="font-size: 11px; color: #94a3b8;">HS-622</div></td>
+            <td>6A2</td>
+            <td style="text-align: right;">
+              <div class="stacked-amount">
+                <span class="stacked-total">2.400.000 Đ</span>
+                <span class="stacked-remain">Còn lại: 1.200.000 Đ</span>
+              </div>
+            </td>
+            <td style="text-align: right; font-family: monospace; font-weight: 700; color: #10b981;">1.200.000 Đ</td>
+            <td style="font-family: monospace;">08/09/2026</td>
+            <td style="text-align: center;">
+              <button class="btn btn-action" style="padding: 4px 10px; font-size: 11px;" onclick="openPaymentHistory('HD2609-202', 'Nguyễn Thu Trang', '2.400.000 Đ', '1.200.000 Đ', '1.200.000 Đ')">
+                🔍 Chi tiết (1)
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center; color: #94a3b8;">3</td>
+            <td><strong style="color: #2563eb; font-family: monospace;">HD2609-1202</strong></td>
+            <td><strong>Lâm Khánh Chi</strong><div style="font-size: 11px; color: #94a3b8;">HS-1202</div></td>
+            <td>12A1</td>
+            <td style="text-align: right;">
+              <div class="stacked-amount">
+                <span class="stacked-total">1.800.000 Đ</span>
+                <span class="stacked-remain">Còn lại: 900.000 Đ</span>
+              </div>
+            </td>
+            <td style="text-align: right; font-family: monospace; font-weight: 700; color: #10b981;">900.000 Đ</td>
+            <td style="font-family: monospace;">10/09/2026</td>
+            <td style="text-align: center;">
+              <button class="btn btn-action" style="padding: 4px 10px; font-size: 11px;" onclick="openPaymentHistory('HD2609-1202', 'Lâm Khánh Chi', '1.800.000 Đ', '900.000 Đ', '900.000 Đ')">
+                🔍 Chi tiết (1)
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- VIEW CONTAINER: TAB 4: UNPAID INVOICES (BR05) -->
+    <div id="viewUnpaid" class="table-container" style="display: none;">
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 50px; text-align: center;">STT</th>
+            <th>Mã Hóa Đơn</th>
+            <th>Học Sinh</th>
+            <th>Lớp</th>
+            <th>Trạng Thái (BR05)</th>
+            <th>Hạn Thanh Toán (BR05)</th>
+            <th style="text-align: right;">Số Tiền Cần Thu</th>
+          </tr>
+        </thead>
+        <tbody id="unpaidTableBody">
+          <tr>
+            <td style="text-align: center; color: #94a3b8;">1</td>
+            <td><strong style="color: #2563eb; font-family: monospace;">HD2609-003</strong></td>
+            <td><strong>Lê Hoàng Cường</strong><div style="font-size: 11px; color: #94a3b8;">HS-603</div></td>
+            <td>6A1</td>
+            <td><span class="badge badge-sent">Đã gửi</span></td>
+            <td style="font-family: monospace;">25/09/2026</td>
+            <td style="text-align: right; font-family: monospace; font-weight: 700; color: #ef4444;">1.935.000 Đ</td>
+          </tr>
+          <tr>
+            <td style="text-align: center; color: #94a3b8;">2</td>
+            <td><strong style="color: #2563eb; font-family: monospace;">HD2609-004</strong></td>
+            <td><strong>Phạm Minh Đức</strong><div style="font-size: 11px; color: #94a3b8;">HS-604</div></td>
+            <td>6A1</td>
+            <td><span class="badge badge-draft">Đã tạo</span></td>
+            <td style="font-family: monospace; color: #ef4444; font-weight: 700;">
+              20/09/2026 <span class="badge badge-overdue">(Trễ)</span>
+            </td>
+            <td style="text-align: right; font-family: monospace; font-weight: 700; color: #ef4444;">2.350.000 Đ</td>
+          </tr>
+          <tr>
+            <td style="text-align: center; color: #94a3b8;">3</td>
+            <td><strong style="color: #2563eb; font-family: monospace;">HD2609-005</strong></td>
+            <td><strong>Vũ Hải Yến</strong><div style="font-size: 11px; color: #94a3b8;">HS-605</div></td>
+            <td>6A1</td>
+            <td><span class="badge badge-overdue">Quá hạn</span></td>
+            <td style="font-family: monospace; color: #ef4444; font-weight: 700;">
+              10/09/2026 <span class="badge badge-overdue">(Trễ)</span>
+            </td>
+            <td style="text-align: right; font-family: monospace; font-weight: 700; color: #ef4444;">1.970.000 Đ</td>
+          </tr>
+          <tr>
+            <td style="text-align: center; color: #94a3b8;">4</td>
+            <td><strong style="color: #2563eb; font-family: monospace;">HD2609-1201</strong></td>
+            <td><strong>Đặng Minh Khang</strong><div style="font-size: 11px; color: #94a3b8;">HS-1201</div></td>
+            <td>12A1</td>
+            <td><span class="badge badge-sent">Đã gửi</span></td>
+            <td style="font-family: monospace; color: #ef4444; font-weight: 700;">
+              20/09/2026 <span class="badge badge-overdue">(Trễ)</span>
+            </td>
+            <td style="text-align: right; font-family: monospace; font-weight: 700; color: #ef4444;">1.800.000 Đ</td>
+          </tr>
+          <tr>
+            <td style="text-align: center; color: #94a3b8;">5</td>
+            <td><strong style="color: #2563eb; font-family: monospace;">HD2609-006</strong></td>
+            <td><strong>Hoàng Quốc Bảo</strong><div style="font-size: 11px; color: #94a3b8;">HS-606</div></td>
+            <td>6A1</td>
+            <td><span class="badge badge-sent">Đã gửi</span></td>
+            <td style="font-family: monospace; color: #ef4444; font-weight: 700;">
+              08/09/2026 <span class="badge badge-overdue">(Trễ)</span>
+            </td>
+            <td style="text-align: right; font-family: monospace; font-weight: 700; color: #ef4444;">1.200.000 Đ</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PAYMENT HISTORY AUDIT MODAL (BR06) -->
+    <div id="paymentHistoryModal" class="modal-overlay">
+      <div class="modal-box">
+        <div class="modal-header">
+          <div>
+            <h3 class="modal-title">Lịch Sử Thanh Toán Đợt (Payment Audit)</h3>
+            <p id="modalSub" style="font-size: 12px; color: #94a3b8; margin-top: 4px;">
+              Hóa đơn: HD2609-007 • Học sinh: Đỗ Mỹ Linh
+            </p>
+          </div>
+          <button class="close-btn" onclick="closePaymentHistory()">✕</button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px;">
+          <div style="background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #383e4a;">
+            <div style="font-size: 11px; color: #94a3b8;">Tổng tiền hóa đơn</div>
+            <div id="modalTotal" style="font-family: monospace; font-size: 16px; font-weight: 700; color: #2563eb;">2.200.000 Đ</div>
+          </div>
+          <div style="background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #383e4a;">
+            <div style="font-size: 11px; color: #94a3b8;">Đã thu các đợt</div>
+            <div id="modalPaid" style="font-family: monospace; font-size: 16px; font-weight: 700; color: #10b981;">1.000.000 Đ</div>
+          </div>
+          <div style="background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #383e4a;">
+            <div style="font-size: 11px; color: #94a3b8;">Dư nợ còn lại</div>
+            <div id="modalRemain" style="font-family: monospace; font-size: 16px; font-weight: 700; color: #ef4444;">1.200.000 Đ</div>
+          </div>
+        </div>
+
+        <div class="table-container" style="margin-bottom: 0;">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 140px;">Ngày Thanh Toán</th>
+                <th style="text-align: right; width: 120px;">Số Tiền</th>
+                <th style="width: 140px;">Xác Nhận Bởi</th>
+                <th style="width: 130px;">Phương Thức</th>
+                <th>Ghi Chú Giao Dịch</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-family: monospace; color: #10b981;">05/09/2026 10:30</td>
+                <td style="text-align: right; font-family: monospace; font-weight: 700; color: #10b981;">1.000.000 Đ</td>
+                <td>KT. Nguyễn Thị Thu</td>
+                <td><span class="badge badge-vietqr">VietQR</span></td>
+                <td style="color: #94a3b8;">Đóng đợt 1 tiền học phí và ăn bán trú</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+          <button class="btn btn-action" onclick="closePaymentHistory()">Đóng Cửa Sổ</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentTab = 'overview';
+
+    function switchTab(tabId) {
+      currentTab = tabId;
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+
+      // Auto-reset date filter to current month (BR01)
+      document.getElementById('filterStartDate').value = '2026-09-01';
+      document.getElementById('filterEndDate').value = '2026-09-30';
+
+      // Toggle views
+      document.getElementById('viewOverview').style.display = tabId === 'overview' ? 'block' : 'none';
+      document.getElementById('viewPaid').style.display = tabId === 'paid' ? 'block' : 'none';
+      document.getElementById('viewPartial').style.display = tabId === 'partial' ? 'block' : 'none';
+      document.getElementById('viewUnpaid').style.display = tabId === 'unpaid' ? 'block' : 'none';
+
+      // Toggle dynamic toolbar controls
+      document.getElementById('methodFilterBox').style.display = tabId === 'paid' ? 'block' : 'none';
+      document.getElementById('unpaidStatusBox').style.display = tabId === 'unpaid' ? 'block' : 'none';
+      document.getElementById('overdueCheckboxBox').style.display = tabId === 'unpaid' ? 'flex' : 'none';
+
+      updateExportCount();
+    }
+
+    function filterData() {
+      // Dynamic filter simulation
+      updateExportCount();
+    }
+
+    function updateExportCount() {
+      let count = 5;
+      if (currentTab === 'overview') count = 4;
+      if (currentTab === 'paid') count = 3;
+      if (currentTab === 'partial') count = 3;
+      if (currentTab === 'unpaid') {
+        const isOverdueOnly = document.getElementById('filterOverdue').checked;
+        count = isOverdueOnly ? 4 : 5;
+      }
+      document.getElementById('exportCountBadge').innerText = count;
+      document.getElementById('exportExcelBtn').disabled = count === 0;
+    }
+
+    function resetFilters() {
+      document.getElementById('filterStartDate').value = '2026-09-01';
+      document.getElementById('filterEndDate').value = '2026-09-30';
+      document.getElementById('filterClass').value = 'all';
+      document.getElementById('filterSearch').value = '';
+      document.getElementById('filterMethod').value = 'all';
+      document.getElementById('filterUnpaidStatus').value = 'all';
+      document.getElementById('filterOverdue').checked = false;
+      updateExportCount();
+    }
+
+    function openPaymentHistory(code, student, total, paid, remain) {
+      document.getElementById('modalSub').innerText = 'Hóa đơn: ' + code + ' • Học sinh: ' + student;
+      document.getElementById('modalTotal').innerText = total;
+      document.getElementById('modalPaid').innerText = paid;
+      document.getElementById('modalRemain').innerText = remain;
+      document.getElementById('paymentHistoryModal').classList.add('open');
+    }
+
+    function closePaymentHistory() {
+      document.getElementById('paymentHistoryModal').classList.remove('open');
+    }
+  </script>
+</body>
+</html>

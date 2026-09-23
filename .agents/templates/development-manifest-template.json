@@ -1,0 +1,86 @@
+{
+  "version": "31.0",
+  "phase": "develop",
+  "topology": "epic_first",
+  "ledger_topology": "epic_first",
+  "feature_id": "",
+  "id_convention": {
+    "epic": "E-001-description",
+    "feature": "F-001-001-description",
+    "module": "M-001-001-description",
+    "page": "P-001-001-description",
+    "task": "T-001-001-001-description"
+  },
+  "source_of_truth": "docs/development/E-###-*/",
+  "epics": {},
+  "minimum_children": {
+    "features": 1,
+    "modules": 1,
+    "pages": 0,
+    "tasks": 1,
+    "issues": 1
+  },
+  "source_artifacts": [
+    "docs/prd.md",
+    "docs/tasks.md",
+    "docs/knowledge.md",
+    "docs/decisions.md",
+    "docs/memory.md",
+    "docs/planning/flows.md",
+    "docs/planning/screens.md",
+    "docs/planning/diagrams.md"
+  ],
+  "buckets": {
+    "epics": {
+      "path": "docs/development/epics",
+      "minimum_count": 1
+    },
+    "modules": {
+      "path": "docs/development/modules",
+      "minimum_count": 1
+    },
+    "features": {
+      "path": "docs/development/features",
+      "minimum_count": 1
+    },
+    "pages": {
+      "path": "docs/development/pages",
+      "minimum_count": 0
+    },
+    "tasks": {
+      "path": "docs/development/tasks",
+      "minimum_count": 1
+    }
+  },
+  "quality_gates": {
+    "require_frontmatter": true,
+    "require_owner_skill": true,
+    "require_verification": true,
+    "require_source_trace": true,
+    "require_code_scope": true,
+    "require_substantive_content": true,
+    "forbid_placeholders": true,
+    "require_completed_checklists": true,
+    "require_commentary": true,
+    "require_specific_code_paths": true,
+    "require_mermaid_diagram": true,
+    "require_jira_story": true,
+    "require_priority": true,
+    "require_relationship_labels": true,
+    "require_work_log": true,
+    "require_epic_issues": true,
+    "require_epic_issues_file": true,
+    "require_docs_before_code": true,
+    "require_epic_first_topology": true,
+    "require_canonical_ids": true,
+    "require_parent_child_trace": true,
+    "forbid_orphan_development_docs": true,
+    "minimum_words": {
+      "epics": 180,
+      "modules": 220,
+      "features": 220,
+      "pages": 180,
+      "tasks": 160
+    }
+  }
+}

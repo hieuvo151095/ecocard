@@ -1,0 +1,15 @@
+<div style="flex:1; display:flex; flex-direction:column; text-align:center;">
+  <div class="edge-alert-danger" style="margin-bottom:12px; text-align:left;">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+    <span>❌ Passport Image Rejected: Direct light glare detected on MRZ barcode. Retake photo.</span>
+  </div>
+  <div style="height:140px; border:2px dashed var(--danger); border-radius:12px; display:flex; flex-direction:column; align-items:center; justify-content:center; margin-bottom:16px; background:#fef2f2; padding:12px;">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+    <span style="font-size:11px; color:var(--danger); font-weight:700; margin-top:6px;">📸 Retake Passport Photo (No Glare)</span>
+  </div>
+  <div class="card" style="text-align:left; font-size:11px; margin-bottom:16px; gap:6px;">
+    <div>🚫 Avoid direct overhead light or flash reflection</div>
+    <div>✔️ Ensure all 4 corners of identity page are visible</div>
+  </div>
+  <button class="btn-primary" style="margin-top:auto;" onclick="highlightArtboard('artboard-7')">Retake Photo under Direct Light</button>
+</div>

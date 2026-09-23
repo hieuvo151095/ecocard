@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Figma Interactive Board — Binance Crypto Trading (023-crypto-binance-trading)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --canvas-bg: #e2e8f0;
+      --canvas-grid: #cbd5e1;
+      --binance-yellow: #F0B90B;
+      --binance-dark: #222126;
+      --dark-card: #2B2F36;
+      --crypto-green: #0ECB81;
+      --crypto-red: #F6465D;
+      --border-color: #cbd5e1;
+      --radius-pill: 50px;
+      --radius-lg: 12px;
+      --shadow-artboard: 0 25px 35px -5px rgba(15, 23, 42, 0.2);
+      --font-sans: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--canvas-bg);
+      background-image: radial-gradient(var(--canvas-grid) 1.5px, transparent 1.5px);
+      background-size: 24px 24px;
+      color: #0f172a;
+      margin: 0; padding: 0;
+      width: 100vw; height: 100vh;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Figma Bar with Binance Yellow Accent */
+    .figma-top-bar {
+      height: 48px;
+      background: var(--binance-dark);
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      font-size: 13px;
+      z-index: 1000;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      border-bottom: 2px solid var(--binance-yellow);
+    }
+
+    .figma-logo-group { display: flex; align-items: center; gap: 12px; font-weight: 600; }
+    .figma-badge { background: var(--binance-yellow); color: #1E2026; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; font-family: var(--font-mono); }
+
+    .figma-btn {
+      background: #2B2F36; color: white; border: 1px solid #383e4a; padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+    }
+    .figma-btn-primary { background: var(--binance-yellow); color: #1E2026; border-color: var(--binance-yellow); font-weight: 700; }
+
+    /* Canvas Viewport */
+    .canvas-viewport {
+      position: absolute; top: 48px; bottom: 56px; left: 0; right: 0; overflow: hidden; cursor: grab;
+    }
+    .canvas-viewport:active { cursor: grabbing; }
+
+    .canvas-world {
+      position: absolute; top: 0; left: 0; width: 5000px; height: 5000px; transform-origin: 0 0;
+    }
+
+    .svg-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+
+    .artboard, .spec-artboard {
+      position: absolute; background: #ffffff; border-radius: var(--radius-lg); box-shadow: var(--shadow-artboard); border: 1px solid var(--border-color); display: flex; flex-direction: column; z-index: 10; transition: outline 0.15s ease;
+    }
+    .artboard.selected, .spec-artboard.selected { outline: 3px solid var(--binance-yellow); box-shadow: 0 0 0 6px rgba(240, 185, 11, 0.3), var(--shadow-artboard); z-index: 20; }
+
+    .artboard-header {
+      height: 38px; background: var(--binance-dark); color: white; border-radius: 12px 12px 0 0; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; cursor: move; font-size: 13px; font-weight: 600;
+    }
+
+    .figma-bottom-bar {
+      height: 56px; background: var(--binance-dark); border-top: 1px solid #2B2F36; position: fixed; bottom: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 0 24px; color: white; z-index: 1000;
+    }
+
+    .btn-binance-pill {
+      background: var(--binance-yellow); color: #1E2026; border: none; padding: 10px 20px; border-radius: var(--radius-pill); font-weight: 700; font-size: 12px; cursor: pointer; box-shadow: 0 4px 12px rgba(240, 185, 11, 0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <div class="figma-top-bar">
+    <div class="figma-logo-group">
+      <span style="font-size: 16px; color: var(--binance-yellow);">❖</span>
+      <span>Figma Interactive Board — Binance Crypto Trading Floor</span>
+      <span class="figma-badge">binance/DESIGN.md</span>
+    </div>
+
+    <div style="display: flex; gap: 12px; align-items: center;">
+      <span style="color: #848E9C; font-size: 12px;">Active System: <strong style="color:var(--binance-yellow);">binance/DESIGN.md</strong></span>
+      <a href="prototype.html" class="figma-btn figma-btn-primary">⚡ Play Spot Trading App</a>
+      <a href="components.html" class="figma-btn">🧩 Component Spec</a>
+    </div>
+  </div>
+
+  <!-- Canvas Viewport -->
+  <div class="canvas-viewport" id="viewport">
+    <div class="canvas-world" id="world">
+
+      <!-- Dynamic SVG Flow Overlay -->
+      <svg class="svg-overlay">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#F0B90B"/>
+          </marker>
+        </defs>
+        <path id="flow-line-1" stroke="#F0B90B" stroke-width="3" fill="none" marker-end="url(#arrow)" stroke-dasharray="6,4"/>
+      </svg>
+
+      <!-- ARTBOARD 1: CRYPTO-001 Trading Floor Screen -->
+      <div class="artboard selected" id="artboard-1" style="left: 100px; top: 100px; width: 1050px;">
+        <div class="artboard-header" onmousedown="startDragArtboard(event, 'artboard-1')">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="color:var(--binance-yellow);">⚡</span>
+            <span>CRYPTO-001: Binance Spot Trading Floor</span>
+            <span style="background:#2B2F36; border:1px solid #383e4a; color:#848E9C; padding:2px 6px; border-radius:4px; font-size:11px; font-family:var(--font-mono);">1920×1080 Desktop</span>
+          </div>
+          <span style="font-size:11px; color:#848E9C;">⋮⋮ Drag Handle</span>
+        </div>
+
+        <div style="padding: 20px; background: #222126; color: white;" onmousedown="event.stopPropagation()">
+          <!-- Pair Ticker Header -->
+          <div style="display:flex; justify-content:space-between; align-items:center; background:#2B2F36; border:1px solid #383e4a; border-radius:8px; padding:12px 16px; margin-bottom:16px;">
+            <div style="display:flex; gap:16px; align-items:center;">
+              <strong style="font-size:16px; color:var(--binance-yellow);">BTC / USDT</strong>
+              <span style="font-size:18px; font-weight:700; color:var(--crypto-green);">$64,250.00</span>
+              <span style="font-size:12px; color:var(--crypto-green); background:rgba(14,203,129,0.15); padding:2px 8px; border-radius:4px;">+3.45% 24h</span>
+            </div>
+            <button class="btn-binance-pill" onclick="highlightModalArtboard()">Buy BTC (Spot Market)</button>
+          </div>
+
+          <!-- Orderbook Bids & Asks Candles Grid -->
+          <div style="display:grid; grid-template-columns: 2fr 1fr; gap:16px;">
+            <div style="background:#1E2026; border:1px solid #383e4a; border-radius:8px; height:200px; padding:16px; display:flex; flex-direction:column; justify-content:space-between;">
+              <div style="font-size:12px; color:#848E9C;">BTC/USDT Candlestick Chart (BinancePlex 24h Depth)</div>
+              <svg width="100%" height="120" viewBox="0 0 500 120">
+                <path d="M 0 100 L 50 80 L 100 90 L 150 50 L 200 65 L 250 30 L 300 45 L 350 20 L 400 35 L 450 10 L 500 25" stroke="#0ECB81" stroke-width="3" fill="none"/>
+              </svg>
+            </div>
+
+            <!-- Depth Orderbook -->
+            <div style="background:#1E2026; border:1px solid #383e4a; border-radius:8px; padding:12px; font-size:11px;">
+              <div style="color:#848E9C; font-weight:600; margin-bottom:8px;">Orderbook Bids / Asks</div>
+              <div style="display:flex; justify-content:space-between; color:var(--crypto-red); margin-bottom:4px;"><span>64,255.00</span><span>0.421 BTC</span></div>
+              <div style="display:flex; justify-content:space-between; color:var(--crypto-red); margin-bottom:8px;"><span>64,252.50</span><span>1.105 BTC</span></div>
+              <div style="border-top:1px solid #383e4a; margin:4px 0;"></div>
+              <div style="display:flex; justify-content:space-between; color:var(--crypto-green); margin-bottom:4px;"><span>64,248.00</span><span>2.850 BTC</span></div>
+              <div style="display:flex; justify-content:space-between; color:var(--crypto-green);"><span>64,245.00</span><span>0.954 BTC</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ARTBOARD 2: CRYPTO-002 Spot Order Execution Modal -->
+      <div class="artboard" id="artboard-2" style="left: 1200px; top: 100px; width: 680px;">
+        <div class="artboard-header" onmousedown="startDragArtboard(event, 'artboard-2')">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="color:var(--binance-yellow);">📦</span>
+            <span>CRYPTO-002: Binance Spot Order Execution Modal</span>
+          </div>
+          <span style="font-size:11px; color:#848E9C;">⋮⋮ Drag Handle</span>
+        </div>
+
+        <div style="padding:24px; background:#222126; color:white;" onmousedown="event.stopPropagation()">
+          <div style="background:#2B2F36; border:1px solid #383e4a; border-radius:12px; padding:20px;">
+            <h3 style="margin-top:0; font-size:16px; color:var(--binance-yellow); border-bottom:1px solid #383e4a; padding-bottom:10px;">Market Order — Buy BTC</h3>
+
+            <div style="background:#1E2026; border:1px solid #383e4a; border-radius:8px; padding:12px; margin:14px 0; font-size:12px;">
+              <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span>Available Balance:</span><strong style="color:var(--binance-yellow);">1,250.00 USDT</strong></div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span>Market Price:</span><strong style="color:var(--crypto-green);">$64,250.00 USDT</strong></div>
+            </div>
+
+            <!-- Percentage Pill Selectors -->
+            <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; margin-bottom:16px;">
+              <button style="background:#1E2026; border:1px solid #383e4a; color:white; padding:6px; border-radius:4px; font-size:11px;">25%</button>
+              <button style="background:#1E2026; border:1px solid #383e4a; color:white; padding:6px; border-radius:4px; font-size:11px;">50%</button>
+              <button style="background:var(--binance-yellow); border:none; color:#1E2026; padding:6px; border-radius:4px; font-size:11px; font-weight:700;">75%</button>
+              <button style="background:#1E2026; border:1px solid #383e4a; color:white; padding:6px; border-radius:4px; font-size:11px;">100%</button>
+            </div>
+
+            <button class="btn-binance-pill" style="width:100%; padding:14px;" onclick="alert('✅ Market Order Executed: Bought 0.0146 BTC at $64,250.00!')">Buy BTC (Instant Spot Market Fill)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MANDATORY ARTBOARD 3: Design Tokens & System Specs (binance/DESIGN.md) -->
+      <div class="spec-artboard" id="artboard-3" style="left: 1930px; top: 100px; width: 620px;">
+        <div class="artboard-header" onmousedown="startDragArtboard(event, 'artboard-3')">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="color:var(--binance-yellow);">🎨</span>
+            <span>Design Tokens &amp; System Specs</span>
+            <span class="figma-badge">binance/DESIGN.md</span>
+          </div>
+          <span style="font-size:11px; color:#848E9C;">⋮⋮ Drag Handle</span>
+        </div>
+
+        <div style="padding:24px; background:#222126; color:white; flex:1; overflow-y:auto;" onmousedown="event.stopPropagation()">
+          <h4 style="margin-top:0; font-size:14px; color:var(--binance-yellow); border-bottom:1px solid #383e4a; padding-bottom:8px;">1. Binance Color Swatches (`binance/DESIGN.md`)</h4>
+          <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; font-size:10px; margin-bottom:20px; text-align:center;">
+            <div><div style="height:32px; background:#F0B90B; border-radius:6px;"></div><code>--binance-yellow</code><br><span style="color:#848E9C;">#F0B90B</span></div>
+            <div><div style="height:32px; background:#222126; border:1px solid #383e4a; border-radius:6px;"></div><code>--binance-dark</code><br><span style="color:#848E9C;">#222126</span></div>
+            <div><div style="height:32px; background:#0ECB81; border-radius:6px;"></div><code>--crypto-green</code><br><span style="color:#848E9C;">#0ECB81</span></div>
+            <div><div style="height:32px; background:#F6465D; border-radius:6px;"></div><code>--crypto-red</code><br><span style="color:#848E9C;">#F6465D</span></div>
+          </div>
+
+          <h4 style="font-size:14px; color:var(--binance-yellow); border-bottom:1px solid #383e4a; padding-bottom:8px; margin-top:0;">2. Binance Components &amp; Typography Rules</h4>
+          <div style="background:#2B2F36; border:1px solid #383e4a; border-radius:8px; padding:12px; margin-bottom:16px; font-size:11px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span>Primary CTA Radius:</span><strong style="color:var(--binance-yellow);">50px Pill Buttons</strong></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span>Proprietary Font:</span><strong>BinancePlex (Weights 400-700)</strong></div>
+            <div style="display:flex; justify-content:space-between;"><span>Bull/Bear Tickers:</span><strong style="color:var(--crypto-green);">Green (#0ECB81)</strong> / <strong style="color:var(--crypto-red);">Red (#F6465D)</strong></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Bottom Figma Toolbar -->
+  <div class="figma-bottom-bar">
+    <div style="display:flex; gap:16px; align-items:center;">
+      <span>Artboards: <strong>3 Screens Rendered (Binance.US Fintech Theme)</strong></span>
+      <span>System: <strong>binance/DESIGN.md</strong></span>
+    </div>
+
+    <div style="display:flex; gap:8px; align-items:center;">
+      <button class="zoom-btn" onclick="zoomOut()">-</button>
+      <span id="zoom-level" style="font-family: var(--font-mono); font-size: 12px; width: 44px; text-align: center;">100%</span>
+      <button class="zoom-btn" onclick="zoomIn()">+</button>
+      <button class="figma-btn" style="margin-left: 12px;" onclick="resetZoom()">Reset View</button>
+    </div>
+  </div>
+
+  <script>
+    let scale = 1, panX = 0, panY = 0, isPanning = false, isDraggingArtboard = false, activeArtboardId = null, startX, startY;
+    const viewport = document.getElementById('viewport');
+    const world = document.getElementById('world');
+
+    document.querySelectorAll('.artboard, .spec-artboard').forEach(card => {
+      card.addEventListener('mousedown', () => {
+        document.querySelectorAll('.artboard, .spec-artboard').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+      });
+    });
+
+    function startDragArtboard(e, id) {
+      e.stopPropagation(); isDraggingArtboard = true; activeArtboardId = id;
+      const el = document.getElementById(id);
+      startX = e.clientX - el.offsetLeft * scale; startY = e.clientY - el.offsetTop * scale;
+      document.addEventListener('mousemove', onDragArtboard); document.addEventListener('mouseup', stopDragArtboard);
+    }
+
+    function onDragArtboard(e) {
+      if (!isDraggingArtboard || !activeArtboardId) return;
+      const el = document.getElementById(activeArtboardId);
+      el.style.left = `${(e.clientX - startX)/scale}px`; el.style.top = `${(e.clientY - startY)/scale}px`;
+      updateConnectors();
+    }
+
+    function stopDragArtboard() { isDraggingArtboard = false; activeArtboardId = null; document.removeEventListener('mousemove', onDragArtboard); document.removeEventListener('mouseup', stopDragArtboard); }
+
+    viewport.addEventListener('mousedown', (e) => { if (isDraggingArtboard) return; isPanning = true; startX = e.clientX - panX; startY = e.clientY - panY; });
+    window.addEventListener('mousemove', (e) => { if (!isPanning) return; panX = e.clientX - startX; panY = e.clientY - startY; updateTransform(); });
+    window.addEventListener('mouseup', () => { isPanning = false; });
+
+    viewport.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const delta = e.deltaY < 0 ? 0.08 : -0.08;
+      const newScale = Math.min(Math.max(0.3, scale + delta), 2.5);
+      const rect = viewport.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left, mouseY = e.clientY - rect.top;
+      panX = mouseX - (mouseX - panX) * (newScale / scale);
+      panY = mouseY - (mouseY - panY) * (newScale / scale);
+      scale = newScale; updateTransform();
+    }, { passive: false });
+
+    function updateTransform() { world.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`; document.getElementById('zoom-level').innerText = `${Math.round(scale * 100)}%`; }
+    function zoomIn() { scale = Math.min(2.5, scale + 0.15); updateTransform(); }
+    function zoomOut() { scale = Math.max(0.3, scale - 0.15); updateTransform(); }
+    function resetZoom() { scale = 1; panX = 0; panY = 0; updateTransform(); }
+
+    function updateConnectors() {
+      const a1 = document.getElementById('artboard-1'), a2 = document.getElementById('artboard-2');
+      if (!a1 || !a2) return;
+      const r1 = { left: a1.offsetLeft, top: a1.offsetTop, width: a1.offsetWidth }, r2 = { left: a2.offsetLeft, top: a2.offsetTop };
+      const x1 = r1.left + r1.width, y1 = r1.top + 160, x2 = r2.left, y2 = r2.top + 160, dx = (x2 - x1) / 2;
+      document.getElementById('flow-line-1').setAttribute('d', `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`);
+    }
+
+    function highlightModalArtboard() {
+      document.querySelectorAll('.artboard, .spec-artboard').forEach(c => c.classList.remove('selected'));
+      document.getElementById('artboard-2').classList.add('selected');
+    }
+
+    window.addEventListener('load', updateConnectors);
+  </script>
+
+</body>
+</html>

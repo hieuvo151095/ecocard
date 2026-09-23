@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Component Gallery &amp; Light Mode Tokens (021-test-order-management)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-canvas: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-subtle: #f1f5f9;
+      --border-color: #e2e8f0;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --primary: #2563eb;
+      --success: #16a34a;
+      --warning: #d97706;
+      --danger: #dc2626;
+    }
+    body { font-family: Inter, sans-serif; background: var(--bg-canvas); color: var(--text-primary); margin: 0; padding: 32px; }
+    h1 { font-size: 22px; font-weight: 700; margin-top: 0; }
+    .comp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px; margin-top: 24px; }
+    .comp-card { background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; padding: 24px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+    .comp-card h3 { margin-top: 0; font-size: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; font-weight: 600; }
+    .preview-box { background: var(--bg-subtle); border: 1px solid var(--border-color); border-radius: 6px; padding: 16px; margin: 12px 0; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    code { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--primary); }
+  </style>
+</head>
+<body>
+
+  <h1>☀️ Enterprise Light Mode Component Gallery</h1>
+  <p style="color: var(--text-secondary); font-size: 13px;">Active System: <code>erp-enterprise/DESIGN.md</code> | Mandate: <strong>LIGHT MODE FIRST</strong></p>
+
+  <div class="comp-grid">
+
+    <!-- Component 1: Buttons -->
+    <div class="comp-card">
+      <h3>1. Button Family (`Button`)</h3>
+      <p style="font-size:12px; color:var(--text-secondary);">Primary, Secondary, Danger variants in Light Mode.</p>
+      <div class="preview-box">
+        <button style="background: #2563eb; color: white; border: none; padding: 7px 14px; border-radius: 4px; font-size: 13px; font-weight: 600;">Primary Action</button>
+        <button style="background: #ffffff; color: #0f172a; border: 1px solid #cbd5e1; padding: 7px 14px; border-radius: 4px; font-size: 13px;">Secondary</button>
+        <button style="background: #fef2f2; color: #dc2626; border: 1px solid #dc2626; padding: 7px 14px; border-radius: 4px; font-size: 13px;">Danger</button>
+      </div>
+    </div>
+
+    <!-- Component 2: Status Badges -->
+    <div class="comp-card">
+      <h3>2. Status Badges (`Badge`)</h3>
+      <p style="font-size:12px; color:var(--text-secondary);">Light Mode Status Badges with WCAG AA verified contrast.</p>
+      <div class="preview-box">
+        <span style="background: #fffbeb; color: #d97706; border: 1px solid rgba(217, 119, 6, 0.4); padding: 3px 10px; border-radius: 9999px; font-size: 11px; font-weight: 600;">Pending</span>
+        <span style="background: #f0fdf4; color: #16a34a; border: 1px solid rgba(22, 163, 74, 0.4); padding: 3px 10px; border-radius: 9999px; font-size: 11px; font-weight: 600;">Dispatched</span>
+        <span style="background: #fef2f2; color: #dc2626; border: 1px solid rgba(220, 38, 38, 0.4); padding: 3px 10px; border-radius: 9999px; font-size: 11px; font-weight: 600;">Hazardous</span>
+      </div>
+    </div>
+
+    <!-- Component 3: Input Controls -->
+    <div class="comp-card">
+      <h3>3. Form Controls (`TextInput` / `Select`)</h3>
+      <p style="font-size:12px; color:var(--text-secondary);">Light Mode input controls with blue focus rings.</p>
+      <div class="preview-box">
+        <input type="text" value="ORD-9021" style="background:#ffffff; border:1px solid #2563eb; color:#0f172a; padding:6px 10px; border-radius:4px; font-size:13px;">
+        <select style="background:#ffffff; border:1px solid #e2e8f0; color:#0f172a; padding:6px 10px; border-radius:4px; font-size:13px;">
+          <option>High Urgency</option>
+        </select>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

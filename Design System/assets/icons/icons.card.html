@@ -1,0 +1,18 @@
+<!-- @dsCard group="Components" viewport="700x180" name="Icons" subtitle="~190 materialized glyphs, currentColor" -->
+<link rel="stylesheet" href="../styles.css">
+<div id="root" style="display:grid;grid-template-columns:repeat(10,1fr);gap:12px;padding:16px;font-family:var(--font-core);color:var(--color-primary-text)"></div>
+<script type="module">
+import icons from './icon-data.js';
+var names=["AAddProperty1Line","ASearchProperty1Line","ADeleteProperty1Line","ACheckProperty1Filled","AlarmProperty1Line","BCommentProperty1Line","Camera","LogOut","Menu","ArrowLeftTypeLine","ArrowRightTypeLine","BadgeTypeDot"];
+var root=document.getElementById('root');
+names.forEach(function(n){
+  var d=icons[n];
+  var box=document.createElement('div');
+  box.style.display='flex';box.style.flexDirection='column';box.style.alignItems='center';box.style.gap='4px';box.style.fontSize='9px';box.style.color='#8B97A1';
+  var svg=document.createElement('div');
+  svg.innerHTML='<svg width="24" height="24" viewBox="'+(d?d.viewBox:'0 0 24 24')+'" fill="none">'+(d?d.body:'')+'</svg>';
+  box.appendChild(svg);
+  var label=document.createElement('span');label.textContent=n.replace(/Property1.*|Type.*/,'');box.appendChild(label);
+  root.appendChild(box);
+});
+</script>

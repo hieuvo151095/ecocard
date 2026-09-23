@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Prototype — Nhà Trường: Học Sinh (Students Master Data & Profile Hub)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+Chettan+2:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --eco-blue: #2563eb;
+      --eco-blue-hover: #1d4ed8;
+      --eco-yellow: #f0b90b;
+      --bg-dark: #0f172a;
+      --card-bg: #1e2026;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --border-dark: #383e4a;
+      --status-emerald: #10b981;
+      --status-amber: #f59e0b;
+      --status-rose: #ef4444;
+      --status-cyan: #38bdf8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Quicksand', 'Inter', sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top App Bar */
+    .top-bar {
+      height: 60px;
+      background: #1e2026;
+      border-bottom: 1px solid #383e4a;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .brand-title {
+      font-family: 'Baloo Chettan 2', cursive;
+      font-size: 20px;
+      font-weight: 700;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .route-switcher {
+      display: flex;
+      background: #0f172a;
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid #383e4a;
+      gap: 6px;
+    }
+    .route-btn {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+    .route-btn.active {
+      background: #2563eb;
+      color: #ffffff;
+    }
+
+    /* Layout Body */
+    .portal-body {
+      display: flex;
+      flex: 1;
+    }
+    .sidebar {
+      width: 240px;
+      background: #1e2026;
+      border-right: 1px solid #383e4a;
+      padding: 20px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .sidebar-group {
+      font-size: 11px;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      padding: 8px 12px 4px;
+      letter-spacing: 0.5px;
+    }
+    .sidebar-item {
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .sidebar-item.active {
+      background: #2563eb;
+      color: #ffffff;
+    }
+    .main-surface {
+      flex: 1;
+      padding: 24px;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Page Surfaces */
+    .page-view { display: none; }
+    .page-view.active { display: block; }
+
+    /* Universal Buttons */
+    .btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .btn-primary { background: #2563eb; color: #ffffff; border: 1px solid #2563eb; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-secondary { background: #0f172a; color: #94a3b8; border: 1px solid #383e4a; }
+    .btn-secondary:hover { color: #f8fafc; border-color: #2563eb; }
+    .btn-success { background: #10b981; color: #ffffff; border: 1px solid #10b981; }
+    .btn-danger { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid #ef4444; }
+
+    /* Filters Toolbar */
+    .toolbar-box {
+      background: #1e2026;
+      border: 1px solid #383e4a;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .filter-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .input-ctrl {
+      background: #0f172a;
+      border: 1px solid #383e4a;
+      color: #f8fafc;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+    }
+    .input-ctrl:focus { border-color: #2563eb; }
+
+    /* Table Styles */
+    .table-container {
+      background: #1e2026;
+      border: 1px solid #383e4a;
+      border-radius: 12px;
+      overflow: visible;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    th {
+      background: #0f172a;
+      padding: 12px 16px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #94a3b8;
+      border-bottom: 1px solid #383e4a;
+      white-space: nowrap;
+    }
+    td {
+      padding: 14px 16px;
+      font-size: 13px;
+      border-bottom: 1px solid #383e4a;
+      color: #f8fafc;
+      vertical-align: middle;
+      position: relative;
+    }
+    tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+    /* Status Pills */
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .status-active { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid #10b981; }
+    .status-leave { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid #f59e0b; }
+    .status-graduated { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid #383e4a; }
+
+    /* Pediatric BMI Badges */
+    .bmi-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .bmi-underweight { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid #f59e0b; }
+    .bmi-normal { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid #10b981; }
+    .bmi-overweight { background: rgba(37, 99, 235, 0.15); color: #60a5fa; border: 1px solid #2563eb; }
+    .bmi-obese { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid #ef4444; }
+
+    /* Action Dropdown Standardization */
+    .action-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: #0f172a;
+      border: 1px solid #383e4a;
+      color: #94a3b8;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .action-btn:hover { color: #f8fafc; border-color: #2563eb; }
+    .dropdown-menu {
+      position: absolute;
+      right: 16px;
+      top: 48px;
+      width: 220px;
+      background: #1e2026;
+      border: 1px solid #383e4a;
+      border-radius: 8px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.7);
+      padding: 6px;
+      z-index: 9999;
+      display: none;
+    }
+    .dropdown-menu.upward {
+      top: auto;
+      bottom: 48px;
+    }
+    .dropdown-menu.show { display: block; }
+    .dropdown-item {
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .dropdown-item:hover { background: #0f172a; color: #38bdf8; }
+
+    /* Global Toast Container (Top-Right) */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+    .toast-item {
+      background: #1e2026;
+      border-left: 4px solid #10b981;
+      border-top: 1px solid #383e4a;
+      border-right: 1px solid #383e4a;
+      border-bottom: 1px solid #383e4a;
+      border-radius: 8px;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+      color: #f8fafc;
+      font-size: 13px;
+      min-width: 320px;
+      pointer-events: auto;
+      animation: slideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Modals Overlay */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      padding: 20px;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal-box {
+      background: #1e2026;
+      border: 1px solid #383e4a;
+      border-radius: 14px;
+      width: 100%;
+      max-width: 520px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+      animation: popModal 0.2s ease-out;
+    }
+    @keyframes popModal {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .modal-header {
+      background: #0f172a;
+      padding: 16px 20px;
+      border-bottom: 1px solid #383e4a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-title {
+      font-family: 'Baloo Chettan 2', cursive;
+      font-size: 18px;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+    .modal-body { padding: 20px; }
+    .modal-footer {
+      background: #0f172a;
+      padding: 14px 20px;
+      border-top: 1px solid #383e4a;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    /* 360 Hub Tabs */
+    .hub-tabs {
+      display: flex;
+      gap: 8px;
+      background: #0f172a;
+      padding: 6px;
+      border-radius: 10px;
+      border: 1px solid #383e4a;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .hub-tab-btn {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .hub-tab-btn.active {
+      background: #2563eb;
+      color: #ffffff;
+    }
+
+    .legacy-fallback {
+      font-style: italic;
+      color: #94a3b8;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Top Bar -->
+  <header class="top-bar">
+    <div class="brand-title">
+      <span style="color: #f0b90b;">🏫</span> Finviet School Portal — Quản Lý Học Sinh
+    </div>
+    <div class="route-switcher">
+      <button class="route-btn active" onclick="switchRoute('roster')">1. Danh sách học sinh (/kid)</button>
+      <button class="route-btn" onclick="switchRoute('create')">2. Tiếp nhận học sinh (/kid/create)</button>
+      <button class="route-btn" onclick="switchRoute('detail')">3. Hồ sơ 360° (/kid/detail)</button>
+    </div>
+  </header>
+
+  <div class="portal-body">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-group">VẬN HÀNH</div>
+      <div class="sidebar-item">📅 Điểm danh</div>
+      <div class="sidebar-item">📝 Hoạt động</div>
+      <div class="sidebar-item">🖼️ Thư viện ảnh</div>
+      <div class="sidebar-item">💬 Trao đổi</div>
+      <div class="sidebar-group">NHÀ TRƯỜNG</div>
+      <div class="sidebar-item active">🎓 Học sinh</div>
+      <div class="sidebar-item">👨‍🏫 Giáo viên</div>
+      <div class="sidebar-item">🏫 Lớp học</div>
+      <div class="sidebar-item">📚 Môn học</div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-surface">
+
+      <!-- ================= ROUTE 1: ROSTER DIRECTORY ================= -->
+      <section id="view-roster" class="page-view active">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <div>
+            <h2 style="font-family: 'Baloo Chettan 2', cursive; font-size: 24px; font-weight: 700; color: #f8fafc;">
+              Danh Sách Học Sinh Toàn Trường
+            </h2>
+            <p style="font-size: 13px; color: #94a3b8;">
+              Quản lý hồ sơ học sinh, tra cứu đa trường, cập nhật thể trạng BMI và điều chuyển lớp học.
+            </p>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <button class="btn btn-secondary" onclick="openTransferModal('batch')">🔄 Chuyển lớp hàng loạt</button>
+            <button class="btn btn-primary" onclick="switchRoute('create')">+ Thêm học sinh mới</button>
+          </div>
+        </div>
+
+        <!-- Filters Toolbar -->
+        <div class="toolbar-box">
+          <div class="filter-group">
+            <input type="text" class="input-ctrl" placeholder="Tìm theo tên, mã HS, CCCD, SĐT PH..." style="width: 280px;" oninput="filterTable(this.value)">
+            <select class="input-ctrl" onchange="filterClass(this.value)">
+              <option value="all">Tất cả các lớp</option>
+              <option value="Lớp 1A1">Lớp 1A1</option>
+              <option value="Lớp 1A2">Lớp 1A2</option>
+              <option value="Lớp 2A1">Lớp 2A1</option>
+            </select>
+            <select class="input-ctrl">
+              <option value="all">Tất cả giới tính</option>
+              <option value="male">Nam</option>
+              <option value="female">Nữ</option>
+            </select>
+            <select class="input-ctrl">
+              <option value="all">Tất cả trạng thái</option>
+              <option value="active">Đang học</option>
+              <option value="leave">Nghỉ học</option>
+            </select>
+          </div>
+          <div style="font-size: 13px; color: #94a3b8;">
+            Hiển thị: <strong style="color: #f8fafc;" id="studentCount">4</strong> học sinh
+          </div>
+        </div>
+
+        <!-- Table with strict sentence-case headers and ••• menus -->
+        <div class="table-container">
+          <table id="studentTable">
+            <thead>
+              <tr>
+                <th style="width: 40px;"><input type="checkbox"></th>
+                <th>Mã học sinh</th>
+                <th>Họ và tên</th>
+                <th>Lớp</th>
+                <th>Ngày sinh</th>
+                <th>Giới tính</th>
+                <th>Số điện thoại phụ huynh</th>
+                <th>Trạng thái</th>
+                <th style="text-align: right;">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Row 1: Normal with Student Code -->
+              <tr>
+                <td><input type="checkbox"></td>
+                <td style="font-family: monospace; font-weight: 600; color: #60a5fa;">HS-101</td>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 10px; cursor: pointer;" onclick="switchRoute('detail')">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: #2563eb; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px;">NH</div>
+                    <div>
+                      <div style="font-weight: 700; color: #f8fafc;">Nguyễn Hoàng Nam</div>
+                      <div style="font-size: 11px; color: #94a3b8;">Biệt danh: Bơ</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span style="background: #0f172a; border: 1px solid #383e4a; padding: 2px 8px; border-radius: 4px; font-size: 12px;">Lớp 1A1</span></td>
+                <td>15/05/2018</td>
+                <td>Nam</td>
+                <td>0988 123 456 (Bố)</td>
+                <td><span class="status-pill status-active">Đang học</span></td>
+                <td style="text-align: right;">
+                  <button class="action-btn" onclick="toggleDropdown(event, 'dd-1')">•••</button>
+                  <div class="dropdown-menu" id="dd-1">
+                    <div class="dropdown-item" onclick="openTransferModal('Nguyễn Hoàng Nam')">🔄 Chuyển lớp học sinh</div>
+                    <div class="dropdown-item" onclick="openGrowthModal('Nguyễn Hoàng Nam')">⚖️ Đo thể trạng & BMI</div>
+                    <div class="dropdown-item" onclick="openNotesModal('Nguyễn Hoàng Nam')">📝 Ghi chú nội bộ</div>
+                    <div class="dropdown-item" onclick="openTuitionModal('Nguyễn Hoàng Nam')">🎁 Ưu đãi học phí</div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 2: Legacy Record without Student Code (K008) -->
+              <tr>
+                <td><input type="checkbox"></td>
+                <td><span class="legacy-fallback">Chưa có mã học sinh</span></td>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 10px; cursor: pointer;" onclick="switchRoute('detail')">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: #f0b90b; color: #0f172a; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px;">TM</div>
+                    <div>
+                      <div style="font-weight: 700; color: #f8fafc;">Trần Mai Anh</div>
+                      <div style="font-size: 11px; color: #94a3b8;">Biệt danh: Miu</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span style="background: #0f172a; border: 1px solid #383e4a; padding: 2px 8px; border-radius: 4px; font-size: 12px;">Lớp 1A1</span></td>
+                <td>20/08/2018</td>
+                <td>Nữ</td>
+                <td>0912 345 678 (Mẹ)</td>
+                <td><span class="status-pill status-active">Đang học</span></td>
+                <td style="text-align: right;">
+                  <button class="action-btn" onclick="toggleDropdown(event, 'dd-2')">•••</button>
+                  <div class="dropdown-menu" id="dd-2">
+                    <div class="dropdown-item" onclick="openTransferModal('Trần Mai Anh')">🔄 Chuyển lớp học sinh</div>
+                    <div class="dropdown-item" onclick="openGrowthModal('Trần Mai Anh')">⚖️ Đo thể trạng & BMI</div>
+                    <div class="dropdown-item" onclick="openNotesModal('Trần Mai Anh')">📝 Ghi chú nội bộ</div>
+                    <div class="dropdown-item" onclick="openTuitionModal('Trần Mai Anh')">🎁 Ưu đãi học phí</div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 3: Class 1A2 -->
+              <tr>
+                <td><input type="checkbox"></td>
+                <td style="font-family: monospace; font-weight: 600; color: #60a5fa;">HS-103</td>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: #10b981; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px;">LQ</div>
+                    <div>
+                      <div style="font-weight: 700; color: #f8fafc;">Lê Quốc Bảo</div>
+                      <div style="font-size: 11px; color: #94a3b8;">Biệt danh: Tí</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span style="background: #0f172a; border: 1px solid #383e4a; padding: 2px 8px; border-radius: 4px; font-size: 12px;">Lớp 1A2</span></td>
+                <td>11/02/2018</td>
+                <td>Nam</td>
+                <td>0977 889 900 (Bố)</td>
+                <td><span class="status-pill status-active">Đang học</span></td>
+                <td style="text-align: right;">
+                  <button class="action-btn" onclick="toggleDropdown(event, 'dd-3')">•••</button>
+                  <div class="dropdown-menu" id="dd-3">
+                    <div class="dropdown-item" onclick="openTransferModal('Lê Quốc Bảo')">🔄 Chuyển lớp học sinh</div>
+                    <div class="dropdown-item" onclick="openGrowthModal('Lê Quốc Bảo')">⚖️ Đo thể trạng & BMI</div>
+                    <div class="dropdown-item" onclick="openNotesModal('Lê Quốc Bảo')">📝 Ghi chú nội bộ</div>
+                    <div class="dropdown-item" onclick="openTuitionModal('Lê Quốc Bảo')">🎁 Ưu đãi học phí</div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 4: Near Bottom (Tests Upward Flip) -->
+              <tr>
+                <td><input type="checkbox"></td>
+                <td style="font-family: monospace; font-weight: 600; color: #60a5fa;">HS-201</td>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: #ef4444; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px;">PH</div>
+                    <div>
+                      <div style="font-weight: 700; color: #f8fafc;">Phạm Hương Giang</div>
+                      <div style="font-size: 11px; color: #94a3b8;">Biệt danh: Nhím</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span style="background: #0f172a; border: 1px solid #383e4a; padding: 2px 8px; border-radius: 4px; font-size: 12px;">Lớp 2A1</span></td>
+                <td>05/09/2017</td>
+                <td>Nữ</td>
+                <td>0903 112 233 (Mẹ)</td>
+                <td><span class="status-pill status-active">Đang học</span></td>
+                <td style="text-align: right;">
+                  <button class="action-btn" onclick="toggleDropdown(event, 'dd-4')">•••</button>
+                  <div class="dropdown-menu upward" id="dd-4">
+                    <div class="dropdown-item" onclick="openTransferModal('Phạm Hương Giang')">🔄 Chuyển lớp học sinh</div>
+                    <div class="dropdown-item" onclick="openGrowthModal('Phạm Hương Giang')">⚖️ Đo thể trạng & BMI</div>
+                    <div class="dropdown-item" onclick="openNotesModal('Phạm Hương Giang')">📝 Ghi chú nội bộ</div>
+                    <div class="dropdown-item" onclick="openTuitionModal('Phạm Hương Giang')">🎁 Ưu đãi học phí</div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ================= ROUTE 2: CREATE ENROLLMENT WIZARD ================= -->
+      <section id="view-create" class="page-view">
+        <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h2 style="font-family: 'Baloo Chettan 2', cursive; font-size: 24px; font-weight: 700; color: #f8fafc;">
+              Tiếp Nhận Hồ Sơ Học Sinh Mới
+            </h2>
+            <p style="font-size: 13px; color: #94a3b8;">
+              Nhập thông tin định danh bắt buộc và kích hoạt bảo vệ biểu mẫu chưa lưu (Resolution K010).
+            </p>
+          </div>
+          <button class="btn btn-secondary" onclick="cancelCreateForm()">✕ Hủy bỏ</button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+          <div style="background: #1e2026; border: 1px solid #383e4a; border-radius: 12px; padding: 24px;">
+            <h3 style="font-size: 16px; font-weight: 700; color: #38bdf8; margin-bottom: 16px;">1. Thông Tin Học Sinh Bắt Buộc</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+              <div>
+                <label style="display: block; font-size: 12px; font-weight: 700; color: #94a3b8; margin-bottom: 6px;">Họ và tên *</label>
+                <input type="text" id="create-name" class="input-ctrl" style="width: 100%;" placeholder="VD: Hoàng Gia Bảo" oninput="markDirty()">
+              </div>
+              <div>
+                <label style="display: block; font-size: 12px; font-weight: 700; color: #94a3b8; margin-bottom: 6px;">Biệt danh</label>
+                <input type="text" class="input-ctrl" style="width: 100%;" placeholder="VD: Sóc" oninput="markDirty()">
+              </div>
+              <div>
+                <label style="display: block; font-size: 12px; font-weight: 700; color: #94a3b8; margin-bottom: 6px;">Mã học sinh *</label>
+                <input type="text" class="input-ctrl" style="width: 100%;" placeholder="VD: HS-105" oninput="markDirty()">
+              </div>
+              <div>
+                <label style="display: block; font-size: 12px; font-weight: 700; color: #94a3b8; margin-bottom: 6px;">Số CCCD/Định danh *</label>
+                <input type="text" class="input-ctrl" style="width: 100%;" placeholder="VD: 001205012345" oninput="markDirty()">
+              </div>
+              <div>
+                <label style="display: block; font-size: 12px; font-weight: 700; color: #94a3b8; margin-bottom: 6px;">Ngày sinh *</label>
+                <input type="date" class="input-ctrl" style="width: 100%;" oninput="markDirty()">
+              </div>
+              <div>
+                <label style="display: block; font-size: 12px; font-weight: 700; color: #94a3b8; margin-bottom: 6px;">Lớp phân bổ *</label>
+                <select class="input-ctrl" style="width: 100%;" oninput="markDirty()">
+                  <option value="1A1">Lớp 1A1</option>
+                  <option value="1A2">Lớp 1A2</option>
+                  <option value="2A1">Lớp 2A1</option>
+                </select>
+              </div>
+            </div>
+
+            <h3 style="font-size: 16px; font-weight: 700; color: #38bdf8; margin-bottom: 16px;">2. Thông Tin Phụ Huynh Liên Hệ Chính</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div>
+                <label style="display: block; font-size: 12px; font-weight: 700; color: #94a3b8; margin-bottom: 6px;">Họ tên phụ huynh *</label>
+                <input type="text" class="input-ctrl" style="width: 100%;" placeholder="VD: Hoàng Tuấn Anh" oninput="markDirty()">
+              </div>
+              <div>
+                <label style="display: block; font-size: 12px; font-weight: 700; color: #94a3b8; margin-bottom: 6px;">Số điện thoại liên lạc *</label>
+                <input type="tel" class="input-ctrl" style="width: 100%;" placeholder="VD: 0988 999 888" oninput="markDirty()">
+              </div>
+            </div>
+
+            <div style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px;">
+              <button class="btn btn-secondary" onclick="cancelCreateForm()">Hủy bỏ</button>
+              <button class="btn btn-primary" onclick="submitCreateForm()">💾 Lưu hồ sơ học sinh</button>
+            </div>
+          </div>
+
+          <!-- BMI Real-Time Helper Sidebar -->
+          <div style="background: #1e2026; border: 1px solid #383e4a; border-radius: 12px; padding: 20px;">
+            <h4 style="font-size: 14px; font-weight: 700; color: #f8fafc; margin-bottom: 14px;">Chỉ Số Thể Trạng Ban Đầu</h4>
+            <div style="margin-bottom: 12px;">
+              <label style="display: block; font-size: 11px; color: #94a3b8; margin-bottom: 4px;">Chiều cao (cm)</label>
+              <input type="number" id="create-h" class="input-ctrl" style="width: 100%;" value="115" oninput="calcCreateBmi(); markDirty();">
+            </div>
+            <div style="margin-bottom: 16px;">
+              <label style="display: block; font-size: 11px; color: #94a3b8; margin-bottom: 4px;">Cân nặng (kg)</label>
+              <input type="number" id="create-w" class="input-ctrl" style="width: 100%;" value="21" oninput="calcCreateBmi(); markDirty();">
+            </div>
+            <div style="background: #0f172a; padding: 14px; border-radius: 8px; border: 1px solid #383e4a; text-align: center;">
+              <div style="font-size: 11px; color: #94a3b8;">BMI tự động tính toán</div>
+              <div id="create-bmi-val" style="font-size: 22px; font-weight: 800; color: #f8fafc; margin: 4px 0;">15.9</div>
+              <div id="create-bmi-badge"><span class="bmi-badge bmi-normal">Bình thường</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= ROUTE 3: 360° PROFILE HUB ================= -->
+      <section id="view-detail" class="page-view">
+        <!-- Header Card -->
+        <div style="background: #1e2026; border: 1px solid #383e4a; border-radius: 14px; padding: 24px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+          <div style="display: flex; align-items: center; gap: 18px;">
+            <div style="width: 64px; height: 64px; border-radius: 50%; background: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; color: #ffffff;">
+              NH
+            </div>
+            <div>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <h2 style="font-family: 'Baloo Chettan 2', cursive; font-size: 24px; font-weight: 700; color: #f8fafc;">
+                  Nguyễn Hoàng Nam (Bơ)
+                </h2>
+                <span class="status-pill status-active">Đang học</span>
+                <span style="background: #0f172a; border: 1px solid #383e4a; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-family: monospace; color: #60a5fa;">HS-101</span>
+              </div>
+              <p style="font-size: 13px; color: #94a3b8; margin-top: 4px;">
+                Lớp: <strong style="color: #f8fafc;">Lớp 1A1</strong> • Ngày sinh: 15/05/2018 (6 tuổi) • Giới tính: Nam • Nhập học: 01/08/2024
+              </p>
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <button class="btn btn-secondary" onclick="openGrowthModal('Nguyễn Hoàng Nam')">⚖️ Đo thể trạng</button>
+            <button class="btn btn-secondary" onclick="openTransferModal('Nguyễn Hoàng Nam')">🔄 Chuyển lớp</button>
+            <button class="btn btn-primary" onclick="openTuitionModal('Nguyễn Hoàng Nam')">🎁 Ưu đãi học phí</button>
+          </div>
+        </div>
+
+        <!-- 5 Tabs Navigation -->
+        <div class="hub-tabs">
+          <button class="hub-tab-btn active" onclick="switchHubTab('tab-profile')">1. Hồ sơ & Thể chất</button>
+          <button class="hub-tab-btn" onclick="switchHubTab('tab-activity')">2. Hoạt động</button>
+          <button class="hub-tab-btn" onclick="switchHubTab('tab-media')">3. Thư viện ảnh (AI Tag)</button>
+          <button class="hub-tab-btn" onclick="switchHubTab('tab-attendance')">4. Điểm danh</button>
+          <button class="hub-tab-btn" onclick="switchHubTab('tab-finance')">5. Học phí & Ưu đãi</button>
+        </div>
+
+        <!-- Tab 1 Content: Profile & Physical Growth -->
+        <div id="tab-profile" class="hub-content">
+          <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px;">
+            <!-- Guardian Cards -->
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+              <div style="background: #1e2026; border: 1px solid #383e4a; border-radius: 12px; padding: 18px;">
+                <h4 style="font-size: 14px; font-weight: 700; color: #38bdf8; margin-bottom: 12px;">👨 Phụ Huynh 1 (Người đón chính)</h4>
+                <div style="font-size: 13px; color: #f8fafc; font-weight: 700;">Nguyễn Văn Hoàng (Bố)</div>
+                <div style="font-size: 12px; color: #94a3b8; margin-top: 4px;">SĐT: 0988 123 456</div>
+                <div style="font-size: 12px; color: #94a3b8;">Email: hoang.nguyen@example.com</div>
+              </div>
+              <div style="background: #1e2026; border: 1px solid #383e4a; border-radius: 12px; padding: 18px;">
+                <h4 style="font-size: 14px; font-weight: 700; color: #38bdf8; margin-bottom: 12px;">👩 Phụ Huynh 2</h4>
+                <div style="font-size: 13px; color: #f8fafc; font-weight: 700;">Lê Thu Trang (Mẹ)</div>
+                <div style="font-size: 12px; color: #94a3b8; margin-top: 4px;">SĐT: 0977 654 321</div>
+              </div>
+            </div>
+
+            <!-- Growth Matrix -->
+            <div style="background: #1e2026; border: 1px solid #383e4a; border-radius: 12px; padding: 20px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h4 style="font-size: 15px; font-weight: 700; color: #f8fafc;">Lịch Sử Đo Thể Trạng & BMI Trẻ Em</h4>
+                <button class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;" onclick="openGrowthModal('Nguyễn Hoàng Nam')">+ Ghi nhận mới</button>
+              </div>
+              <table style="font-size: 12px;">
+                <thead>
+                  <tr>
+                    <th>Ngày ghi nhận</th>
+                    <th>Chiều cao (cm)</th>
+                    <th>Cân nặng (kg)</th>
+                    <th>Chỉ số BMI</th>
+                    <th>Phân loại thể trạng</th>
+                    <th>Cán bộ đo</th>
+                  </tr>
+                </thead>
+                <tbody id="growthHistoryBody">
+                  <tr>
+                    <td>01/09/2026</td>
+                    <td>116.5</td>
+                    <td>22.0</td>
+                    <td style="font-weight: 700;">16.2</td>
+                    <td><span class="bmi-badge bmi-normal">Bình thường</span></td>
+                    <td>Y tế trường</td>
+                  </tr>
+                  <tr>
+                    <td>15/05/2026</td>
+                    <td>114.0</td>
+                    <td>20.5</td>
+                    <td style="font-weight: 700;">15.8</td>
+                    <td><span class="bmi-badge bmi-normal">Bình thường</span></td>
+                    <td>Y tế trường</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Activity Stream -->
+        <div id="tab-activity" class="hub-content" style="display: none;">
+          <div style="background: #1e2026; border: 1px solid #383e4a; border-radius: 12px; padding: 20px;">
+            <h4 style="font-size: 14px; font-weight: 700; color: #38bdf8; margin-bottom: 12px;">Dòng Hoạt Động Của Học Sinh</h4>
+            <p style="font-size: 13px; color: #94a3b8;">Tổng hợp các bài viết lớp có nhắc tên (@Nguyễn Hoàng Nam) hoặc hoạt động cá nhân.</p>
+            <div style="margin-top: 16px; padding: 14px; background: #0f172a; border-radius: 8px; border: 1px solid #383e4a;">
+              <div style="font-size: 12px; color: #94a3b8;">Hôm nay lúc 09:30 • Hoạt động góc tạo hình</div>
+              <div style="font-size: 13px; color: #f8fafc; margin-top: 4px;">Em Nam hoàn thành bức tranh xé dán ngôi nhà rất sáng tạo và ngăn nắp!</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3: Media Gallery -->
+        <div id="tab-media" class="hub-content" style="display: none;">
+          <div style="background: #1e2026; border: 1px solid #383e4a; border-radius: 12px; padding: 20px;">
+            <h4 style="font-size: 14px; font-weight: 700; color: #38bdf8; margin-bottom: 12px;">Kho Ảnh Nhận Diện AI (Face Recognition)</h4>
+            <p style="font-size: 13px; color: #94a3b8;">Đã gắn thẻ khuôn mặt tự động trong 18 bức ảnh lớp 1A1 (Độ bao phủ: 85%).</p>
+          </div>
+        </div>
+
+        <!-- Tab 4: Attendance -->
+        <div id="tab-attendance" class="hub-content" style="display: none;">
+          <div style="background: #1e2026; border: 1px solid #383e4a; border-radius: 12px; padding: 20px;">
+            <h4 style="font-size: 14px; font-weight: 700; color: #38bdf8; margin-bottom: 12px;">Nhật Ký Điểm Danh Tháng 09/2026</h4>
+            <p style="font-size: 13px; color: #94a3b8;">Có mặt: 11 ngày • Nghỉ có phép: 0 • Nhiệt độ trung bình: 36.6°C • Người đón: Bố.</p>
+          </div>
+        </div>
+
+        <!-- Tab 5: Finance & Invoices -->
+        <div id="tab-finance" class="hub-content" style="display: none;">
+          <div style="background: #1e2026; border: 1px solid #383e4a; border-radius: 12px; padding: 20px;">
+            <h4 style="font-size: 14px; font-weight: 700; color: #38bdf8; margin-bottom: 12px;">Tình Trạng Học Phí & Giảm Trừ</h4>
+            <p style="font-size: 13px; color: #94a3b8;">Đã thanh toán hóa đơn T09/2026 (2.500.000 đ qua Ví Finviet). Ưu đãi hiện tại: 10% học bổng khuyến học.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ================= MODAL 1: CLASS TRANSFER (CASCADE SAFEGUARDS) ================= -->
+  <div class="modal-overlay" id="modal-transfer">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">Chuyển Lớp Học Sinh</h3>
+        <span style="color: #94a3b8; cursor: pointer;" onclick="closeModal('modal-transfer')">✕</span>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: #f8fafc; margin-bottom: 14px;">
+          Học sinh: <strong id="transferStudentName" style="color: #60a5fa;">Nguyễn Hoàng Nam</strong>
+        </p>
+        <div style="margin-bottom: 14px;">
+          <label style="display: block; font-size: 12px; color: #94a3b8; margin-bottom: 4px;">Lớp đích chuyển đến *</label>
+          <select class="input-ctrl" style="width: 100%;" id="transferTargetClass">
+            <option value="Lớp 2A1">Lớp 2A1 (Khối 2)</option>
+            <option value="Lớp 1A2">Lớp 1A2 (Khối 1)</option>
+          </select>
+        </div>
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; font-size: 12px; color: #94a3b8; margin-bottom: 4px;">Ngày bắt đầu có hiệu lực *</label>
+          <input type="date" class="input-ctrl" style="width: 100%;" value="2026-09-16">
+        </div>
+
+        <!-- 3 Cascade Warnings -->
+        <div style="background: rgba(37, 99, 235, 0.1); border: 1px solid #2563eb; border-radius: 8px; padding: 12px;">
+          <div style="font-weight: 700; font-size: 12px; color: #60a5fa; margin-bottom: 6px;">3 Cảnh Báo Hệ Thống Khi Chuyển Lớp:</div>
+          <div style="font-size: 11px; color: #f8fafc; margin-bottom: 4px;">1. <strong>Học phí:</strong> Biểu phí lớp mới tự động áp dụng từ ngày hiệu lực.</div>
+          <div style="font-size: 11px; color: #f8fafc; margin-bottom: 4px;">2. <strong>Trao đổi:</strong> Phụ huynh được tự động thêm vào kênh chat của lớp mới.</div>
+          <div style="font-size: 11px; color: #f8fafc;">3. <strong>Học tập:</strong> Bảo lưu toàn bộ bảng điểm và hoạt động của lớp cũ.</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-transfer')">Hủy bỏ</button>
+        <button class="btn btn-primary" onclick="confirmTransfer()">Xác nhận chuyển lớp</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL 2: PHYSICAL GROWTH & LIVE BMI ================= -->
+  <div class="modal-overlay" id="modal-growth">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">Ghi Nhận Thể Trạng & Tính BMI</h3>
+        <span style="color: #94a3b8; cursor: pointer;" onclick="closeModal('modal-growth')">✕</span>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: #f8fafc; margin-bottom: 14px;">
+          Học sinh: <strong id="growthStudentName" style="color: #60a5fa;">Nguyễn Hoàng Nam</strong>
+        </p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px;">
+          <div>
+            <label style="display: block; font-size: 12px; color: #94a3b8; margin-bottom: 4px;">Chiều cao (cm) *</label>
+            <input type="number" id="modal-h" class="input-ctrl" style="width: 100%;" value="117" oninput="calcModalBmi()">
+          </div>
+          <div>
+            <label style="display: block; font-size: 12px; color: #94a3b8; margin-bottom: 4px;">Cân nặng (kg) *</label>
+            <input type="number" id="modal-w" class="input-ctrl" style="width: 100%;" value="22.5" oninput="calcModalBmi()">
+          </div>
+        </div>
+        <div style="background: #0f172a; border: 1px solid #383e4a; border-radius: 8px; padding: 14px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-size: 11px; color: #94a3b8;">Chỉ số BMI tính toán:</div>
+            <div id="modal-bmi-val" style="font-size: 20px; font-weight: 800; color: #f8fafc; font-family: monospace;">16.4</div>
+          </div>
+          <div id="modal-bmi-badge">
+            <span class="bmi-badge bmi-normal">Bình thường</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-growth')">Hủy bỏ</button>
+        <button class="btn btn-primary" onclick="confirmGrowth()">Lưu chỉ số</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL 3: STUDENT NOTES ================= -->
+  <div class="modal-overlay" id="modal-notes">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">Ghi Chú Nội Bộ Ban Giám Hiệu</h3>
+        <span style="color: #94a3b8; cursor: pointer;" onclick="closeModal('modal-notes')">✕</span>
+      </div>
+      <div class="modal-body">
+        <label style="display: block; font-size: 12px; color: #94a3b8; margin-bottom: 6px;">Nội dung lưu ý đặc biệt (Dị ứng, tính cách, dặn dò y tế):</label>
+        <textarea class="input-ctrl" style="width: 100%; height: 100px;" placeholder="Nhập ghi chú... (Tối đa 500 ký tự)"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-notes')">Hủy bỏ</button>
+        <button class="btn btn-primary" onclick="confirmNotes()">Lưu ghi chú</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL 4: TUITION OVERRIDE ================= -->
+  <div class="modal-overlay" id="modal-tuition">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">Cấu Hình Ưu Đãi Học Phí</h3>
+        <span style="color: #94a3b8; cursor: pointer;" onclick="closeModal('modal-tuition')">✕</span>
+      </div>
+      <div class="modal-body">
+        <div style="margin-bottom: 14px;">
+          <label style="display: block; font-size: 12px; color: #94a3b8; margin-bottom: 4px;">Tỷ lệ học bổng / miễn giảm (%)</label>
+          <input type="number" class="input-ctrl" style="width: 100%;" value="10" placeholder="VD: 10">
+        </div>
+        <div style="margin-bottom: 14px;">
+          <label style="display: block; font-size: 12px; color: #94a3b8; margin-bottom: 4px;">Lý do miễn giảm</label>
+          <input type="text" class="input-ctrl" style="width: 100%;" value="Con giáo viên trường">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-tuition')">Hủy bỏ</button>
+        <button class="btn btn-primary" onclick="confirmTuition()">Cập nhật ưu đãi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL 5: DIRTY FORM CANCEL CONFIRMATION (K010) ================= -->
+  <div class="modal-overlay" id="modal-dirty-cancel">
+    <div class="modal-box" style="max-width: 440px;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="color: #f59e0b;">Xác Nhận Rời Khỏi</h3>
+        <span style="color: #94a3b8; cursor: pointer;" onclick="closeModal('modal-dirty-cancel')">✕</span>
+      </div>
+      <div class="modal-body">
+        <div style="display: flex; gap: 14px; align-items: flex-start;">
+          <div style="font-size: 28px;">⚠️</div>
+          <div>
+            <div style="font-size: 14px; font-weight: 700; color: #f8fafc; margin-bottom: 4px;">Dữ liệu chưa được lưu!</div>
+            <div style="font-size: 13px; color: #94a3b8; line-height: 1.4;">
+              Bạn đã nhập thông tin hồ sơ học sinh. Nếu rời khỏi trang lúc này, toàn bộ thay đổi sẽ bị mất.
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-dirty-cancel')">Tiếp tục chỉnh sửa</button>
+        <button class="btn btn-danger" onclick="forceLeaveForm()">Rời khỏi không lưu</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let formIsDirty = false;
+    let activeDropdownId = null;
+
+    function showToast(message, subtext = '') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast-item';
+      toast.innerHTML = `
+        <span style="color: #10b981; font-size: 16px;">✓</span>
+        <div style="flex: 1;">
+          <div style="font-weight: 700; font-size: 13px; color: #f8fafc;">${message}</div>
+          ${subtext ? `<div style="font-size: 11px; color: #94a3b8;">${subtext}</div>` : ''}
+        </div>
+        <span style="color: #94a3b8; cursor: pointer; font-size: 13px;" onclick="this.parentElement.remove()">✕</span>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.transition = 'opacity 0.3s';
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+
+    function switchRoute(route) {
+      if (formIsDirty && route !== 'create') {
+        openModal('modal-dirty-cancel');
+        window.pendingRoute = route;
+        return;
+      }
+      document.querySelectorAll('.page-view').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.route-btn').forEach(el => el.classList.remove('active'));
+
+      if (route === 'roster') {
+        document.getElementById('view-roster').classList.add('active');
+        document.querySelectorAll('.route-btn')[0].classList.add('active');
+      } else if (route === 'create') {
+        document.getElementById('view-create').classList.add('active');
+        document.querySelectorAll('.route-btn')[1].classList.add('active');
+      } else if (route === 'detail') {
+        document.getElementById('view-detail').classList.add('active');
+        document.querySelectorAll('.route-btn')[2].classList.add('active');
+      }
+      closeAllDropdowns();
+    }
+
+    function switchHubTab(tabId) {
+      document.querySelectorAll('.hub-content').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.hub-tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).style.display = 'block';
+      event.target.classList.add('active');
+    }
+
+    function toggleDropdown(event, id) {
+      event.stopPropagation();
+      const menu = document.getElementById(id);
+      const isShown = menu.classList.contains('show');
+      closeAllDropdowns();
+      if (!isShown) {
+        menu.classList.add('show');
+        activeDropdownId = id;
+      }
+    }
+
+    function closeAllDropdowns() {
+      document.querySelectorAll('.dropdown-menu').forEach(el => el.classList.remove('show'));
+      activeDropdownId = null;
+    }
+
+    document.addEventListener('click', () => closeAllDropdowns());
+
+    function openModal(id) {
+      closeAllDropdowns();
+      document.getElementById(id).classList.add('show');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('show');
+    }
+
+    function openTransferModal(name) {
+      document.getElementById('transferStudentName').textContent = name;
+      openModal('modal-transfer');
+    }
+
+    function confirmTransfer() {
+      closeModal('modal-transfer');
+      showToast('Chuyển lớp thành công', 'Đã chuyển học sinh sang Lớp 2A1 với 3 cascade bảo toàn');
+    }
+
+    function openGrowthModal(name) {
+      document.getElementById('growthStudentName').textContent = name;
+      calcModalBmi();
+      openModal('modal-growth');
+    }
+
+    function confirmGrowth() {
+      closeModal('modal-growth');
+      showToast('Ghi nhận thể trạng thành công', 'Chỉ số BMI: 16.4 (Bình thường)');
+    }
+
+    function openNotesModal(name) { openModal('modal-notes'); }
+    function confirmNotes() {
+      closeModal('modal-notes');
+      showToast('Lưu ghi chú thành công');
+    }
+
+    function openTuitionModal(name) { openModal('modal-tuition'); }
+    function confirmTuition() {
+      closeModal('modal-tuition');
+      showToast('Cập nhật ưu đãi học phí thành công', 'Áp dụng giảm 10% học phí chính khóa');
+    }
+
+    function markDirty() { formIsDirty = true; }
+    function cancelCreateForm() {
+      if (formIsDirty) {
+        window.pendingRoute = 'roster';
+        openModal('modal-dirty-cancel');
+      } else {
+        switchRoute('roster');
+      }
+    }
+    function forceLeaveForm() {
+      formIsDirty = false;
+      closeModal('modal-dirty-cancel');
+      switchRoute(window.pendingRoute || 'roster');
+    }
+    function submitCreateForm() {
+      formIsDirty = false;
+      showToast('Tiếp nhận học sinh thành công', 'Hồ sơ đã được lưu vào hệ thống');
+      switchRoute('roster');
+    }
+
+    function calcCreateBmi() {
+      const h = parseFloat(document.getElementById('create-h').value) || 0;
+      const w = parseFloat(document.getElementById('create-w').value) || 0;
+      if (h <= 0 || w <= 0) return;
+      const bmi = (w / ((h/100) * (h/100))).toFixed(1);
+      document.getElementById('create-bmi-val').textContent = bmi;
+      renderBmiBadge(bmi, 'create-bmi-badge');
+    }
+
+    function calcModalBmi() {
+      const h = parseFloat(document.getElementById('modal-h').value) || 0;
+      const w = parseFloat(document.getElementById('modal-w').value) || 0;
+      if (h <= 0 || w <= 0) return;
+      const bmi = (w / ((h/100) * (h/100))).toFixed(1);
+      document.getElementById('modal-bmi-val').textContent = bmi;
+      renderBmiBadge(bmi, 'modal-bmi-badge');
+    }
+
+    function renderBmiBadge(bmi, containerId) {
+      let badgeHtml = '';
+      if (bmi < 14.0) {
+        badgeHtml = '<span class="bmi-badge bmi-underweight">Gầy</span>';
+      } else if (bmi <= 18.0) {
+        badgeHtml = '<span class="bmi-badge bmi-normal">Bình thường</span>';
+      } else if (bmi <= 20.0) {
+        badgeHtml = '<span class="bmi-badge bmi-overweight">Nguy cơ thừa cân</span>';
+      } else {
+        badgeHtml = '<span class="bmi-badge bmi-obese">Béo phì</span>';
+      }
+      document.getElementById(containerId).innerHTML = badgeHtml;
+    }
+
+    function filterTable(keyword) {
+      const rows = document.querySelectorAll('#studentTable tbody tr');
+      const kw = keyword.toLowerCase().trim();
+      let count = 0;
+      rows.forEach(r => {
+        const text = r.textContent.toLowerCase();
+        if (text.includes(kw)) {
+          r.style.display = '';
+          count++;
+        } else {
+          r.style.display = 'none';
+        }
+      });
+      document.getElementById('studentCount').textContent = count;
+    }
+
+    function filterClass(className) {
+      const rows = document.querySelectorAll('#studentTable tbody tr');
+      let count = 0;
+      rows.forEach(r => {
+        if (className === 'all' || r.textContent.includes(className)) {
+          r.style.display = '';
+          count++;
+        } else {
+          r.style.display = 'none';
+        }
+      });
+      document.getElementById('studentCount').textContent = count;
+    }
+  </script>
+</body>
+</html>

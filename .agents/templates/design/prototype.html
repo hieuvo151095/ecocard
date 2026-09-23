@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Prototype — {{feature_name}}</title>
+  <style>
+    :root {
+      --bg-canvas: #f8fafc;
+      --bg-surface: #ffffff;
+      --text-primary: #0f172a;
+      --border-color: #e2e8f0;
+      --primary: #2563eb;
+    }
+    body {
+      font-family: Inter, sans-serif;
+      margin: 0;
+      display: flex;
+      height: 100vh;
+      background: var(--bg-canvas);
+    }
+    sidebar {
+      width: 260px;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border-color);
+      padding: 20px;
+    }
+    main {
+      flex: 1;
+      padding: 32px;
+      overflow-y: auto;
+    }
+    .state-picker {
+      background: #f1f5f9;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <sidebar>
+    <h3 style="margin-top: 0;">Screen Switcher</h3>
+    <ul style="padding-left: 16px;">
+      <li><a href="#scr-001">SCR-001: Main View</a></li>
+      <li><a href="#scr-002">SCR-002: Detail Panel</a></li>
+    </ul>
+  </sidebar>
+
+  <main>
+    <div class="state-picker">
+      <strong>State Simulator:</strong>
+      <button onclick="alert('Simulating Loading State')">Loading</button>
+      <button onclick="alert('Simulating Empty State')">Empty</button>
+      <button onclick="alert('Simulating Error State')">Error</button>
+    </div>
+
+    <div id="scr-001" style="background: white; border: 1px solid #e2e8f0; padding: 24px; border-radius: 8px;">
+      <h2>SCR-001: Main View</h2>
+      <p>Prototype shell rendered for feature flow validation.</p>
+    </div>
+  </main>
+
+</body>
+</html>

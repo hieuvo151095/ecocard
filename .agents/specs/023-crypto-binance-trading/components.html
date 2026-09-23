@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Binance Component Spec Gallery — 023-crypto-binance-trading</title>
+  <style>
+    :root {
+      --binance-yellow: #F0B90B;
+      --binance-dark: #222126;
+      --crypto-green: #0ECB81;
+      --crypto-red: #F6465D;
+    }
+    body { font-family: sans-serif; background: var(--binance-dark); color: white; padding: 32px; }
+    .card { background: #2B2F36; border: 1px solid #383e4a; border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+    .btn-pill { background: var(--binance-yellow); color: #1E2026; border: none; padding: 12px 24px; border-radius: 50px; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <h1>❖ Binance Design System Component Gallery (`binance/DESIGN.md`)</h1>
+  
+  <div class="card">
+    <h3>1. 50px Pill-Shaped Primary CTA Buttons</h3>
+    <button class="btn-pill">Buy BTC (Instant Market Order)</button>
+  </div>
+
+  <div class="card">
+    <h3>2. Crypto Price Tickers &amp; Candles</h3>
+    <span style="color:var(--crypto-green); font-weight:700;">Bull Green (#0ECB81) +3.45%</span> | 
+    <span style="color:var(--crypto-red); font-weight:700;">Bear Red (#F6465D) -1.20%</span>
+  </div>
+</body>
+</html>

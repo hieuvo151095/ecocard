@@ -1,0 +1,353 @@
+/**
+ * ECO Card Portal - Module M6 (Đối soát)
+ * Seed Data transcribed faithfully from Screenshots & Legacy Specs
+ */
+
+import { generatePeriodSchedule, createSessionSnapshot } from '../services/reconciliationCalculator.js';
+import { SESSION_STATUS, ARREARS_STATUS, SETTLEMENT_SCOPES } from './models.js';
+
+export const INITIAL_GROUPS = [
+  {
+    id: 'G-HIEUTEST',
+    code: 'HIEUTEST',
+    name: 'Hệ thống Trường Hieutest',
+    taxCode: '0312345678',
+    bankName: 'Ngân hàng Ngoại thương Việt Nam (Vietcombank)',
+    bankAccount: '0071001234567',
+    bankAccountName: 'HE THONG TRUONG HIEUTEST',
+    settlementScope: SETTLEMENT_SCOPES.GROUP, // Theo nhóm trường
+    emails: ['finance@hieutest.edu.vn', 'ketoan@hieutest.edu.vn'],
+    isActive: true,
+    serviceYearStart: '2026-09-01',
+    serviceYearEnd: '2027-05-31',
+    periodsCount: 9,
+    thresholds: {
+      minActiveMonths: 1,
+      surplusDayThreshold: 15,
+    },
+    periods: generatePeriodSchedule('2026-09-01', '2027-05-31', 9),
+    branches: [
+      {
+        id: 'BR-HIEUTEST-1',
+        code: 'HIEUTEST_1',
+        name: 'Tiểu học Hieutest Cơ sở 1',
+        studentCount: 120,
+        isActive: true,
+        emails: ['cs1@hieutest.edu.vn'],
+        services: {
+          managementSoftware: true,
+          cameraAi: true,
+          studentCard: true,
+          canteen: false,
+        },
+        tariffs: {
+          'Kỳ 1': { managementSoftware: 15000, cameraAi: 8000, studentCard: 5000, canteen: 0 },
+          'Kỳ 2': { managementSoftware: 15000, cameraAi: 8000, studentCard: 5000, canteen: 0 },
+          'Kỳ 3': { managementSoftware: 15000, cameraAi: 8000, studentCard: 5000, canteen: 0 },
+        },
+      },
+      {
+        id: 'BR-HIEUTEST-2',
+        code: 'HIEUTEST_2',
+        name: 'THCS Hieutest Cơ sở 2',
+        studentCount: 95,
+        isActive: true,
+        emails: ['cs2@hieutest.edu.vn'],
+        services: {
+          managementSoftware: true,
+          cameraAi: true,
+          studentCard: false,
+          canteen: true,
+        },
+        tariffs: {
+          'Kỳ 1': { managementSoftware: 15000, cameraAi: 8000, studentCard: 0, canteen: 12000 },
+          'Kỳ 2': { managementSoftware: 15000, cameraAi: 8000, studentCard: 0, canteen: 12000 },
+          'Kỳ 3': { managementSoftware: 15000, cameraAi: 8000, studentCard: 0, canteen: 12000 },
+        },
+      },
+    ],
+  },
+  {
+    id: 'G-TESTUAT',
+    code: 'TESTUAT',
+    name: 'Hệ thống Giáo dục UAT School',
+    taxCode: '0398765432',
+    bankName: 'Ngân hàng Quân đội (MBBank)',
+    bankAccount: '088812345678',
+    bankAccountName: 'CONG TY GIAO DUC UAT',
+    settlementScope: SETTLEMENT_SCOPES.BRANCH, // Theo từng trường
+    emails: ['uat-accounting@uat.edu.vn'],
+    isActive: true,
+    serviceYearStart: '2026-09-01',
+    serviceYearEnd: '2027-05-31',
+    periodsCount: 9,
+    thresholds: {
+      minActiveMonths: 1,
+      surplusDayThreshold: 10,
+    },
+    periods: generatePeriodSchedule('2026-09-01', '2027-05-31', 9),
+    branches: [
+      {
+        id: 'BR-TESTUAT-MN',
+        code: 'TESTUAT_MN',
+        name: 'Mầm non UAT Sunshine',
+        studentCount: 60,
+        isActive: true,
+        emails: ['sunshine@uat.edu.vn'],
+        services: {
+          managementSoftware: true,
+          cameraAi: true,
+          studentCard: false,
+          canteen: false,
+        },
+        tariffs: {
+          'Kỳ 1': { managementSoftware: 12000, cameraAi: 6000, studentCard: 0, canteen: 0 },
+        },
+      },
+    ],
+  },
+  {
+    id: 'G-THUANTEST',
+    code: 'THUANTEST',
+    name: 'Trường Liên cấp Thuận Test',
+    taxCode: '0109998888',
+    bankName: 'Techcombank',
+    bankAccount: '19033344455566',
+    bankAccountName: 'TRUONG LIEN CAP THUAN TEST',
+    settlementScope: SETTLEMENT_SCOPES.GROUP,
+    emails: ['thuantest@gmail.com'],
+    isActive: true,
+    serviceYearStart: '2026-09-01',
+    serviceYearEnd: '2027-05-31',
+    periodsCount: 9,
+    thresholds: {
+      minActiveMonths: 1,
+      surplusDayThreshold: 15,
+    },
+    periods: generatePeriodSchedule('2026-09-01', '2027-05-31', 9),
+    branches: [
+      {
+        id: 'BR-THUAN-01',
+        code: 'THUAN_01',
+        name: 'Trường Tiểu học Thuận Test',
+        studentCount: 80,
+        isActive: true,
+        emails: ['thuan01@gmail.com'],
+        services: {
+          managementSoftware: true,
+          cameraAi: false,
+          studentCard: true,
+          canteen: false,
+        },
+        tariffs: {
+          'Kỳ 1': { managementSoftware: 10000, cameraAi: 0, studentCard: 3000, canteen: 0 },
+        },
+      },
+    ],
+  },
+];
+
+// Mark initial period hasActiveSession
+INITIAL_GROUPS[0].periods[0].hasActiveSession = true; // HIEUTEST Kỳ 1 has REC-B7A17279166
+INITIAL_GROUPS[0].periods[1].hasActiveSession = true; // HIEUTEST Kỳ 2 has REC-8A9C11029F
+INITIAL_GROUPS[1].periods[0].hasActiveSession = true; // TESTUAT Kỳ 1 has REC-518BB66CE4
+
+const groupHieu = INITIAL_GROUPS[0];
+const groupUat = INITIAL_GROUPS[1];
+
+export const INITIAL_SESSIONS = [
+  {
+    id: 'REC-B7A17279166',
+    sessionCode: 'REC-B7A17279166',
+    groupId: groupHieu.id,
+    groupCode: groupHieu.code,
+    groupName: groupHieu.name,
+    settlementScope: groupHieu.settlementScope,
+    periodId: 'Kỳ 1',
+    periodName: 'Kỳ 1 - Tháng 9/2026',
+    cutOffDate: '2026-09-30',
+    createdAt: '2026-09-23T08:30:00Z',
+    updatedAt: '2026-09-23T14:20:00Z',
+    status: SESSION_STATUS.PAID,
+    arrearsStatus: ARREARS_STATUS.HAS_ARREARS,
+    isReleased: false,
+    isArrears: false,
+    parentSessionId: null,
+    totalActiveStudents: 215,
+    periodFee: 4860000,
+    arrearsFee: 0,
+    totalFee: 4860000,
+    snapshot: createSessionSnapshot(groupHieu, groupHieu.branches, groupHieu.periods[0], groupHieu.thresholds),
+    branchesSummary: [
+      {
+        branchId: 'BR-HIEUTEST-1',
+        branchCode: 'HIEUTEST_1',
+        branchName: 'Tiểu học Hieutest Cơ sở 1',
+        studentCount: 120,
+        activeStudents: 120,
+        periodFee: 3360000,
+        arrearsFee: 0,
+        totalFee: 3360000,
+        serviceBreakdown: [
+          { serviceId: 'managementSoftware', serviceName: 'Phần mềm quản lý nhà trường', isEnabled: true, activeStudents: 120, unitPrice: 15000, totalFee: 1800000 },
+          { serviceId: 'cameraAi', serviceName: 'Camera AI', isEnabled: true, activeStudents: 120, unitPrice: 8000, totalFee: 960000 },
+          { serviceId: 'studentCard', serviceName: 'Thẻ học sinh', isEnabled: true, activeStudents: 120, unitPrice: 5000, totalFee: 600000 },
+          { serviceId: 'canteen', serviceName: 'Căn tin học đường', isEnabled: false, activeStudents: 0, unitPrice: 0, totalFee: 0 },
+        ],
+      },
+      {
+        branchId: 'BR-HIEUTEST-2',
+        branchCode: 'HIEUTEST_2',
+        branchName: 'THCS Hieutest Cơ sở 2',
+        studentCount: 95,
+        activeStudents: 95,
+        periodFee: 1500000, // Reduced demo tariff
+        arrearsFee: 0,
+        totalFee: 1500000,
+        serviceBreakdown: [
+          { serviceId: 'managementSoftware', serviceName: 'Phần mềm quản lý nhà trường', isEnabled: true, activeStudents: 95, unitPrice: 15000, totalFee: 1425000 },
+          { serviceId: 'cameraAi', serviceName: 'Camera AI', isEnabled: true, activeStudents: 95, unitPrice: 8000, totalFee: 760000 },
+          { serviceId: 'studentCard', serviceName: 'Thẻ học sinh', isEnabled: false, activeStudents: 0, unitPrice: 0, totalFee: 0 },
+          { serviceId: 'canteen', serviceName: 'Căn tin học đường', isEnabled: true, activeStudents: 95, unitPrice: 12000, totalFee: 1140000 },
+        ],
+      },
+    ],
+  },
+  // Child nested truy thu session under REC-B7A17279166
+  {
+    id: 'REC-B7A17279166-TT1',
+    sessionCode: 'REC-B7A17279166-TT1',
+    groupId: groupHieu.id,
+    groupCode: groupHieu.code,
+    groupName: groupHieu.name,
+    settlementScope: groupHieu.settlementScope,
+    periodId: 'Kỳ 1',
+    periodName: 'Kỳ 1 - Tháng 9/2026',
+    cutOffDate: '2026-10-05',
+    createdAt: '2026-10-05T09:15:00Z',
+    updatedAt: '2026-10-05T10:00:00Z',
+    status: SESSION_STATUS.PAID,
+    arrearsStatus: ARREARS_STATUS.NORMAL,
+    isReleased: false,
+    isArrears: true,
+    parentSessionId: 'REC-B7A17279166',
+    targetBranchId: 'BR-HIEUTEST-1',
+    targetBranchName: 'Tiểu học Hieutest Cơ sở 1',
+    totalActiveStudents: 15,
+    periodFee: 0,
+    arrearsFee: 350000,
+    totalFee: 350000,
+    snapshot: createSessionSnapshot(groupHieu, [groupHieu.branches[0]], groupHieu.periods[0], groupHieu.thresholds),
+    branchesSummary: [
+      {
+        branchId: 'BR-HIEUTEST-1',
+        branchCode: 'HIEUTEST_1',
+        branchName: 'Tiểu học Hieutest Cơ sở 1',
+        studentCount: 15,
+        activeStudents: 15,
+        periodFee: 0,
+        arrearsFee: 350000,
+        totalFee: 350000,
+        serviceBreakdown: [
+          { serviceId: 'managementSoftware', serviceName: 'Phần mềm quản lý nhà trường (Truy thu)', isEnabled: true, activeStudents: 15, unitPrice: 15000, totalFee: 225000 },
+          { serviceId: 'cameraAi', serviceName: 'Camera AI (Truy thu)', isEnabled: true, activeStudents: 15, unitPrice: 8000, totalFee: 125000 },
+        ],
+      },
+    ],
+  },
+  // UAT Session matching Screenshot 01 exact total: 1.008.000đ
+  {
+    id: 'REC-518BB66CE4',
+    sessionCode: 'REC-518BB66CE4',
+    groupId: groupUat.id,
+    groupCode: groupUat.code,
+    groupName: groupUat.name,
+    settlementScope: groupUat.settlementScope,
+    periodId: 'Kỳ 1',
+    periodName: 'Kỳ 1 - Tháng 9/2026',
+    cutOffDate: '2026-09-30',
+    createdAt: '2026-09-23T11:00:00Z',
+    updatedAt: '2026-09-23T11:30:00Z',
+    status: SESSION_STATUS.PENDING_APPROVAL, // Chờ duyệt
+    arrearsStatus: ARREARS_STATUS.NORMAL,
+    isReleased: false,
+    isArrears: false,
+    parentSessionId: null,
+    totalActiveStudents: 56,
+    periodFee: 1008000,
+    arrearsFee: 0,
+    totalFee: 1008000, // 56 students * (12000 + 6000) = 1,008,000 VND exact match!
+    snapshot: createSessionSnapshot(groupUat, groupUat.branches, groupUat.periods[0], groupUat.thresholds),
+    branchesSummary: [
+      {
+        branchId: 'BR-TESTUAT-MN',
+        branchCode: 'TESTUAT_MN',
+        branchName: 'Mầm non UAT Sunshine',
+        studentCount: 60,
+        activeStudents: 56,
+        periodFee: 1008000,
+        arrearsFee: 0,
+        totalFee: 1008000,
+        serviceBreakdown: [
+          { serviceId: 'managementSoftware', serviceName: 'Phần mềm quản lý nhà trường', isEnabled: true, activeStudents: 56, unitPrice: 12000, totalFee: 672000 },
+          { serviceId: 'cameraAi', serviceName: 'Camera AI', isEnabled: true, activeStudents: 56, unitPrice: 6000, totalFee: 336000 },
+        ],
+      },
+    ],
+  },
+  // Draft session for HIEUTEST Kỳ 2
+  {
+    id: 'REC-8A9C11029F',
+    sessionCode: 'REC-8A9C11029F',
+    groupId: groupHieu.id,
+    groupCode: groupHieu.code,
+    groupName: groupHieu.name,
+    settlementScope: groupHieu.settlementScope,
+    periodId: 'Kỳ 2',
+    periodName: 'Kỳ 2 - Tháng 10/2026',
+    cutOffDate: '2026-10-31',
+    createdAt: '2026-10-20T10:00:00Z',
+    updatedAt: '2026-10-20T10:00:00Z',
+    status: SESSION_STATUS.DRAFT, // Nháp
+    arrearsStatus: ARREARS_STATUS.NORMAL,
+    isReleased: false,
+    isArrears: false,
+    parentSessionId: null,
+    totalActiveStudents: 215,
+    periodFee: 4860000,
+    arrearsFee: 0,
+    totalFee: 4860000,
+    snapshot: createSessionSnapshot(groupHieu, groupHieu.branches, groupHieu.periods[1], groupHieu.thresholds),
+    branchesSummary: [
+      {
+        branchId: 'BR-HIEUTEST-1',
+        branchCode: 'HIEUTEST_1',
+        branchName: 'Tiểu học Hieutest Cơ sở 1',
+        studentCount: 120,
+        activeStudents: 120,
+        periodFee: 3360000,
+        arrearsFee: 0,
+        totalFee: 3360000,
+        serviceBreakdown: [
+          { serviceId: 'managementSoftware', serviceName: 'Phần mềm quản lý nhà trường', isEnabled: true, activeStudents: 120, unitPrice: 15000, totalFee: 1800000 },
+          { serviceId: 'cameraAi', serviceName: 'Camera AI', isEnabled: true, activeStudents: 120, unitPrice: 8000, totalFee: 960000 },
+          { serviceId: 'studentCard', serviceName: 'Thẻ học sinh', isEnabled: true, activeStudents: 120, unitPrice: 5000, totalFee: 600000 },
+        ],
+      },
+      {
+        branchId: 'BR-HIEUTEST-2',
+        branchCode: 'HIEUTEST_2',
+        branchName: 'THCS Hieutest Cơ sở 2',
+        studentCount: 95,
+        activeStudents: 95,
+        periodFee: 1500000,
+        arrearsFee: 0,
+        totalFee: 1500000,
+        serviceBreakdown: [
+          { serviceId: 'managementSoftware', serviceName: 'Phần mềm quản lý nhà trường', isEnabled: true, activeStudents: 95, unitPrice: 15000, totalFee: 1425000 },
+          { serviceId: 'cameraAi', serviceName: 'Camera AI', isEnabled: true, activeStudents: 95, unitPrice: 8000, totalFee: 760000 },
+        ],
+      },
+    ],
+  },
+];

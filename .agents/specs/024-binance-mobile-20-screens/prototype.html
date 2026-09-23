@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Binance Mobile App — 20-Screen Interactive Prototype (024-binance-mobile-20-screens)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --binance-yellow: #F0B90B;
+      --binance-dark: #222126;
+      --dark-card: #2B2F36;
+      --crypto-green: #0ECB81;
+      --crypto-red: #F6465D;
+      --font-sans: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      font-family: var(--font-sans);
+      background-color: #0f172a;
+      color: white;
+      margin: 0; padding: 0;
+      display: flex; flex-direction: column;
+      height: 100vh; overflow: hidden;
+    }
+
+    .sim-bar {
+      background: #020617; border-bottom: 1px solid #1e293b; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; font-size: 12px;
+    }
+
+    .phone-container { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; }
+
+    .phone-shell {
+      width: 390px; height: 780px; background: var(--binance-dark); border: 10px solid #1e293b; border-radius: 48px; box-shadow: 0 25px 50px rgba(0,0,0,0.6); display: flex; flex-direction: column; overflow: hidden; position: relative;
+    }
+
+    .phone-header { height: 44px; background: var(--binance-dark); border-bottom: 1px solid #2B2F36; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; font-size: 11px; font-weight: 700; }
+    .dynamic-island { width: 90px; height: 22px; background: black; border-radius: 20px; }
+
+    .phone-screen { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; }
+    .btn-pill { background: var(--binance-yellow); color: #1E2026; border: none; padding: 12px 20px; border-radius: 50px; font-weight: 700; font-size: 12px; width: 100%; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+  <!-- Top Simulator Bar -->
+  <div class="sim-bar">
+    <div><strong style="color:var(--binance-yellow);">❖ Binance Mobile App (20 Screens Navigator):</strong></div>
+    <select onchange="navigateScreen(this.value)" style="background:#1e293b; color:white; border:1px solid #334155; padding:4px 8px; border-radius:4px; font-size:12px;">
+      <option value="1">MOB-001: Splash &amp; Welcome</option>
+      <option value="2">MOB-002: Onboarding 1 (Security)</option>
+      <option value="3">MOB-003: Onboarding 2 (Spot)</option>
+      <option value="4">MOB-004: Biometric Login</option>
+      <option value="5">MOB-005: 2FA Security OTP</option>
+      <option value="6">MOB-006: KYC Identity Photo</option>
+      <option value="7">MOB-007: Home Market Dashboard</option>
+      <option value="8">MOB-008: Search &amp; Watchlist</option>
+      <option value="9">MOB-009: Spot Candlestick Chart</option>
+      <option value="10">MOB-010: Orderbook &amp; Trade Drawer</option>
+      <option value="11">MOB-011: Instant Fiat Buy</option>
+      <option value="12">MOB-012: Zero-Fee Convert Swap</option>
+      <option value="13">MOB-013: Futures 125x Leverage</option>
+      <option value="14">MOB-014: Binance Earn APY Vaults</option>
+      <option value="15">MOB-015: Spot Wallet Balance</option>
+      <option value="16">MOB-016: Deposit Crypto QR Code</option>
+      <option value="17">MOB-017: Withdraw Address Check</option>
+      <option value="18">MOB-018: P2P Merchant Express</option>
+      <option value="19">MOB-019: Transaction History</option>
+      <option value="20">MOB-020: Security Settings</option>
+    </select>
+  </div>
+
+  <!-- Mobile Phone Shell -->
+  <div class="phone-container">
+    <div class="phone-shell">
+      <div class="phone-header"><span>9:41</span><div class="dynamic-island"></div><span>5G 📶</span></div>
+
+      <div class="phone-screen" id="screen">
+        <div style="text-align:center; padding:40px 10px;">
+          <div style="font-size:48px; color:var(--binance-yellow); margin-bottom:12px;">❖</div>
+          <h2 style="margin:0 0 8px 0; color:var(--binance-yellow);">BINANCE MOBILE</h2>
+          <p style="font-size:12px; color:#848E9C; margin-bottom:30px;">Currently viewing Screen #<span id="current-num">1</span> of 20 Mobile Screens</p>
+          <button class="btn-pill" onclick="nextScreen()">Navigate Next Screen &rarr;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentScreen = 1;
+    function navigateScreen(val) {
+      currentScreen = parseInt(val);
+      document.getElementById('current-num').innerText = currentScreen;
+    }
+    function nextScreen() {
+      currentScreen = (currentScreen % 20) + 1;
+      document.getElementById('current-num').innerText = currentScreen;
+    }
+  </script>
+
+</body>
+</html>

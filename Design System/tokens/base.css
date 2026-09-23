@@ -1,0 +1,6 @@
+/* Minimal element defaults so specimens and kits inherit ECO type + colour. */
+:root{color-scheme:light}
+body{margin:0;font-family:var(--font-core);font-size:var(--font-size-base);line-height:var(--font-height-default);color:var(--color-primary-text);background:var(--color-alias-theme);-webkit-font-smoothing:antialiased}
+a{color:var(--color-alias-hyperlink);text-decoration:none}
+a:hover{color:var(--color-primary-blue-eco);text-decoration:underline}
+*,*::before,*::after{box-sizing:border-box}

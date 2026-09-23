@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Figma Mobile Board — Fleet Driver App (022-mobile-fleet-driver)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --canvas-bg: #e2e8f0;
+      --canvas-grid: #cbd5e1;
+      --artboard-bg: #ffffff;
+      --border-color: #cbd5e1;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --primary: #2563eb;
+      --primary-subtle: #eff6ff;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --shadow-artboard: 0 25px 35px -5px rgba(15, 23, 42, 0.2);
+      --font-sans: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--canvas-bg);
+      background-image: radial-gradient(var(--canvas-grid) 1.5px, transparent 1.5px);
+      background-size: 24px 24px;
+      color: var(--text-primary);
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Figma Bar */
+    .figma-top-bar {
+      height: 48px;
+      background: #0f172a;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      font-size: 13px;
+      z-index: 1000;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+
+    .figma-logo-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 600;
+    }
+
+    .figma-badge {
+      background: #2563eb;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .figma-btn {
+      background: #1e293b;
+      color: white;
+      border: 1px solid #334155;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .figma-btn:hover { background: #334155; }
+    .figma-btn-primary { background: #2563eb; border-color: #2563eb; font-weight: 600; }
+    .figma-btn-primary:hover { background: #1d4ed8; }
+
+    /* Canvas Viewport */
+    .canvas-viewport {
+      position: absolute;
+      top: 48px;
+      bottom: 56px;
+      left: 0;
+      right: 0;
+      overflow: hidden;
+      cursor: grab;
+    }
+
+    .canvas-viewport:active {
+      cursor: grabbing;
+    }
+
+    .canvas-world {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 5000px;
+      height: 5000px;
+      transform-origin: 0 0;
+    }
+
+    /* SVG Flow Overlay */
+    .svg-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    /* Phone Shell Artboard */
+    .artboard {
+      position: absolute;
+      background: #ffffff;
+      border-radius: 44px;
+      box-shadow: var(--shadow-artboard);
+      border: 6px solid #0f172a;
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+      transition: outline 0.15s ease, box-shadow 0.15s ease;
+      width: 390px;
+      height: 810px;
+      overflow: hidden;
+    }
+
+    /* Desktop/Spec Artboard Frame */
+    .spec-artboard {
+      position: absolute;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: var(--shadow-artboard);
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+      width: 620px;
+      height: 810px;
+      overflow: hidden;
+    }
+
+    .artboard.selected, .spec-artboard.selected {
+      outline: 3px solid #2563eb;
+      box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.25), var(--shadow-artboard);
+      z-index: 20;
+    }
+
+    .mobile-header-handle {
+      height: 48px;
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      cursor: move;
+      font-size: 11px;
+      font-weight: 700;
+      color: #0f172a;
+      position: relative;
+    }
+
+    .dynamic-island {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 96px;
+      height: 24px;
+      background: #000000;
+      border-radius: 20px;
+    }
+
+    .artboard-meta-label {
+      position: absolute;
+      top: -36px;
+      left: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #334155;
+      white-space: nowrap;
+    }
+
+    .mobile-body {
+      flex: 1;
+      background: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      position: relative;
+      cursor: auto;
+      gap: 12px;
+      overflow-y: auto;
+    }
+
+    .home-indicator-bar {
+      height: 20px;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .home-indicator { width: 120px; height: 4px; background: #0f172a; border-radius: 2px; }
+
+    /* Bottom Figma Canvas Toolbar */
+    .figma-bottom-bar {
+      height: 56px;
+      background: #0f172a;
+      border-top: 1px solid #1e293b;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 24px;
+      z-index: 1000;
+      color: white;
+      font-size: 13px;
+    }
+
+    .tool-group { display: flex; gap: 8px; align-items: center; }
+    .tool-btn { background: #1e293b; color: white; border: 1px solid #334155; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+    .tool-btn.active { background: #2563eb; border-color: #2563eb; font-weight: 600; }
+    .zoom-btn { background: #1e293b; color: white; border: 1px solid #334155; width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: 600; }
+
+    .card-designer {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+
+    .btn-designer {
+      background: #2563eb;
+      color: white;
+      border: none;
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Figma Navigation Bar -->
+  <div class="figma-top-bar">
+    <div class="figma-logo-group">
+      <span style="font-size: 16px;">❖</span>
+      <span>Figma Interactive Mobile Board — Fleet Driver PoD</span>
+      <span class="figma-badge">DESIGN SYSTEM TOKEN SPEC MANDATORY</span>
+    </div>
+
+    <div class="top-actions">
+      <span style="color: #94a3b8; font-size: 12px;">Active System: <strong style="color:white;">company/DESIGN.md</strong></span>
+      <a href="prototype.html" class="figma-btn figma-btn-primary">📱 Play Interactive Prototype App</a>
+      <a href="components.html" class="figma-btn">🧩 Component Spec</a>
+    </div>
+  </div>
+
+  <!-- Main Canvas Viewport -->
+  <div class="canvas-viewport" id="viewport">
+    <div class="canvas-world" id="world">
+
+      <!-- Dynamic SVG Flow Connectors -->
+      <svg class="svg-overlay">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
+          </marker>
+        </defs>
+        <path id="flow-line-1" stroke="#2563eb" stroke-width="3" fill="none" marker-end="url(#arrow)" stroke-dasharray="6,4"/>
+        <path id="flow-line-2" stroke="#2563eb" stroke-width="3" fill="none" marker-end="url(#arrow)" stroke-dasharray="6,4"/>
+      </svg>
+
+      <!-- ARTBOARD 1: MOB-001 Active Delivery Route Dashboard -->
+      <div class="artboard selected" id="artboard-1" style="left: 100px; top: 100px;">
+        <div class="artboard-meta-label">
+          <span>MOB-001: Active Route Dashboard</span>
+          <span style="background:#ffffff; border:1px solid #cbd5e1; padding:2px 6px; border-radius:4px; font-size:11px; font-family:var(--font-mono); color:#64748b;">390×844 Mobile</span>
+        </div>
+
+        <div class="mobile-header-handle" onmousedown="startDragArtboard(event, 'artboard-1')">
+          <span>9:41</span>
+          <div class="dynamic-island"></div>
+          <span>5G 📶 100%</span>
+        </div>
+
+        <div class="mobile-body" onmousedown="event.stopPropagation()">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-size:10px; color:#64748b; font-weight:600;">Driver: Alex Morgan</div>
+              <h3 style="margin:0; font-size:16px; font-weight:800;">Route #DRV-8820</h3>
+            </div>
+            <span style="background:#ecfdf5; color:#10b981; border:1px solid rgba(16,185,129,0.3); padding:3px 8px; border-radius:9999px; font-size:10px; font-weight:700;">4 Drops Left</span>
+          </div>
+
+          <!-- Vector Map Card -->
+          <div style="height:140px; background:#e0f2fe; border-radius:12px; overflow:hidden; position:relative; border:1px solid #bae6fd;">
+            <svg width="100%" height="100%" viewBox="0 0 360 140">
+              <path d="M 0 70 Q 90 10, 180 70 T 360 70" stroke="#93c5fd" stroke-width="20" fill="none"/>
+              <path d="M 30 110 L 120 30 L 260 100 L 330 20" stroke="#2563eb" stroke-width="4" fill="none" stroke-dasharray="5,3"/>
+              <circle cx="120" cy="30" r="5" fill="#2563eb"/>
+              <circle cx="260" cy="100" r="6" fill="#ef4444"/>
+            </svg>
+            <div style="position:absolute; bottom:8px; left:10px; background:rgba(255,255,255,0.9); padding:3px 8px; border-radius:4px; font-size:10px; font-weight:600;">📍 GPS: 1.2 mi to Dock 04</div>
+          </div>
+
+          <!-- Active Stop Card -->
+          <div class="card-designer" style="border-left: 4px solid #2563eb;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+              <span style="font-size:10px; color:#2563eb; font-weight:700;">Priority Stop #1</span>
+              <span style="font-size:10px; color:#f59e0b; font-weight:700; background:#fffbeb; padding:2px 6px; border-radius:4px;">⏱️ 14m SLA</span>
+            </div>
+            <h4 style="margin:0 0 2px 0; font-size:13px; font-weight:700;">Acme Logistics Tech Hub</h4>
+            <p style="margin:0 0 8px 0; font-size:11px; color:#475569;">Building B, Dock 04, San Francisco</p>
+            <button class="btn-designer" onclick="highlightScannerArtboard()">📷 Open Camera QR Scanner</button>
+          </div>
+        </div>
+
+        <div class="home-indicator-bar"><div class="home-indicator"></div></div>
+      </div>
+
+      <!-- ARTBOARD 2: MOB-002 Camera Laser Scanner -->
+      <div class="artboard" id="artboard-2" style="left: 550px; top: 100px;">
+        <div class="artboard-meta-label">
+          <span>MOB-002: Camera QR Package Scanner</span>
+          <span style="background:#ffffff; border:1px solid #cbd5e1; padding:2px 6px; border-radius:4px; font-size:11px; font-family:var(--font-mono); color:#64748b;">Scan Viewport</span>
+        </div>
+
+        <div class="mobile-header-handle" onmousedown="startDragArtboard(event, 'artboard-2')">
+          <span>9:42</span>
+          <div class="dynamic-island"></div>
+          <span>⚡ Torch On</span>
+        </div>
+
+        <div class="mobile-body" style="background:#0f172a; color:white;" onmousedown="event.stopPropagation()">
+          <div style="text-align:center; font-size:12px; font-weight:600; margin-bottom:12px;">Point Camera at Barcode</div>
+
+          <div style="flex:1; border:2px dashed #2563eb; border-radius:16px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:rgba(37,99,235,0.1); position:relative;">
+            <div style="width:150px; height:150px; border:2px solid #2563eb; border-radius:12px; display:flex; align-items:center; justify-content:center;">
+              <span style="font-size:36px;">📷</span>
+            </div>
+            <p style="font-size:11px; color:#94a3b8; margin-top:12px;">Target SKU: <code style="color:#60a5fa;">SKU-9920-BAY04</code></p>
+          </div>
+
+          <button class="btn-designer" style="background:#10b981;" onclick="highlightPoDArtboard()">✅ Package Matched! Proceed to E-Sign</button>
+        </div>
+
+        <div class="home-indicator-bar"><div class="home-indicator"></div></div>
+      </div>
+
+      <!-- ARTBOARD 3: MOB-003 PoD Signature Drawer -->
+      <div class="artboard" id="artboard-3" style="left: 1000px; top: 100px;">
+        <div class="artboard-meta-label">
+          <span>MOB-003: Proof-of-Delivery Signature Drawer</span>
+          <span style="background:#ffffff; border:1px solid #cbd5e1; padding:2px 6px; border-radius:4px; font-size:11px; font-family:var(--font-mono); color:#64748b;">PoD Sign-off</span>
+        </div>
+
+        <div class="mobile-header-handle" onmousedown="startDragArtboard(event, 'artboard-3')">
+          <span>9:43</span>
+          <div class="dynamic-island"></div>
+          <span>✍️ E-Sign</span>
+        </div>
+
+        <div class="mobile-body" onmousedown="event.stopPropagation()">
+          <h4 style="margin:0 0 4px 0; font-size:14px; font-weight:700;">Customer E-Sign (PoD)</h4>
+          <p style="margin:0 0 10px 0; font-size:11px; color:#64748b;">Confirm Package Receipt for Order <code>#ORD-9021</code></p>
+
+          <div style="background:white; border:2px dashed #cbd5e1; border-radius:10px; height:130px; position:relative; display:flex; align-items:center; justify-content:center;">
+            <svg width="180" height="70"><path d="M 10 45 Q 50 10, 100 45 T 170 25" stroke="#0f172a" stroke-width="3" fill="none"/></svg>
+            <span style="position:absolute; bottom:6px; right:8px; font-size:9px; color:#94a3b8;">X Customer Signature</span>
+          </div>
+
+          <div style="margin-bottom:10px;">
+            <label style="font-size:10px; color:#475569; font-weight:600; display:block; margin-bottom:2px;">Recipient Name:</label>
+            <input type="text" value="John Doe (Warehouse Manager)" style="width:100%; border:1px solid #cbd5e1; padding:8px; border-radius:6px; font-size:11px;">
+          </div>
+
+          <button class="btn-designer" style="background:#10b981;" onclick="alert('✅ Delivery PoD Complete! Synchronized to Cloud.')">Submit Delivery &amp; Complete Drop</button>
+        </div>
+
+        <div class="home-indicator-bar"><div class="home-indicator"></div></div>
+      </div>
+
+      <!-- MANDATORY ARTBOARD 4: Design Tokens & System Specs Card -->
+      <div class="spec-artboard" id="artboard-4" style="left: 1450px; top: 100px;">
+        <div class="mobile-header-handle" style="background:#f8fafc;" onmousedown="startDragArtboard(event, 'artboard-4')">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="color:#2563eb;">🎨</span>
+            <strong style="font-size:13px; color:#0f172a;">Design Tokens &amp; System Specs</strong>
+            <span style="background:#eff6ff; color:#2563eb; border:1px solid #2563eb; padding:2px 6px; border-radius:4px; font-size:10px; font-family:var(--font-mono);">MANDATORY PROOF</span>
+          </div>
+          <span style="font-size:11px; color:#64748b;">⋮⋮ Drag Handle</span>
+        </div>
+
+        <div style="padding:24px; background:white; flex:1; overflow-y:auto;" onmousedown="event.stopPropagation()">
+          <h4 style="margin-top:0; font-size:14px; color:#0f172a; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">1. Color Swatches (`company/DESIGN.md`)</h4>
+          <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; font-size:11px; margin-bottom:20px; text-align:center;">
+            <div><div style="height:32px; background:#f8fafc; border:1px solid #ccc; border-radius:6px;"></div><code>--bg-canvas</code><br><span style="color:#64748b;">#f8fafc</span></div>
+            <div><div style="height:32px; background:#ffffff; border:1px solid #ccc; border-radius:6px;"></div><code>--bg-surface</code><br><span style="color:#64748b;">#ffffff</span></div>
+            <div><div style="height:32px; background:#2563eb; border-radius:6px;"></div><code>--primary</code><br><span style="color:#64748b;">#2563eb</span></div>
+            <div><div style="height:32px; background:#10b981; border-radius:6px;"></div><code>--success</code><br><span style="color:#64748b;">#10b981</span></div>
+          </div>
+
+          <h4 style="font-size:14px; color:#0f172a; border-bottom:1px solid #e2e8f0; padding-bottom:8px; margin-top:0;">2. Ergonomic Mobile Touch Targets</h4>
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px; margin-bottom:20px; font-size:12px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span>Minimum Touch Height:</span><strong>48px (Thumb Ergonomic)</strong></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span>Text Contrast Ratio:</span><strong style="color:#10b981;">WCAG AA (> 4.5:1)</strong></div>
+            <div style="display:flex; justify-content:space-between;"><span>Theme Mode Mandate:</span><strong style="color:#2563eb;">Light Mode First</strong></div>
+          </div>
+
+          <h4 style="font-size:14px; color:#0f172a; border-bottom:1px solid #e2e8f0; padding-bottom:8px; margin-top:0;">3. Systemic Governance Compliance</h4>
+          <ul style="font-size:12px; color:#475569; padding-left:16px; margin:0;">
+            <li style="margin-bottom:6px;"><strong>Active Design System:</strong> <code>company/DESIGN.md</code></li>
+            <li style="margin-bottom:6px;"><strong>Zoom &amp; Pan Engine:</strong> Mouse wheel &amp; pinch gesture active.</li>
+            <li><strong>Dynamic Connectors:</strong> SVG Bezier curves link screens live on drag.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Bottom Figma Toolbar -->
+  <div class="figma-bottom-bar">
+    <div class="tool-group">
+      <button class="tool-btn active">📱 Mobile Artboards + Design Token Specs</button>
+      <span>Wheel Zoom &amp; Drag Active</span>
+    </div>
+
+    <div class="tool-group">
+      <button class="zoom-btn" onclick="zoomOut()">-</button>
+      <span id="zoom-level" style="font-family: var(--font-mono); font-size: 12px; width: 44px; text-align: center;">100%</span>
+      <button class="zoom-btn" onclick="zoomIn()">+</button>
+      <button class="figma-btn" style="margin-left: 12px;" onclick="resetZoom()">Reset View</button>
+    </div>
+  </div>
+
+  <script>
+    let scale = 1, panX = 0, panY = 0, isPanning = false, isDraggingArtboard = false, activeArtboardId = null, startX, startY;
+    const viewport = document.getElementById('viewport');
+    const world = document.getElementById('world');
+
+    document.querySelectorAll('.artboard, .spec-artboard').forEach(card => {
+      card.addEventListener('mousedown', () => {
+        document.querySelectorAll('.artboard, .spec-artboard').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+      });
+    });
+
+    function startDragArtboard(e, id) {
+      e.stopPropagation(); isDraggingArtboard = true; activeArtboardId = id;
+      const el = document.getElementById(id);
+      startX = e.clientX - el.offsetLeft * scale;
+      startY = e.clientY - el.offsetTop * scale;
+      document.addEventListener('mousemove', onDragArtboard);
+      document.addEventListener('mouseup', stopDragArtboard);
+    }
+
+    function onDragArtboard(e) {
+      if (!isDraggingArtboard || !activeArtboardId) return;
+      const el = document.getElementById(activeArtboardId);
+      el.style.left = `${(e.clientX - startX)/scale}px`;
+      el.style.top = `${(e.clientY - startY)/scale}px`;
+      updateConnectors();
+    }
+
+    function stopDragArtboard() { isDraggingArtboard = false; activeArtboardId = null; document.removeEventListener('mousemove', onDragArtboard); document.removeEventListener('mouseup', stopDragArtboard); }
+
+    viewport.addEventListener('mousedown', (e) => {
+      if (isDraggingArtboard) return;
+      isPanning = true; startX = e.clientX - panX; startY = e.clientY - panY;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isPanning) return;
+      panX = e.clientX - startX; panY = e.clientY - startY;
+      updateTransform();
+    });
+
+    window.addEventListener('mouseup', () => { isPanning = false; });
+
+    viewport.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const delta = e.deltaY < 0 ? 0.08 : -0.08;
+      const newScale = Math.min(Math.max(0.3, scale + delta), 2.5);
+      const rect = viewport.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left, mouseY = e.clientY - rect.top;
+      panX = mouseX - (mouseX - panX) * (newScale / scale);
+      panY = mouseY - (mouseY - panY) * (newScale / scale);
+      scale = newScale;
+      updateTransform();
+    }, { passive: false });
+
+    function updateTransform() {
+      world.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+      document.getElementById('zoom-level').innerText = `${Math.round(scale * 100)}%`;
+    }
+
+    function zoomIn() { scale = Math.min(2.5, scale + 0.15); updateTransform(); }
+    function zoomOut() { scale = Math.max(0.3, scale - 0.15); updateTransform(); }
+    function resetZoom() { scale = 1; panX = 0; panY = 0; updateTransform(); }
+
+    function updateConnectors() {
+      const a1 = document.getElementById('artboard-1'), a2 = document.getElementById('artboard-2'), a3 = document.getElementById('artboard-3');
+      if (!a1 || !a2 || !a3) return;
+
+      const r1 = { left: a1.offsetLeft, top: a1.offsetTop, width: a1.offsetWidth, height: a1.offsetHeight };
+      const r2 = { left: a2.offsetLeft, top: a2.offsetTop, width: a2.offsetWidth, height: a2.offsetHeight };
+      const r3 = { left: a3.offsetLeft, top: a3.offsetTop, width: a3.offsetWidth, height: a3.offsetHeight };
+
+      // Line 1 -> 2
+      const x1 = r1.left + r1.width, y1 = r1.top + 200, x2 = r2.left, y2 = r2.top + 200;
+      const dx1 = (x2 - x1) / 2;
+      document.getElementById('flow-line-1').setAttribute('d', `M ${x1} ${y1} C ${x1 + dx1} ${y1}, ${x2 - dx1} ${y2}, ${x2} ${y2}`);
+
+      // Line 2 -> 3
+      const x3 = r2.left + r2.width, y3 = r2.top + 200, x4 = r3.left, y4 = r3.top + 200;
+      const dx2 = (x4 - x3) / 2;
+      document.getElementById('flow-line-2').setAttribute('d', `M ${x3} ${y3} C ${x3 + dx2} ${y3}, ${x4 - dx2} ${y4}, ${x4} ${y4}`);
+    }
+
+    function highlightScannerArtboard() {
+      document.querySelectorAll('.artboard, .spec-artboard').forEach(c => c.classList.remove('selected'));
+      document.getElementById('artboard-2').classList.add('selected');
+    }
+
+    function highlightPoDArtboard() {
+      document.querySelectorAll('.artboard, .spec-artboard').forEach(c => c.classList.remove('selected'));
+      document.getElementById('artboard-3').classList.add('selected');
+    }
+
+    window.addEventListener('load', updateConnectors);
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!-- @dsCard group="Consumer App" viewport="360x640" name="ECO Consumer" subtitle="Home → Product → Cart → Checkout, clickable" -->
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>body{margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#e5e5ea}#frame{width:360px;height:640px;overflow:hidden;position:relative;box-shadow:0 8px 30px rgba(0,0,0,.2);border-radius:24px;background:#fff}</style>
+<div id="frame"><div id="root"></div></div>
+<script type="text/babel" data-presets="react">
+const { useState } = React;
+const iconStub = (glyph) => <span style={{fontSize:18,lineHeight:1}}>{glyph}</span>;
+
+function TopBar({ title, onBack, right }) {
+  return (
+    <div style={{ display:'flex', alignItems:'center', gap:8, height:56, padding:'0 16px', background:'#fff', boxSizing:'border-box' }}>
+      {onBack ? <button onClick={onBack} style={{border:'none',background:'transparent',fontSize:20,cursor:'pointer',padding:0,width:24}}>‹</button> : <span style={{width:24}}/>}
+      <div style={{flex:1,fontFamily:'var(--font-core)',fontSize:18,fontWeight:500,color:'#232628'}}>{title}</div>
+      {right || <span style={{width:24}}/>}
+    </div>
+  );
+}
+
+function BottomNav({ active, onSelect }) {
+  const items = [{k:'home',label:'Trang chủ',i:'⌂'},{k:'discover',label:'Khám phá',i:'⊞'},{k:'orders',label:'Đơn hàng',i:'▤'},{k:'wallet',label:'Ví của tôi',i:'◈'}];
+  const left = items.slice(0,2), right = items.slice(2);
+  const Item = ({it}) => (
+    <button key={it.k} onClick={()=>onSelect(it.k)} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:6,width:64,padding:'12px 4px',border:'none',background:'transparent',cursor:'pointer'}}>
+      {iconStub(it.i)}
+      <span style={{fontFamily:'var(--font-legacy)',fontSize:11,fontWeight:active===it.k?700:400,color:active===it.k?'#3E4559':'#7587A6'}}>{it.label}</span>
+    </button>
+  );
+  return (
+    <div style={{position:'absolute',left:0,bottom:0,width:360,height:90}}>
+      <div style={{position:'absolute',left:0,bottom:0,display:'flex',justifyContent:'space-between',width:360,height:68,padding:'0 10px',background:'#fff',boxShadow:'0 -0.5px 0 0 #D3D9E0, 0 -2px 4px 0 rgba(0,0,0,.08)',boxSizing:'border-box'}}>
+        <div style={{display:'flex'}}>{left.map(it=><Item key={it.k} it={it}/>)}</div>
+        <div style={{display:'flex'}}>{right.map(it=><Item key={it.k} it={it}/>)}</div>
+      </div>
+      <button onClick={()=>onSelect('pay')} style={{position:'absolute',left:150,top:0,display:'flex',flexDirection:'column',alignItems:'center',gap:2,border:'none',background:'transparent',cursor:'pointer'}}>
+        <span style={{display:'flex',alignItems:'center',justifyContent:'center',width:60,height:60,borderRadius:'50%',background:'#FEC020',fontSize:22}}>▦</span>
+        <span style={{fontFamily:'var(--font-legacy)',fontSize:11,color:'#7587A6'}}>Thanh toán</span>
+      </button>
+    </div>
+  );
+}
+
+function Button({ children, type='soil', size='large', full, onClick, style }) {
+  const h = size==='large'?48:size==='small'?32:40;
+  const skin = type==='soil' ? {background:'#FEC020',color:'#000'} : type==='outline' ? {boxShadow:'inset 0 0 0 1px #000',color:'#232628',background:'transparent'} : {color:'#232628',background:'transparent'};
+  return <button onClick={onClick} style={{height:h,padding:'0 16px',border:'none',borderRadius:8,fontFamily:'var(--font-core)',fontSize:16,fontWeight:500,cursor:'pointer',width:full?'100%':undefined,...skin,...style}}>{children}</button>;
+}
+
+function Chip({ children, active, onClick }) {
+  return <button onClick={onClick} style={{height:32,padding:'0 12px',borderRadius:16,border:'none',background:active?'#E6F1FB':'#fff',boxShadow:active?'inset 0 0 0 1px #1A94FF':'inset 0 0 0 1px #DDDDE3',color:active?'#1A94FF':'#232628',fontFamily:'var(--font-core)',fontSize:14,marginRight:8,cursor:'pointer',whiteSpace:'nowrap'}}>{children}</button>;
+}
+
+function Stepper({ value, onChange }) {
+  const Btn = ({label,d}) => <button onClick={()=>onChange(Math.max(1,value+d))} style={{width:40,height:40,border:'none',borderRadius:4,background:'#FEC020',fontSize:16,cursor:'pointer'}}>{label}</button>;
+  return <div style={{display:'flex',gap:4}}><Btn label="−" d={-1}/><div style={{width:48,height:40,display:'flex',alignItems:'center',justifyContent:'center',borderRadius:4,boxShadow:'inset 0 0 0 1px #DDDDE3',fontFamily:'var(--font-core)',fontSize:14}}>{value}</div><Btn label="+" d={1}/></div>;
+}
+
+const PRODUCT = { name: 'Áo thun cotton basic', price: 189000, img: '../../assets/images/image-placeholder.png' };
+
+function HomeScreen({ nav }) {
+  return (
+    <div style={{height:'100%',display:'flex',flexDirection:'column'}}>
+      <TopBar title="ECO" right={iconStub('🔍').props?null:<span/>} />
+      <div style={{padding:'0 16px 8px'}}>
+        <div style={{display:'flex',alignItems:'center',gap:8,height:40,padding:'0 12px',borderRadius:8,background:'#F5F5FA',boxShadow:'inset 0 0 0 1px #DDDDE3'}}>
+          <span style={{color:'#8B97A1'}}>⌕</span>
+          <span style={{color:'#A2ACB4',fontFamily:'var(--font-core)',fontSize:14}}>Tìm kiếm</span>
+        </div>
+      </div>
+      <div style={{display:'flex',overflowX:'auto',padding:'0 16px 12px'}}>
+        {['Đề xuất','Bia · Nước giải khát','Sữa các loại','Mì ăn liền','Dầu ăn'].map((c,i)=><Chip key={c} active={i===0}>{c}</Chip>)}
+      </div>
+      <div style={{flex:1,overflowY:'auto',padding:'0 16px 100px',display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
+        {Array.from({length:6}).map((_,i)=>(
+          <button key={i} onClick={()=>nav('product')} style={{display:'flex',flexDirection:'column',border:'none',background:'#fff',boxShadow:'inset 0 0 0 1px #EBEBF0',borderRadius:8,overflow:'hidden',cursor:'pointer',textAlign:'left',padding:0}}>
+            <div style={{width:'100%',height:120,background:'#F4F5F6'}} />
+            <div style={{padding:8,display:'flex',flexDirection:'column',gap:4}}>
+              <span style={{fontFamily:'var(--font-core)',fontSize:12,color:'#232628',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{PRODUCT.name}</span>
+              <span style={{fontFamily:'var(--font-core)',fontSize:14,fontWeight:700,color:'#FF424E'}}>{PRODUCT.price.toLocaleString('vi-VN')}₫</span>
+            </div>
+          </button>
+        ))}
+      </div>
+      <BottomNav active="home" onSelect={(k)=>k==='pay'?nav('checkout'):null} />
+    </div>
+  );
+}
+
+function ProductScreen({ nav }) {
+  const [qty,setQty]=useState(1);
+  return (
+    <div style={{height:'100%',display:'flex',flexDirection:'column'}}>
+      <TopBar title="Sản phẩm" onBack={()=>nav('home')} />
+      <div style={{flex:1,overflowY:'auto'}}>
+        <div style={{width:'100%',height:200,background:'#F4F5F6'}} />
+        <div style={{padding:16,display:'flex',flexDirection:'column',gap:8}}>
+          <span style={{fontFamily:'var(--font-core)',fontSize:18,fontWeight:500,color:'#232628'}}>{PRODUCT.name}</span>
+          <span style={{fontFamily:'var(--font-core)',fontSize:20,fontWeight:700,color:'#FF424E'}}>{PRODUCT.price.toLocaleString('vi-VN')}₫</span>
+          <div style={{display:'flex',alignItems:'center',gap:4,color:'#FEC020',fontSize:14}}>★★★★★<span style={{color:'#8B97A1',marginLeft:4,fontFamily:'var(--font-core)',fontSize:12}}>4.8 (320)</span></div>
+          <div style={{height:1,background:'#EBEBF0',margin:'8px 0'}} />
+          <span style={{fontFamily:'var(--font-core)',fontSize:14,color:'#8B97A1',lineHeight:1.5}}>Áo thun cotton 100%, thoáng mát, phù hợp mặc hàng ngày. Có sẵn nhiều màu và size.</span>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginTop:8}}>
+            <span style={{fontFamily:'var(--font-core)',fontSize:14,color:'#232628'}}>Số lượng</span>
+            <Stepper value={qty} onChange={setQty} />
+          </div>
+        </div>
+      </div>
+      <div style={{display:'flex',gap:8,padding:16,boxShadow:'inset 0 1px 0 #EBEBF0'}}>
+        <Button type="outline" full onClick={()=>nav('home')}>Giỏ hàng</Button>
+        <Button type="soil" full onClick={()=>nav('checkout')}>Mua ngay</Button>
+      </div>
+    </div>
+  );
+}
+
+function CheckoutScreen({ nav }) {
+  const [method,setMethod]=useState('cod');
+  return (
+    <div style={{height:'100%',display:'flex',flexDirection:'column'}}>
+      <TopBar title="Thanh toán" onBack={()=>nav('product')} />
+      <div style={{flex:1,overflowY:'auto',padding:16,display:'flex',flexDirection:'column',gap:16}}>
+        <div>
+          <div style={{fontFamily:'var(--font-core)',fontSize:14,fontWeight:500,color:'#232628',marginBottom:8}}>Địa chỉ nhận hàng</div>
+          <div style={{padding:12,borderRadius:8,boxShadow:'inset 0 0 0 1px #DDDDE3',fontFamily:'var(--font-core)',fontSize:14,color:'#232628'}}>Nguyễn Văn A · 090 123 4567<br/><span style={{color:'#8B97A1'}}>123 Đường Lê Lợi, Quận 1, TP.HCM</span></div>
+        </div>
+        <div>
+          <div style={{fontFamily:'var(--font-core)',fontSize:14,fontWeight:500,color:'#232628',marginBottom:8}}>Phương thức thanh toán</div>
+          {[['cod','Thanh toán khi nhận hàng'],['wallet','Ví ECO']].map(([id,label])=>(
+            <label key={id} style={{display:'flex',alignItems:'center',gap:8,padding:'8px 0',cursor:'pointer'}}>
+              <span style={{display:'inline-flex',alignItems:'center',justifyContent:'center',width:20,height:20,borderRadius:'50%',background:method===id?'#1A94FF':'#fff',boxShadow:method===id?'none':'inset 0 0 0 1px #DDDDE3'}}>
+                {method===id?<span style={{width:8,height:8,borderRadius:'50%',background:'#fff'}}/>:null}
+              </span>
+              <span onClick={()=>setMethod(id)} style={{fontFamily:'var(--font-core)',fontSize:14,color:'#232628'}}>{label}</span>
+            </label>
+          ))}
+        </div>
+        <div style={{display:'flex',justifyContent:'space-between',fontFamily:'var(--font-core)',fontSize:16,fontWeight:700,color:'#232628',paddingTop:8,borderTop:'1px solid #EBEBF0'}}>
+          <span>Tổng cộng</span><span>189.000₫</span>
+        </div>
+      </div>
+      <div style={{padding:16,boxShadow:'inset 0 1px 0 #EBEBF0'}}>
+        <Button type="soil" full onClick={()=>nav('success')}>Đặt hàng</Button>
+      </div>
+    </div>
+  );
+}
+
+function SuccessScreen({ nav }) {
+  return (
+    <div style={{height:'100%',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:16,padding:24,textAlign:'center'}}>
+      <span style={{display:'inline-flex',alignItems:'center',justifyContent:'center',width:64,height:64,borderRadius:'50%',background:'#00AB56',color:'#fff',fontSize:28}}>✓</span>
+      <span style={{fontFamily:'var(--font-core)',fontSize:18,fontWeight:500,color:'#232628'}}>Đặt hàng thành công</span>
+      <span style={{fontFamily:'var(--font-core)',fontSize:14,color:'#8B97A1'}}>Đơn hàng #ECO10293 đang được xử lý.</span>
+      <Button type="soil" onClick={()=>nav('home')}>Về trang chủ</Button>
+    </div>
+  );
+}
+
+function App() {
+  const [screen, setScreen] = useState('home');
+  const nav = (s) => setScreen(s);
+  return (
+    <div style={{width:360,height:640,position:'relative',overflow:'hidden',background:'#fff'}}>
+      {screen==='home' && <HomeScreen nav={nav} />}
+      {screen==='product' && <ProductScreen nav={nav} />}
+      {(screen==='checkout') && <CheckoutScreen nav={nav} />}
+      {screen==='success' && <SuccessScreen nav={nav} />}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>

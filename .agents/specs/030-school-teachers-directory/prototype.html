@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Prototype — Nhà Trường: Giáo Viên (School Teachers Directory)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+Chettan+2:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --eco-blue: #2563eb;
+      --eco-blue-hover: #1d4ed8;
+      --eco-yellow: #f0b90b;
+      --eco-green: #10b981;
+      --eco-red: #ef4444;
+      --eco-amber: #f59e0b;
+      --eco-slate: #0f172a;
+      --eco-dark-card: #1e2026;
+      --eco-dark-border: #383e4a;
+      --eco-text-muted: #94a3b8;
+      --eco-text-light: #f8fafc;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    /* Top Simulation Bar */
+    .sim-bar {
+      background: #1e2026;
+      border-bottom: 1px solid #383e4a;
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .sim-routes {
+      display: flex;
+      gap: 8px;
+    }
+    .sim-btn {
+      background: #0f172a;
+      border: 1px solid #383e4a;
+      color: #94a3b8;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .sim-btn.active, .sim-btn:hover {
+      background: #2563eb;
+      color: #ffffff;
+      border-color: #2563eb;
+    }
+    /* App Layout */
+    .app-container {
+      display: flex;
+      flex: 1;
+    }
+    .sidebar {
+      width: 240px;
+      background: #1e2026;
+      border-right: 1px solid #383e4a;
+      padding: 24px 16px;
+    }
+    .sidebar-brand {
+      font-family: 'Baloo Chettan 2', cursive;
+      font-size: 20px;
+      font-weight: 800;
+      color: #f0b90b;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sidebar-group-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin: 16px 8px 8px;
+    }
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      color: #94a3b8;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      margin-bottom: 4px;
+      transition: all 0.15s;
+    }
+    .nav-link:hover, .nav-link.active {
+      background: #2563eb;
+      color: #ffffff;
+    }
+    .main-content {
+      flex: 1;
+      padding: 32px;
+      background: #0f172a;
+      overflow-y: auto;
+    }
+    /* Page Views */
+    .page-view {
+      display: none;
+    }
+    .page-view.active {
+      display: block;
+    }
+    /* Statistics KPI Cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: #1e2026;
+      border: 1px solid #383e4a;
+      border-radius: 12px;
+      padding: 18px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .stat-val {
+      font-size: 26px;
+      font-weight: 800;
+      color: #f8fafc;
+      font-family: 'Baloo Chettan 2', cursive;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+    .stat-icon {
+      font-size: 28px;
+      opacity: 0.8;
+    }
+    /* Toolbar */
+    .toolbar-bar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      background: #1e2026;
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid #383e4a;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .search-wrap {
+      flex: 1;
+      min-width: 260px;
+      position: relative;
+    }
+    .search-wrap input {
+      width: 100%;
+      background: #0f172a;
+      border: 1px solid #383e4a;
+      border-radius: 8px;
+      padding: 10px 14px 10px 36px;
+      color: #f8fafc;
+      font-size: 14px;
+      outline: none;
+    }
+    .search-wrap input:focus {
+      border-color: #2563eb;
+    }
+    .select-box {
+      background: #0f172a;
+      border: 1px solid #383e4a;
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #f8fafc;
+      font-size: 14px;
+      outline: none;
+      cursor: pointer;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+    .btn-primary { background: #2563eb; color: #ffffff; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-secondary { background: #383e4a; color: #f8fafc; }
+    .btn-secondary:hover { background: #475569; }
+    .btn-danger { background: #ef4444; color: #ffffff; }
+    .btn-outline { background: transparent; border: 1px solid #383e4a; color: #f8fafc; }
+    .btn-outline:hover { border-color: #60a5fa; color: #60a5fa; }
+    /* Master Table */
+    .table-card {
+      background: #1e2026;
+      border: 1px solid #383e4a;
+      border-radius: 12px;
+      overflow: visible;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th {
+      background: #0f172a;
+      color: #94a3b8;
+      font-weight: 600;
+      padding: 14px 16px;
+      border-bottom: 1px solid #383e4a;
+      white-space: nowrap;
+      text-transform: none; /* Strict Sentence-Case */
+    }
+    td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #383e4a;
+      vertical-align: middle;
+    }
+    tr:hover td {
+      background: #1e2026;
+    }
+    .avatar-cell {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .avatar-circle {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #2563eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: #ffffff;
+      font-size: 14px;
+      border: 2px solid #38bdf8;
+    }
+    .teacher-name {
+      font-weight: 600;
+      color: #f8fafc;
+    }
+    .teacher-email {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+    .code-badge {
+      font-family: monospace;
+      background: #0f172a;
+      border: 1px solid #383e4a;
+      padding: 3px 8px;
+      border-radius: 6px;
+      color: #60a5fa;
+      font-size: 13px;
+    }
+    .legacy-fallback {
+      font-style: italic;
+      color: #94a3b8;
+      font-size: 13px;
+    }
+    .perm-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .perm-lead {
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .perm-assist {
+      background: rgba(245, 158, 11, 0.15);
+      color: #f59e0b;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .status-pill {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .status-active {
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+    }
+    .status-paused {
+      background: rgba(245, 158, 11, 0.15);
+      color: #f59e0b;
+    }
+    /* Action Dropdown Menu with Upward Flip */
+    .action-menu-wrap {
+      position: relative;
+      display: inline-block;
+    }
+    .action-btn {
+      background: transparent;
+      border: 1px solid #383e4a;
+      color: #94a3b8;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .action-btn:hover {
+      border-color: #60a5fa;
+      color: #60a5fa;
+    }
+    .action-dropdown {
+      position: absolute;
+      right: 0;
+      top: 100%;
+      margin-top: 6px;
+      background: #1e2026;
+      border: 1px solid #383e4a;
+      border-radius: 8px;
+      min-width: 200px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+      z-index: 9999;
+      display: none;
+    }
+    .action-dropdown.flip-up {
+      top: auto;
+      bottom: 100%;
+      margin-top: 0;
+      margin-bottom: 6px;
+    }
+    .action-dropdown.show {
+      display: block;
+    }
+    .action-item {
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #f8fafc;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .action-item:hover {
+      background: #0f172a;
+      color: #38bdf8;
+    }
+    .action-item.danger:hover {
+      color: #ef4444;
+    }
+    /* Modals */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(4px);
+      z-index: 99999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.show {
+      display: flex;
+    }
+    .modal-card {
+      background: #1e2026;
+      border: 1px solid #383e4a;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 580px;
+      padding: 28px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+    }
+    .modal-title {
+      font-family: 'Baloo Chettan 2', cursive;
+      font-size: 22px;
+      font-weight: 700;
+      color: #f0b90b;
+      margin-bottom: 16px;
+    }
+    .conflict-banner {
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid #f59e0b;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 12px;
+      color: #f8fafc;
+      font-size: 13.5px;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+    .form-input {
+      width: 100%;
+      background: #0f172a;
+      border: 1px solid #383e4a;
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #f8fafc;
+      font-size: 14px;
+      outline: none;
+    }
+    .form-input:focus {
+      border-color: #2563eb;
+    }
+    .form-input.readonly {
+      background: #1e2026;
+      color: #94a3b8;
+      cursor: not-allowed;
+    }
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 999999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .toast {
+      background: #1e2026;
+      border-left: 4px solid #10b981;
+      border: 1px solid #383e4a;
+      padding: 12px 20px;
+      border-radius: 8px;
+      color: #f8fafc;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Simulation Control Bar -->
+  <div class="sim-bar">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <span style="font-weight: 700; color: #f0b90b;">🏫 Finviet School Portal — Quản Trị Giáo Viên</span>
+    </div>
+    <div class="sim-routes">
+      <button class="sim-btn active" onclick="switchRoute('roster')">1. Danh sách giáo viên (/teacher)</button>
+      <button class="sim-btn" onclick="switchRoute('create')">2. Tiếp nhận giáo viên (/teacher/create)</button>
+      <button class="sim-btn" onclick="switchRoute('detail')">3. Hồ sơ chi tiết (/teacher/info)</button>
+    </div>
+  </div>
+
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <span>🏫</span>
+        <span>Finviet Portal</span>
+      </div>
+
+      <div class="sidebar-group-title">NHÀ TRƯỜNG</div>
+      <div class="nav-link" onclick="triggerToast('Chuyển hướng sang danh sách học sinh')">🎓 Học sinh</div>
+      <div class="nav-link active" onclick="switchRoute('roster')">👨‍🏫 Giáo viên</div>
+      <div class="nav-link" onclick="triggerToast('Chuyển hướng sang lớp học')">🏫 Lớp học</div>
+      <div class="nav-link" onclick="triggerToast('Chuyển hướng sang môn học')">📚 Môn học</div>
+      <div class="nav-link" onclick="triggerToast('Chuyển hướng sang khối lớp')">📊 Khối lớp</div>
+
+      <div class="sidebar-group-title">VẬN HÀNH</div>
+      <div class="nav-link" onclick="triggerToast('Mô-đun Điểm danh')">📋 Điểm danh</div>
+      <div class="nav-link" onclick="triggerToast('Mô-đun Hoạt động')">🎈 Hoạt động</div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      
+      <!-- ROUTE 1: TEACHER ROSTER -->
+      <div id="route-roster" class="page-view active">
+        <!-- Page Title -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <div>
+            <h1 style="font-family: 'Baloo Chettan 2', cursive; font-size: 26px; color: #f8fafc; font-weight: 800;">
+              Danh Sách Giáo Viên Toàn Trường
+            </h1>
+            <p style="color: #94a3b8; font-size: 14px;">
+              Quản lý danh sách giáo viên, phân công lớp chủ nhiệm/bộ môn và phân quyền kiểm duyệt hoạt động (BR01).
+            </p>
+          </div>
+          <button class="btn btn-primary" onclick="switchRoute('create')">+ Thêm giáo viên mới</button>
+        </div>
+
+        <!-- KPI Stats -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div>
+              <div class="stat-val" id="totalCount">4</div>
+              <div class="stat-label">Tổng số giáo viên</div>
+            </div>
+            <div class="stat-icon">👨‍🏫</div>
+          </div>
+          <div class="stat-card">
+            <div>
+              <div class="stat-val" style="color: #38bdf8;">2</div>
+              <div class="stat-label">Giáo viên chủ nhiệm</div>
+            </div>
+            <div class="stat-icon">🎖️</div>
+          </div>
+          <div class="stat-card">
+            <div>
+              <div class="stat-val" style="color: #10b981;">3</div>
+              <div class="stat-label">Giáo viên chính (Tự duyệt)</div>
+            </div>
+            <div class="stat-icon">⚡</div>
+          </div>
+          <div class="stat-card">
+            <div>
+              <div class="stat-val" style="color: #f59e0b;">1</div>
+              <div class="stat-label">Giáo viên hỗ trợ (Chờ duyệt)</div>
+            </div>
+            <div class="stat-icon">⏳</div>
+          </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar-bar">
+          <div class="search-wrap">
+            <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8;">🔍</span>
+            <input type="text" id="searchInput" placeholder="Tìm theo tên, mã GV, email, SĐT, CCCD..." oninput="filterRoster(this.value)">
+          </div>
+          <select class="select-box" id="classFilter" onchange="filterRoster(document.getElementById('searchInput').value)">
+            <option value="all">Tất cả các lớp</option>
+            <option value="1A1">Lớp 1A1</option>
+            <option value="1A2">Lớp 1A2</option>
+            <option value="2A1">Lớp 2A1</option>
+          </select>
+          <select class="select-box" id="permFilter" onchange="filterRoster(document.getElementById('searchInput').value)">
+            <option value="all">Tất cả phân quyền</option>
+            <option value="chinh">Giáo viên chính</option>
+            <option value="ho_tro">Giáo viên hỗ trợ</option>
+          </select>
+          <button class="btn btn-outline" onclick="triggerToast('Mở bộ lọc mở rộng CSDL Sở GD&ĐT (BR09)')">⚙️ Bộ lọc CSDL Sở</button>
+        </div>
+
+        <!-- Roster Table -->
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 40px;"><input type="checkbox"></th>
+                <th>Mã giáo viên</th>
+                <th>Họ và tên</th>
+                <th>Lớp chủ nhiệm</th>
+                <th>Lớp bộ môn</th>
+                <th>Phân quyền đăng bài</th>
+                <th>Trạng thái</th>
+                <th style="text-align: right;">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="rosterBody">
+              <!-- Dynamically populated via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ROUTE 2: TEACHER ONBOARDING WIZARD -->
+      <div id="route-create" class="page-view">
+        <div style="margin-bottom: 24px;">
+          <h1 style="font-family: 'Baloo Chettan 2', cursive; font-size: 26px; color: #f8fafc; font-weight: 800;">
+            Tiếp Nhận Hồ Sơ Giáo Viên Mới
+          </h1>
+          <p style="color: #94a3b8; font-size: 14px;">
+            Nhập thông tin cá nhân, phân quyền kiểm duyệt và khởi tạo tài khoản đăng nhập portal.
+          </p>
+        </div>
+
+        <div style="background: #1e2026; border: 1px solid #383e4a; border-radius: 16px; padding: 28px; max-width: 760px;">
+          <h3 style="font-size: 16px; font-weight: 700; color: #38bdf8; margin-bottom: 16px;">
+            1. Thông Tin Bắt Buộc (BR03)
+          </h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+              <label class="form-label">Mã giáo viên *</label>
+              <input type="text" id="createCode" class="form-input" placeholder="GV-005" oninput="markDirty()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Họ và tên *</label>
+              <input type="text" id="createName" class="form-input" placeholder="Nguyễn Văn A" oninput="markDirty()">
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+              <label class="form-label">Email đăng nhập * (BR06)</label>
+              <input type="email" id="createEmail" class="form-input" placeholder="giaovien@finviet.edu.vn" oninput="markDirty()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Số điện thoại *</label>
+              <input type="tel" id="createPhone" class="form-input" placeholder="0901 234 567" oninput="markDirty()">
+            </div>
+          </div>
+
+          <h3 style="font-size: 16px; font-weight: 700; color: #38bdf8; margin-top: 16px; margin-bottom: 16px;">
+            2. Phân Quyền Kiểm Duyệt Bài Viết (BR01)
+          </h3>
+          <div style="background: #0f172a; padding: 16px; border-radius: 10px; border: 1px solid #383e4a; margin-bottom: 24px;">
+            <div style="margin-bottom: 12px;">
+              <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                <input type="radio" name="permTier" value="chinh" checked onchange="markDirty()">
+                <strong style="color: #10b981;">Giáo viên chính (Tự động duyệt bài)</strong>
+              </label>
+              <p style="font-size: 13px; color: #94a3b8; margin-left: 24px; margin-top: 4px;">
+                Mọi bài viết hoạt động, hình ảnh và tin nhắn gửi tới phụ huynh sẽ được xuất bản ngay lập tức.
+              </p>
+            </div>
+            <div>
+              <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                <input type="radio" name="permTier" value="ho_tro" onchange="markDirty()">
+                <strong style="color: #f59e0b;">Giáo viên hỗ trợ (Yêu cầu duyệt qua hàng đợi)</strong>
+              </label>
+              <p style="font-size: 13px; color: #94a3b8; margin-left: 24px; margin-top: 4px;">
+                Bài viết và hình ảnh sẽ được chuyển vào mục 'Chờ duyệt' để Ban giám hiệu hoặc GVCN phê duyệt trước khi phụ huynh nhìn thấy.
+              </p>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 12px;">
+            <!-- Dirty State Guard Trigger -->
+            <button class="btn btn-secondary" onclick="handleCancelCreate()">Hủy bỏ</button>
+            <button class="btn btn-primary" onclick="handleSubmitCreate()">💾 Lưu hồ sơ giáo viên</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROUTE 3: TEACHER DETAIL VIEW -->
+      <div id="route-detail" class="page-view">
+        <div style="margin-bottom: 24px; display: flex; align-items: center; gap: 16px;">
+          <button class="btn btn-outline" onclick="switchRoute('roster')">← Quay lại danh sách</button>
+          <h1 style="font-family: 'Baloo Chettan 2', cursive; font-size: 26px; color: #f8fafc; font-weight: 800;">
+            Hồ Sơ Chi Tiết Giáo Viên
+          </h1>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 320px 1fr; gap: 24px;">
+          <!-- Profile Card -->
+          <div style="background: #1e2026; border: 1px solid #383e4a; border-radius: 16px; padding: 24px; text-align: center;">
+            <div class="avatar-circle" style="width: 72px; height: 72px; font-size: 26px; margin: 0 auto 16px;">NL</div>
+            <h2 style="font-size: 20px; font-weight: 700; color: #f8fafc;" id="detailName">Nguyễn Thị Lan</h2>
+            <div style="margin: 8px 0;"><span class="code-badge" id="detailCode">GV-001</span></div>
+            <div style="margin-top: 12px;"><span class="perm-pill perm-lead">⚡ Giáo viên chính</span></div>
+
+            <div style="margin-top: 24px; text-align: left; border-top: 1px solid #383e4a; padding-top: 16px; font-size: 13.5px;">
+              <div style="color: #94a3b8; margin-bottom: 4px;">Email đăng nhập:</div>
+              <div style="color: #f8fafc; font-weight: 600; margin-bottom: 12px;" id="detailEmail">lan.nguyen@finviet.edu.vn</div>
+              <div style="color: #94a3b8; margin-bottom: 4px;">Số điện thoại:</div>
+              <div style="color: #f8fafc; font-weight: 600; margin-bottom: 12px;">0903 123 456</div>
+              <div style="color: #94a3b8; margin-bottom: 4px;">Số CCCD:</div>
+              <div style="color: #f8fafc; font-weight: 600;">001198002345</div>
+            </div>
+          </div>
+
+          <!-- Assignment & Moderation Panel -->
+          <div style="display: flex; flex-direction: column; gap: 24px;">
+            <div style="background: #1e2026; border: 1px solid #383e4a; border-radius: 16px; padding: 24px;">
+              <h3 style="font-family: 'Baloo Chettan 2', cursive; font-size: 18px; color: #38bdf8; margin-bottom: 16px;">
+                Phân Công Lớp Học Hiện Tại
+              </h3>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div style="background: #0f172a; padding: 16px; border-radius: 10px; border: 1px solid #383e4a;">
+                  <div style="font-size: 12px; color: #94a3b8; text-transform: uppercase;">Lớp chủ nhiệm (GVCN)</div>
+                  <div style="font-size: 20px; font-weight: 700; color: #60a5fa; margin-top: 6px;">Lớp 1A1</div>
+                  <div style="font-size: 13px; color: #94a3b8; margin-top: 4px;">32 học sinh đang theo học</div>
+                </div>
+                <div style="background: #0f172a; padding: 16px; border-radius: 10px; border: 1px solid #383e4a;">
+                  <div style="font-size: 12px; color: #94a3b8; text-transform: uppercase;">Lớp bộ môn phụ trách</div>
+                  <div style="font-size: 16px; font-weight: 700; color: #f8fafc; margin-top: 6px;">Lớp 1A2, Lớp 2A1</div>
+                  <div style="font-size: 13px; color: #94a3b8; margin-top: 4px;">Môn: Tiếng Việt, Toán</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Moderation Notice Card -->
+            <div style="background: #1e2026; border: 1px solid #383e4a; border-radius: 16px; padding: 24px;">
+              <h3 style="font-family: 'Baloo Chettan 2', cursive; font-size: 18px; color: #38bdf8; margin-bottom: 12px;">
+                Quy Trình Xuất Bản Nội Dung (BR01)
+              </h3>
+              <p style="font-size: 14px; color: #94a3b8; line-height: 1.6;">
+                Giáo viên này hiện giữ quyền <strong style="color: #10b981;">Giáo viên chính</strong>. Các bài đăng hoạt động hàng ngày, nhật ký lớp học và album hình ảnh học sinh sẽ được tự động đồng bộ sang ứng dụng phụ huynh mà không cần chờ Ban giám hiệu kiểm duyệt.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- MODAL 1: ASSIGN CLASS WITH K006 CONFLICT WARNING -->
+  <div id="assignModal" class="modal-overlay">
+    <div class="modal-card">
+      <h3 class="modal-title">Phân Công Giảng Dạy &amp; Chủ Nhiệm</h3>
+      
+      <!-- Interactive Conflict Banner -->
+      <div id="conflictAlert" class="conflict-banner">
+        <span style="font-size: 20px; color: #f59e0b;">⚠️</span>
+        <div>
+          <strong style="color: #f0b90b;">Cảnh báo trùng lặp GVCN (Resolution K006):</strong><br>
+          <span id="conflictText">Lớp 1A1 hiện đã có GVCN là Cô Nguyễn Thị Lan. Nếu lưu thay đổi, quyền GVCN của Lớp 1A1 sẽ tự động được chuyển sang giáo viên này.</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Giáo viên được phân công</label>
+        <input type="text" id="assignTeacherName" class="form-input readonly" value="Trần Văn Hùng (GV-002)" readonly>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Lớp chủ nhiệm (GVCN)</label>
+        <select id="homeroomSelect" class="form-input" onchange="onHomeroomChange(this.value)">
+          <option value="none">-- Không phân công chủ nhiệm --</option>
+          <option value="1A1" selected>Lớp 1A1 (Đang có GVCN: Nguyễn Thị Lan)</option>
+          <option value="1A2">Lớp 1A2 (Đang có GVCN: Lê Thị Hồng)</option>
+          <option value="2A1">Lớp 2A1 (Chưa có GVCN)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Lớp bộ môn phụ trách</label>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <span class="code-badge" style="background: #2563eb; color: #ffffff;">Lớp 1A1 ✕</span>
+          <span class="code-badge" style="background: #2563eb; color: #ffffff;">Lớp 1A2 ✕</span>
+          <span class="code-badge" style="background: #2563eb; color: #ffffff;">Lớp 2A1 ✕</span>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+        <button class="btn btn-secondary" onclick="closeModal('assignModal')">Hủy</button>
+        <button class="btn btn-primary" onclick="saveAssignment()">💾 Lưu phân công</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: CHANGE EMAIL (BR06) -->
+  <div id="emailModal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 460px;">
+      <h3 class="modal-title">Thay Đổi Email Đăng Nhập</h3>
+      <div class="form-group">
+        <label class="form-label">Email hiện tại (chỉ đọc)</label>
+        <input type="email" id="currEmailDisplay" class="form-input readonly" value="lan.nguyen@finviet.edu.vn" readonly>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email đăng nhập mới *</label>
+        <input type="email" id="newEmailInput" class="form-input" placeholder="nhap.email.moi@finviet.edu.vn">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Mật khẩu xác nhận *</label>
+        <input type="password" class="form-input" placeholder="Mật khẩu của bạn">
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+        <button class="btn btn-secondary" onclick="closeModal('emailModal')">Đóng</button>
+        <button class="btn btn-primary" onclick="saveEmailChange()">Xác nhận đổi email</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: DELETE TEACHER CONFIRMATION (BR10) -->
+  <div id="deleteModal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 480px;">
+      <h3 class="modal-title" style="color: #ef4444;">Xác Nhận Xóa Giáo Viên</h3>
+      <p style="font-size: 14px; color: #94a3b8; line-height: 1.6; margin-bottom: 20px;">
+        Giáo viên <strong id="deleteTeacherName" style="color: #f8fafc;">Trần Văn Hùng</strong> đang phụ trách các lớp học. Việc xóa giáo viên sẽ tự động:
+      </p>
+      <ul style="font-size: 13.5px; color: #f8fafc; margin-left: 20px; line-height: 1.8; margin-bottom: 24px;">
+        <li>Hủy vai trò GVCN và giải phóng lớp chủ nhiệm.</li>
+        <li>Hủy phân công các lớp bộ môn.</li>
+        <li>Thu hồi tài khoản đăng nhập portal vĩnh viễn.</li>
+      </ul>
+      <div style="display: flex; justify-content: flex-end; gap: 12px;">
+        <button class="btn btn-secondary" onclick="closeModal('deleteModal')">Hủy bỏ</button>
+        <button class="btn btn-danger" onclick="confirmDelete()">Xóa vĩnh viễn</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 4: DIRTY FORM ABANDONMENT CONFIRMATION (Resolution K010) -->
+  <div id="dirtyGuardModal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 440px;">
+      <h3 class="modal-title" style="color: #f59e0b;">Xác Nhận Rời Trang</h3>
+      <p style="font-size: 14px; color: #f8fafc; line-height: 1.6; margin-bottom: 24px;">
+        Bạn đã nhập thông tin hồ sơ giáo viên. Nếu rời khỏi trang lúc này, toàn bộ dữ liệu vừa nhập sẽ bị mất.
+      </p>
+      <div style="display: flex; justify-content: flex-end; gap: 12px;">
+        <button class="btn btn-secondary" onclick="closeModal('dirtyGuardModal')">Tiếp tục nhập</button>
+        <button class="btn btn-danger" onclick="forceLeaveCreate()">Rời khỏi không lưu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script>
+    // State
+    const TEACHERS = [
+      { id: '1', code: 'GV-001', name: 'Nguyễn Thị Lan', email: 'lan.nguyen@finviet.edu.vn', homeroom: '1A1', subjects: 'Lớp 1A2, Lớp 2A1', perm: 'chinh', status: 'active', initials: 'NL', isLegacy: false },
+      { id: '2', code: 'GV-002', name: 'Trần Văn Hùng', email: 'hung.tran@finviet.edu.vn', homeroom: null, subjects: 'Lớp 3A1, Lớp 3A2', perm: 'ho_tro', status: 'active', initials: 'TH', isLegacy: false },
+      { id: '3', code: 'GV-003', name: 'Lê Thị Hồng', email: 'hong.le@finviet.edu.vn', homeroom: '1A2', subjects: 'Lớp 1A1', perm: 'chinh', status: 'active', initials: 'LH', isLegacy: false },
+      { id: '4', code: null, name: 'Phạm Thị Mai (Hồ sơ cũ)', email: 'mai.pham@finviet.edu.vn', homeroom: null, subjects: 'Lớp 5A1', perm: 'ho_tro', status: 'paused', initials: 'PM', isLegacy: true }
+    ];
+    let isFormDirty = false;
+    let selectedTeacher = null;
+
+    function renderTable(items) {
+      const tbody = document.getElementById('rosterBody');
+      tbody.innerHTML = items.map((t, idx) => {
+        const isFlip = (idx >= items.length - 2);
+        return `
+          <tr>
+            <td><input type="checkbox"></td>
+            <td>
+              ${t.code ? `<span class="code-badge">${t.code}</span>` : `<span class="legacy-fallback">Chưa có mã GV</span>`}
+            </td>
+            <td>
+              <div class="avatar-cell">
+                <div class="avatar-circle">${t.initials}</div>
+                <div>
+                  <div class="teacher-name">${t.name}</div>
+                  <div class="teacher-email">${t.email}</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              ${t.homeroom ? `<strong style="color: #60a5fa;">Lớp ${t.homeroom}</strong>` : `<span class="legacy-fallback">Chưa phân công</span>`}
+            </td>
+            <td>${t.subjects}</td>
+            <td>
+              ${t.perm === 'chinh' 
+                ? `<span class="perm-pill perm-lead">⚡ Giáo viên chính</span>`
+                : `<span class="perm-pill perm-assist">⏳ Giáo viên hỗ trợ</span>`}
+            </td>
+            <td>
+              ${t.status === 'active' 
+                ? `<span class="status-pill status-active">Đang làm việc</span>` 
+                : `<span class="status-pill status-paused">Tạm nghỉ</span>`}
+            </td>
+            <td style="text-align: right;">
+              <div class="action-menu-wrap">
+                <button class="action-btn" onclick="toggleDropdown('drop-${t.id}')">•••</button>
+                <div id="drop-${t.id}" class="action-dropdown ${isFlip ? 'flip-up' : ''}">
+                  <div class="action-item" onclick="viewDetail('${t.id}')">👁️ Xem thông tin</div>
+                  <div class="action-item" onclick="openAssignModal('${t.id}')">🔄 Phân công lớp</div>
+                  <div class="action-item" onclick="openEmailModal('${t.id}')">✉️ Đổi email đăng nhập</div>
+                  <div class="action-item danger" onclick="openDeleteModal('${t.id}')">🗑️ Xóa giáo viên</div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function switchRoute(routeId) {
+      document.querySelectorAll('.sim-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+      
+      const targetBtn = Array.from(document.querySelectorAll('.sim-btn')).find(b => b.getAttribute('onclick').includes(routeId));
+      if (targetBtn) targetBtn.classList.add('active');
+
+      const targetPage = document.getElementById('route-' + routeId);
+      if (targetPage) targetPage.classList.add('active');
+    }
+
+    function toggleDropdown(id) {
+      document.querySelectorAll('.action-dropdown').forEach(d => {
+        if (d.id !== id) d.classList.remove('show');
+      });
+      const d = document.getElementById(id);
+      if (d) d.classList.toggle('show');
+    }
+
+    window.onclick = function(e) {
+      if (!e.target.matches('.action-btn')) {
+        document.querySelectorAll('.action-dropdown').forEach(d => d.classList.remove('show'));
+      }
+    };
+
+    function filterRoster() {
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      const c = document.getElementById('classFilter').value;
+      const p = document.getElementById('permFilter').value;
+
+      const filtered = TEACHERS.filter(t => {
+        const matchesQ = !q || t.name.toLowerCase().includes(q) || (t.code && t.code.toLowerCase().includes(q)) || t.email.toLowerCase().includes(q);
+        const matchesC = (c === 'all') || (t.homeroom === c) || t.subjects.includes(c);
+        const matchesP = (p === 'all') || (t.perm === p);
+        return matchesQ && matchesC && matchesP;
+      });
+      renderTable(filtered);
+      document.getElementById('totalCount').innerText = filtered.length;
+    }
+
+    function openAssignModal(id) {
+      selectedTeacher = TEACHERS.find(t => t.id === id);
+      document.getElementById('assignTeacherName').value = selectedTeacher.name + ' (' + (selectedTeacher.code || 'Chưa có mã') + ')';
+      document.getElementById('assignModal').classList.add('show');
+      onHomeroomChange(document.getElementById('homeroomSelect').value);
+    }
+
+    function onHomeroomChange(val) {
+      const banner = document.getElementById('conflictAlert');
+      if (val === '1A1') {
+        document.getElementById('conflictText').innerText = 'Lớp 1A1 hiện đã có GVCN là Cô Nguyễn Thị Lan. Nếu lưu, hệ thống sẽ chuyển quyền GVCN của Lớp 1A1 sang giáo viên này.';
+        banner.style.display = 'flex';
+      } else if (val === '1A2') {
+        document.getElementById('conflictText').innerText = 'Lớp 1A2 hiện đã có GVCN là Cô Lê Thị Hồng. Nếu lưu, hệ thống sẽ chuyển quyền GVCN của Lớp 1A2 sang giáo viên này.';
+        banner.style.display = 'flex';
+      } else {
+        banner.style.display = 'none';
+      }
+    }
+
+    function saveAssignment() {
+      closeModal('assignModal');
+      triggerToast('Đã lưu phân công lớp cho ' + selectedTeacher.name + ' và giải quyết conflict K006');
+    }
+
+    function openEmailModal(id) {
+      selectedTeacher = TEACHERS.find(t => t.id === id);
+      document.getElementById('currEmailDisplay').value = selectedTeacher.email;
+      document.getElementById('emailModal').classList.add('show');
+    }
+
+    function saveEmailChange() {
+      const newEmail = document.getElementById('newEmailInput').value;
+      if (!newEmail || !newEmail.includes('@')) {
+        alert('Vui lòng nhập định dạng email hợp lệ');
+        return;
+      }
+      closeModal('emailModal');
+      selectedTeacher.email = newEmail;
+      renderTable(TEACHERS);
+      triggerToast('Đã cập nhật email đăng nhập của ' + selectedTeacher.name);
+    }
+
+    function openDeleteModal(id) {
+      selectedTeacher = TEACHERS.find(t => t.id === id);
+      document.getElementById('deleteTeacherName').innerText = selectedTeacher.name;
+      document.getElementById('deleteModal').classList.add('show');
+    }
+
+    function confirmDelete() {
+      closeModal('deleteModal');
+      triggerToast('Đã xóa giáo viên ' + selectedTeacher.name + ' và hủy liên kết lớp học');
+    }
+
+    function viewDetail(id) {
+      selectedTeacher = TEACHERS.find(t => t.id === id);
+      document.getElementById('detailName').innerText = selectedTeacher.name;
+      document.getElementById('detailCode').innerText = selectedTeacher.code || 'Chưa có mã GV';
+      document.getElementById('detailEmail').innerText = selectedTeacher.email;
+      switchRoute('detail');
+    }
+
+    function markDirty() {
+      isFormDirty = true;
+    }
+
+    function handleCancelCreate() {
+      if (isFormDirty) {
+        document.getElementById('dirtyGuardModal').classList.add('show');
+      } else {
+        switchRoute('roster');
+      }
+    }
+
+    function forceLeaveCreate() {
+      isFormDirty = false;
+      closeModal('dirtyGuardModal');
+      switchRoute('roster');
+    }
+
+    function handleSubmitCreate() {
+      const name = document.getElementById('createName').value;
+      if (!name) {
+        alert('Vui lòng nhập họ và tên giáo viên');
+        return;
+      }
+      isFormDirty = false;
+      triggerToast('Đã tiếp nhận hồ sơ giáo viên ' + name + ' thành công');
+      switchRoute('roster');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('show');
+    }
+
+    function triggerToast(msg) {
+      const c = document.getElementById('toastContainer');
+      const t = document.createElement('div');
+      t.className = 'toast';
+      t.innerHTML = '<span>✅</span><span>' + msg + '</span>';
+      c.appendChild(t);
+      setTimeout(() => { t.remove(); }, 3500);
+    }
+
+    // Initialize
+    renderTable(TEACHERS);
+  </script>
+</body>
+</html>

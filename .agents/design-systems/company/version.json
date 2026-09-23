@@ -1,0 +1,10 @@
+{
+  "name": "@company/design-system",
+  "version": "1.0.0",
+  "releasedAt": "2026-07-29",
+  "status": "active",
+  "compatibility": {
+    "minAgentsVersion": "V35.0.0",
+    "supportedDomains": ["company", "erp-enterprise", "ops-monitoring", "executive-insight"]
+  }
+}

@@ -1,0 +1,17 @@
+/* ECO space tokens. Stack = vertical (margin-bottom), inline = horizontal
+   (margin-right), inset = equal padding on all 4 sides. Same scale for all three. */
+:root{
+  --space-4x:4px;
+  --space-8x:8px;
+  --space-12x:12px;
+  --space-16x:16px;
+  --space-20x:20px;
+  --space-24x:24px;
+  --space-32x:32px;
+  --space-48x:48px;
+  --space-64x:64px;
+
+  /* Mobile layout margin */
+  --layout-margin:16px;
+  --layout-gutter:8px;
+}

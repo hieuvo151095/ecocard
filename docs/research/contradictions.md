@@ -1,0 +1,10 @@
+# Planning Contradictions & Ambiguity Register
+
+This register documents observed discrepancies, ambiguities, and operational decisions identified across legacy documentation, screenshots, and business rules during the Module M6 planning phase.
+
+| ID | Topic | Source A | Source B | Conflict / Ambiguity | Decision / Resolution | Owner |
+|---|---|---|---|---|---|---|
+| K001 | Role Access Boundaries | `docs_legacy/00-master-index.md` (Open Question 1) | `docs_legacy/m6-sm1-cau-hinh-doi-soat.md` (Section 2.1) | Test user possessed unrestricted access across all actions. Product spec indicates separate Ops and Finance actors. | Model explicit role capabilities (Portal Admin, Ops Admin, Finance Officer) with UI permission gates, while allowing role-switching in development mode. | sophia-product-manager |
+| K002 | Period Hard Block vs Warning | `docs_legacy/m6-sm2-phien-doi-soat.md` (BR01) | `docs_legacy/00-master-index.md` (Open Question 5) | Dropdown displays `Đã có phiên` label. Unconfirmed whether system hard-blocks or merely warns against duplicate session creation. | Implement a strict prevention rule: an active period with an existing non-canceled session cannot spawn a duplicate active session, protecting against double-billing. | david-systems-architect |
+| K003 | Paid Status Transition | `docs_legacy/m6-sm2-phien-doi-soat.md` (Step 11) | `docs_legacy/00-master-index.md` (Open Question 3) | Legacy UI lacked a visible manual button for marking `Đã thanh toán` directly on the session card. | Provide an explicit Finance action `Xác nhận thanh toán` on `Đã gửi trường` sessions for operational control, alongside an automated payment webhook contract. | alan-tech-lead |
+| K004 | Status Label `Đã nhả kết quả` | `docs_legacy/screenshots/sm2-phien-doi-soat-danh-sach.jpeg` | `docs_legacy/m6-sm2-phien-doi-soat.md` (Section 3.6) | Secondary badge `Đã nhả kết quả` appears alongside `Đã hủy` in the table but is absent from the filter status dropdown. | Treat `Đã nhả kết quả` as a secondary system release flag indicating that calculated student active records were released back to the unbilled pool upon cancellation. | cyrus-research-critic |

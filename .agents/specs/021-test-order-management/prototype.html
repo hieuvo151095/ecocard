@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enterprise Order Management Dashboard — Light Mode Prototype</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-canvas: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-subtle: #f1f5f9;
+      --border-color: #e2e8f0;
+      --border-strong: #cbd5e1;
+      --border-focus: #2563eb;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-tertiary: #94a3b8;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-subtle: #eff6ff;
+      --success: #16a34a;
+      --success-bg: #f0fdf4;
+      --warning: #d97706;
+      --warning-bg: #fffbeb;
+      --danger: #dc2626;
+      --danger-bg: #fef2f2;
+      --radius-sm: 4px;
+      --radius-md: 6px;
+      --radius-lg: 8px;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --font-sans: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-canvas);
+      color: var(--text-primary);
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top State Switcher Control Bar (Light Mode) */
+    .state-simulator-bar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-color);
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .state-btn-group {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .state-btn {
+      background: var(--bg-canvas);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+      padding: 5px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .state-btn:hover { background: var(--bg-subtle); color: var(--text-primary); }
+    .state-btn.active {
+      background: var(--primary-subtle);
+      color: var(--primary);
+      border-color: var(--primary);
+      font-weight: 600;
+    }
+
+    /* Main App Layout */
+    .app-layout {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* Sidebar Navigation (Light Mode) */
+    aside {
+      width: 240px;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      padding: 20px 16px;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 16px;
+      margin-bottom: 24px;
+      color: var(--text-primary);
+    }
+
+    .brand-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: white;
+    }
+
+    .nav-menu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-decoration: none;
+    }
+
+    .nav-item:hover {
+      background: var(--bg-subtle);
+      color: var(--text-primary);
+    }
+
+    .nav-item.active {
+      background: var(--primary-subtle);
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    /* Main Content Area */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--bg-canvas);
+    }
+
+    /* App Header Bar (Light Mode) */
+    header {
+      height: 60px;
+      border-bottom: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+    }
+
+    .header-search {
+      width: 320px;
+      position: relative;
+    }
+
+    .header-search input {
+      width: 100%;
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px 8px 36px;
+      color: var(--text-primary);
+      font-size: 13px;
+      outline: none;
+    }
+
+    .header-search input:focus { border-color: var(--border-focus); background: white; }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-tertiary);
+      font-size: 14px;
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+    }
+
+    .avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--primary-subtle);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      border: 1px solid var(--primary);
+    }
+
+    /* Content View Container */
+    .view-container {
+      flex: 1;
+      padding: 24px 28px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Filter Bar (Light Mode) */
+    .filter-bar {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 14px 20px;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .filter-group {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .form-control {
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 7px 12px;
+      color: var(--text-primary);
+      font-size: 13px;
+      outline: none;
+    }
+
+    .form-control:focus { border-color: var(--border-focus); background: white; }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-primary:hover { background: var(--primary-hover); }
+
+    /* Data Table Section (Light Mode) */
+    .data-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .erp-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .erp-table th {
+      background: var(--bg-subtle);
+      padding: 11px 16px;
+      text-align: left;
+      color: var(--text-secondary);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border-color);
+      user-select: none;
+    }
+
+    .erp-table td {
+      padding: 11px 16px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-primary);
+    }
+
+    .erp-table tbody tr:hover {
+      background: var(--bg-subtle);
+    }
+
+    .erp-table tbody tr.selected {
+      background: var(--primary-subtle);
+    }
+
+    /* Badges & Tags (Light Mode) */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: var(--font-mono);
+    }
+
+    .badge-pending { background: var(--warning-bg); color: var(--warning); border: 1px solid rgba(217, 119, 6, 0.3); }
+    .badge-dispatched { background: var(--success-bg); color: var(--success); border: 1px solid rgba(22, 163, 74, 0.3); }
+    .badge-hazard { background: var(--danger-bg); color: var(--danger); border: 1px solid rgba(220, 38, 38, 0.3); }
+
+    .sla-timer {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--warning);
+      font-weight: 600;
+    }
+
+    /* Floating Batch Action Bar (Light Mode) */
+    .batch-floating-bar {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-surface);
+      border: 1px solid var(--primary);
+      border-radius: var(--radius-lg);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      box-shadow: var(--shadow-lg);
+      z-index: 90;
+    }
+
+    .batch-count {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--primary);
+    }
+
+    /* Modal Overlay (SCR-002 Light Mode) */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.4);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      width: 640px;
+      max-width: 90%;
+      padding: 28px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 16px;
+      margin-bottom: 20px;
+    }
+
+    .modal-header h3 { margin: 0; font-size: 18px; font-weight: 600; color: var(--text-primary); }
+
+    /* Skeleton Loader Component */
+    .skeleton-row {
+      height: 18px;
+      background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+      border-radius: 4px;
+    }
+
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Top 8-State Simulator Toolbar (Light Mode) -->
+  <div class="state-simulator-bar">
+    <div>
+      <strong style="color: var(--primary);">☀️ Light Mode Mandate Simulator:</strong>
+      <span style="color: var(--text-secondary); font-size: 12px; margin-left: 8px;">Switch state machine view</span>
+    </div>
+    <div class="state-btn-group">
+      <button class="state-btn active" onclick="switchState('populated')">populated (50 Orders)</button>
+      <button class="state-btn" onclick="switchState('loading')">loading (Skeleton)</button>
+      <button class="state-btn" onclick="switchState('empty')">empty (Zero Orders)</button>
+      <button class="state-btn" onclick="switchState('validation-error')">validation-error</button>
+      <button class="state-btn" onclick="switchState('system-error')">system-error (DB Banner)</button>
+      <button class="state-btn" onclick="switchState('success')">success (Green Toast)</button>
+      <button class="state-btn" onclick="switchState('permission-denied')">permission-denied (RBAC)</button>
+    </div>
+  </div>
+
+  <div class="app-layout">
+
+    <!-- Sidebar Navigation -->
+    <aside>
+      <div class="brand-logo">
+        <div class="brand-icon">F</div>
+        <span>Fleet ERP v35</span>
+      </div>
+
+      <ul class="nav-menu">
+        <a class="nav-item" href="#">📊 Dashboard</a>
+        <a class="nav-item active" href="#">📦 Order Fulfillment</a>
+        <a class="nav-item" href="#">🚚 Batch Shipping</a>
+        <a class="nav-item" href="#">⚠️ Exceptions &amp; Splits</a>
+        <a class="nav-item" href="#">📋 Audit Trails</a>
+        <a class="nav-item" href="#">⚙️ System Settings</a>
+      </ul>
+    </aside>
+
+    <!-- Main Workspace -->
+    <main>
+
+      <!-- App Header -->
+      <header>
+        <div class="header-search">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="Search order ID, customer, SKU, or tracking #...">
+        </div>
+
+        <div class="user-profile">
+          <span style="color: var(--text-secondary);">Logistics Admin: <strong style="color:var(--text-primary);">Nhan Le</strong></span>
+          <div class="avatar">NL</div>
+        </div>
+      </header>
+
+      <!-- View Container -->
+      <div class="view-container">
+
+        <!-- System Error Banner (Hidden by default) -->
+        <div id="banner-system-error" style="display: none; background: var(--danger-bg); border: 1px solid var(--danger); padding: 14px 20px; border-radius: var(--radius-md); font-size: 13px; color: var(--danger); display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <strong>⚠️ System Exception (DB Connection Timeout):</strong> Unable to reach inventory stock master node <code>inv-db-prod-02</code>.
+          </div>
+          <button class="btn-primary" style="background: var(--danger); font-size: 12px; padding: 4px 10px;" onclick="switchState('populated')">Retry Connection</button>
+        </div>
+
+        <!-- Success Toast Banner (Hidden by default) -->
+        <div id="banner-success" style="display: none; background: var(--success-bg); border: 1px solid var(--success); padding: 14px 20px; border-radius: var(--radius-md); font-size: 13px; color: var(--success);">
+          <strong>✅ Batch Dispatch Success:</strong> 25 Order packages allocated. Shipping labels generated and sent to warehouse thermal printer.
+        </div>
+
+        <!-- Validation Error Banner (Hidden by default) -->
+        <div id="banner-validation-error" style="display: none; background: var(--warning-bg); border: 1px solid var(--warning); padding: 14px 20px; border-radius: var(--radius-md); font-size: 13px; color: var(--warning);">
+          <strong>⚠️ Validation Error:</strong> Please select at least one order row from the grid before initiating bulk inventory allocation.
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+          <div class="filter-group">
+            <label style="font-size: 13px; font-weight: 500;">Filter Status:</label>
+            <select class="form-control">
+              <option>Pending Fulfillment (48)</option>
+              <option>Allocated (12)</option>
+              <option>Dispatched (150)</option>
+            </select>
+
+            <select class="form-control">
+              <option>SLA Urgency: High (&lt; 30m)</option>
+              <option>SLA Urgency: Normal</option>
+              <option>SLA Urgency: All</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <button class="btn-primary" onclick="openModal()">⚡ Run Bulk Allocation (25 Selected)</button>
+          </div>
+        </div>
+
+        <!-- Data Card Grid (Populated State) -->
+        <div id="view-populated" class="data-card">
+          <table class="erp-table">
+            <thead>
+              <tr>
+                <th style="width: 40px;"><input type="checkbox" checked onclick="toggleAllRows(this)"></th>
+                <th>Order ID</th>
+                <th>Customer / Destination</th>
+                <th>Items &amp; SKUs</th>
+                <th>Total Value</th>
+                <th>SLA Timer</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="table-body">
+              <tr class="selected">
+                <td><input type="checkbox" checked></td>
+                <td><code style="color:var(--primary); font-family:var(--font-mono); font-weight:600;">ORD-9021</code></td>
+                <td>
+                  <strong>Acme Logistics Corp</strong><br>
+                  <span style="font-size:11px; color:var(--text-secondary);">Warehouse Hub A1 - Distribution Center</span>
+                </td>
+                <td>14 Items <span style="font-size:11px; color:var(--text-secondary);">(SKU-8821, SKU-9920)</span></td>
+                <td style="font-family:var(--font-mono); font-weight:600;">$4,250.00</td>
+                <td><span class="sla-timer">⏱️ 12m 45s</span></td>
+                <td><span class="badge badge-pending">Pending</span></td>
+                <td><button style="background:transparent; border:1px solid var(--border-color); color:var(--text-secondary); padding:4px 8px; border-radius:4px; font-size:11px; cursor:pointer;">Details</button></td>
+              </tr>
+              <tr class="selected">
+                <td><input type="checkbox" checked></td>
+                <td><code style="color:var(--primary); font-family:var(--font-mono); font-weight:600;">ORD-9022</code></td>
+                <td>
+                  <strong>Global Supply Ltd</strong> <span class="badge badge-hazard">Hazardous</span><br>
+                  <span style="font-size:11px; color:var(--text-secondary);">Regional Depot B - Dock 04</span>
+                </td>
+                <td>8 Items <span style="font-size:11px; color:var(--text-secondary);">(SKU-1044, SKU-2099)</span></td>
+                <td style="font-family:var(--font-mono); font-weight:600;">$1,890.50</td>
+                <td><span class="sla-timer">⏱️ 18m 10s</span></td>
+                <td><span class="badge badge-pending">Pending</span></td>
+                <td><button style="background:transparent; border:1px solid var(--border-color); color:var(--text-secondary); padding:4px 8px; border-radius:4px; font-size:11px; cursor:pointer;">Details</button></td>
+              </tr>
+              <tr class="selected">
+                <td><input type="checkbox" checked></td>
+                <td><code style="color:var(--primary); font-family:var(--font-mono); font-weight:600;">ORD-9023</code></td>
+                <td>
+                  <strong>Apex Industrial Hub</strong><br>
+                  <span style="font-size:11px; color:var(--text-secondary);">East Coast Gateway Port</span>
+                </td>
+                <td>3 Items <span style="font-size:11px; color:var(--text-secondary);">(SKU-4022)</span></td>
+                <td style="font-family:var(--font-mono); font-weight:600;">$650.00</td>
+                <td><span class="sla-timer">⏱️ 24m 00s</span></td>
+                <td><span class="badge badge-pending">Pending</span></td>
+                <td><button style="background:transparent; border:1px solid var(--border-color); color:var(--text-secondary); padding:4px 8px; border-radius:4px; font-size:11px; cursor:pointer;">Details</button></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td><code style="color:var(--primary); font-family:var(--font-mono); font-weight:600;">ORD-9019</code></td>
+                <td>
+                  <strong>Nexus Tech Partner</strong><br>
+                  <span style="font-size:11px; color:var(--text-secondary);">South Facility Bay 12</span>
+                </td>
+                <td>22 Items <span style="font-size:11px; color:var(--text-secondary);">(SKU-7711, SKU-3001)</span></td>
+                <td style="font-family:var(--font-mono); font-weight:600;">$12,400.00</td>
+                <td><span style="font-family:var(--font-mono); font-size:12px; color:var(--success);">⏱️ 2h 15m</span></td>
+                <td><span class="badge badge-dispatched">Dispatched</span></td>
+                <td><button style="background:transparent; border:1px solid var(--border-color); color:var(--text-secondary); padding:4px 8px; border-radius:4px; font-size:11px; cursor:pointer;">Details</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Skeleton Loading View (Hidden by default) -->
+        <div id="view-loading" class="data-card" style="display: none; padding: 24px;">
+          <div style="display:flex; flex-direction:column; gap:16px;">
+            <div class="skeleton-row" style="width: 40%;"></div>
+            <div class="skeleton-row" style="width: 100%;"></div>
+            <div class="skeleton-row" style="width: 100%;"></div>
+            <div class="skeleton-row" style="width: 90%;"></div>
+            <div class="skeleton-row" style="width: 95%;"></div>
+          </div>
+        </div>
+
+        <!-- Empty State View (Hidden by default) -->
+        <div id="view-empty" class="data-card" style="display: none; padding: 60px; text-align: center;">
+          <div style="font-size: 40px; margin-bottom: 12px;">📦</div>
+          <h3 style="margin: 0 0 8px 0; font-size: 18px;">All Batch Orders Fulfilled!</h3>
+          <p style="color: var(--text-secondary); font-size: 13px; margin: 0 0 20px 0;">There are currently zero pending orders requiring allocation in this queue.</p>
+          <button class="btn-primary" onclick="switchState('populated')">View Historical Fulfillment Logs</button>
+        </div>
+
+        <!-- Permission Denied View (Hidden by default) -->
+        <div id="view-permission-denied" class="data-card" style="display: none; padding: 60px; text-align: center;">
+          <div style="font-size: 40px; margin-bottom: 12px;">🔒</div>
+          <h3 style="margin: 0 0 8px 0; font-size: 18px; color: var(--danger);">Access Restricted (RBAC Protection)</h3>
+          <p style="color: var(--text-secondary); font-size: 13px; margin: 0 0 20px 0;">Your account does not possess <code>role:warehouse_admin</code> permissions required for bulk dispatch.</p>
+          <button class="btn-primary" style="background:#475569;" onclick="switchState('populated')">Request Elevated Access</button>
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+
+  <!-- Floating Selection Bar (Light Mode) -->
+  <div id="floating-bar" class="batch-floating-bar">
+    <span class="batch-count">25 Orders Selected for Batch Fulfillment</span>
+    <button class="btn-primary" onclick="openModal()">Confirm Allocation &amp; Print Labels</button>
+  </div>
+
+  <!-- Modal Dialog (SCR-002 Light Mode) -->
+  <div id="modal-allocation" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>📦 Bulk Inventory Allocation Review (SCR-002)</h3>
+        <button onclick="closeModal()" style="background:transparent; border:none; color:var(--text-secondary); font-size:18px; cursor:pointer;">✕</button>
+      </div>
+
+      <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px;">Review automated inventory allocation results for the 25 selected orders before dispatch.</p>
+
+      <div style="background: var(--bg-subtle); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 16px; margin-bottom: 24px;">
+        <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px;">
+          <span>Total Orders In Batch:</span>
+          <strong>25 Orders</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px;">
+          <span>Stock Allocation Status:</span>
+          <strong style="color: var(--success);">100% In Stock (248 SKUs)</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 13px;">
+          <span>Target Thermal Printer:</span>
+          <code>PRN-WH-BAY04-THERMAL</code>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 12px;">
+        <button style="background: var(--bg-subtle); color: var(--text-primary); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: var(--radius-sm); cursor: pointer;" onclick="closeModal()">Cancel</button>
+        <button class="btn-primary" onclick="closeModal(); switchState('success')">Confirm &amp; Dispatch 25 Orders</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive JavaScript -->
+  <script>
+    function switchState(state) {
+      document.querySelectorAll('.state-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      document.getElementById('view-populated').style.display = 'none';
+      document.getElementById('view-loading').style.display = 'none';
+      document.getElementById('view-empty').style.display = 'none';
+      document.getElementById('view-permission-denied').style.display = 'none';
+      document.getElementById('banner-system-error').style.display = 'none';
+      document.getElementById('banner-success').style.display = 'none';
+      document.getElementById('banner-validation-error').style.display = 'none';
+      document.getElementById('floating-bar').style.display = 'none';
+
+      if (state === 'populated') {
+        document.getElementById('view-populated').style.display = 'block';
+        document.getElementById('floating-bar').style.display = 'flex';
+      } else if (state === 'loading') {
+        document.getElementById('view-loading').style.display = 'block';
+      } else if (state === 'empty') {
+        document.getElementById('view-empty').style.display = 'block';
+      } else if (state === 'permission-denied') {
+        document.getElementById('view-permission-denied').style.display = 'block';
+      } else if (state === 'system-error') {
+        document.getElementById('view-populated').style.display = 'block';
+        document.getElementById('banner-system-error').style.display = 'flex';
+      } else if (state === 'success') {
+        document.getElementById('view-populated').style.display = 'block';
+        document.getElementById('banner-success').style.display = 'block';
+      } else if (state === 'validation-error') {
+        document.getElementById('view-populated').style.display = 'block';
+        document.getElementById('banner-validation-error').style.display = 'block';
+      }
+    }
+
+    function openModal() {
+      document.getElementById('modal-allocation').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('modal-allocation').classList.remove('open');
+    }
+  </script>
+
+</body>
+</html>

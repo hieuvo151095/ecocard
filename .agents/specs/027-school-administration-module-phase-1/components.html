@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Component Gallery — Nhà Trường: Học Sinh (Students Master Data & Profile Hub)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+Chettan+2:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --eco-blue: #2563eb;
+      --eco-yellow: #f0b90b;
+      --bg-dark: #0f172a;
+      --card-bg: #1e2026;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --border-dark: #383e4a;
+      --status-emerald: #10b981;
+      --status-amber: #f59e0b;
+      --status-rose: #ef4444;
+      --status-cyan: #38bdf8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Quicksand', 'Inter', sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 32px;
+      line-height: 1.5;
+    }
+    .gallery-container { max-width: 1200px; margin: 0 auto; }
+    .gallery-header { margin-bottom: 32px; border-bottom: 1px solid #383e4a; padding-bottom: 16px; }
+    .gallery-title { font-family: 'Baloo Chettan 2', cursive; font-size: 28px; font-weight: 700; color: #f8fafc; }
+    .section-title { font-size: 15px; font-weight: 700; color: #38bdf8; margin: 28px 0 14px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .comp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; }
+    .comp-card { background: #1e2026; border: 1px solid #383e4a; border-radius: 12px; padding: 20px; position: relative; }
+    .comp-card h4 { font-size: 13px; font-weight: 700; color: #94a3b8; margin-bottom: 12px; text-transform: uppercase; }
+
+    /* Universal Buttons */
+    .btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .btn-primary { background: #2563eb; color: #ffffff; border: 1px solid #2563eb; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-secondary { background: #0f172a; color: #94a3b8; border: 1px solid #383e4a; }
+    .btn-secondary:hover { color: #f8fafc; border-color: #2563eb; }
+    .btn-danger { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid #ef4444; }
+    .btn-success { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid #10b981; }
+
+    /* Action Dropdown Standardization */
+    .action-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: #0f172a;
+      border: 1px solid #383e4a;
+      color: #94a3b8;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .action-btn:hover { color: #f8fafc; border-color: #2563eb; }
+    .dropdown-menu {
+      position: absolute;
+      right: 20px;
+      top: 54px;
+      width: 220px;
+      background: #1e2026;
+      border: 1px solid #383e4a;
+      border-radius: 8px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
+      padding: 6px;
+      z-index: 9999;
+    }
+    .dropdown-item {
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .dropdown-item:hover { background: #0f172a; color: #38bdf8; }
+    .dropdown-item.danger:hover { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+
+    /* Pediatric BMI Badges */
+    .bmi-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .bmi-underweight { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid #f59e0b; }
+    .bmi-normal { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid #10b981; }
+    .bmi-overweight { background: rgba(37, 99, 235, 0.15); color: #60a5fa; border: 1px solid #2563eb; }
+    .bmi-obese { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid #ef4444; }
+
+    /* Legacy Record Fallback */
+    .legacy-fallback {
+      font-style: italic;
+      color: #94a3b8;
+      font-size: 12px;
+    }
+
+    /* Cascade Alert Banner */
+    .cascade-banner {
+      background: rgba(37, 99, 235, 0.1);
+      border: 1px solid #2563eb;
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-top: 10px;
+    }
+    .cascade-item {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      margin-bottom: 6px;
+      font-size: 12px;
+      color: #f8fafc;
+    }
+    .cascade-item:last-child { margin-bottom: 0; }
+
+    /* Top-Right Toast Simulator */
+    .toast-preview {
+      position: relative;
+      background: #1e2026;
+      border-left: 4px solid #10b981;
+      border-top: 1px solid #383e4a;
+      border-right: 1px solid #383e4a;
+      border-bottom: 1px solid #383e4a;
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+    }
+  </style>
+</head>
+<body>
+  <div class="gallery-container">
+    <header class="gallery-header">
+      <h1 class="gallery-title">Bộ Thành Phần UI — Quản Lý Học Sinh (Student Master Components)</h1>
+      <p style="color: #94a3b8; font-size: 13px; margin-top: 4px;">
+        Thư viện thành phần giao diện chuẩn hóa • ECO Design System 1.0 • Chuẩn hóa Thao Tác •••, BMI Trẻ Em, Cảnh Báo Cascade & K008/K010
+      </p>
+    </header>
+
+    <!-- SECTION 1: UNIVERSAL ACTION DROPDOWN -->
+    <h3 class="section-title">1. Menu Thao Tác Chuẩn Hóa (••• Floating Action Dropdown)</h3>
+    <div class="comp-grid">
+      <div class="comp-card" style="min-height: 220px;">
+        <h4>Nút Thao Tác ••• Với Upward Flip & Z-Index 9999</h4>
+        <p style="font-size: 12px; color: #94a3b8; margin-bottom: 12px;">
+          Áp dụng cho mọi hàng bảng: kích hoạt floating menu ngữ cảnh, tự động lật lên khi ở gần đáy trang, click ngoài tự đóng.
+        </p>
+        <div style="display: flex; justify-content: flex-end;">
+          <button class="action-btn" title="Thao tác">•••</button>
+          <div class="dropdown-menu">
+            <div class="dropdown-item">🔄 Chuyển lớp học sinh</div>
+            <div class="dropdown-item">⚖️ Cập nhật thể trạng & BMI</div>
+            <div class="dropdown-item">📝 Ghi chú nội bộ</div>
+            <div class="dropdown-item">🎁 Ưu đãi & Giảm học phí</div>
+            <div style="height: 1px; background: #383e4a; margin: 4px 0;"></div>
+            <div class="dropdown-item danger">🚫 Chuyển trạng thái nghỉ</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="comp-card">
+        <h4>Quy Tắc Tiêu Đề Cột Bảng (Strict Sentence-case)</h4>
+        <p style="font-size: 12px; color: #94a3b8; margin-bottom: 12px;">
+          Tất cả tiêu đề cột bảng trên toàn bộ hệ thống phải viết hoa chữ cái đầu (Sentence case):
+        </p>
+        <div style="background: #0f172a; border: 1px solid #383e4a; border-radius: 8px; padding: 12px; font-size: 12px;">
+          <div style="color: #10b981; font-weight: 700; margin-bottom: 4px;">✅ Chuẩn: Sentence-case Table Headers</div>
+          <div style="color: #f8fafc;">• Mã học sinh</div>
+          <div style="color: #f8fafc;">• Họ và tên</div>
+          <div style="color: #f8fafc;">• Lớp</div>
+          <div style="color: #f8fafc;">• Ngày sinh</div>
+          <div style="color: #f8fafc;">• Số điện thoại phụ huynh</div>
+          <div style="color: #f8fafc;">• Thao tác</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: PEDIATRIC BMI CLASSIFICATION (BR-KID-01) -->
+    <h3 class="section-title">2. Phân Loại Thể Trạng Trẻ Em & BMI Tự Động (BR-KID-01)</h3>
+    <div class="comp-grid">
+      <div class="comp-card">
+        <h4>Hệ Thống Badge Phân Loại Dinh Dưỡng</h4>
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+          <div><span class="bmi-badge bmi-underweight">Gầy (BMI &lt; 14.0)</span></div>
+          <div><span class="bmi-badge bmi-normal">Bình thường (14.0 - 18.0)</span></div>
+          <div><span class="bmi-badge bmi-overweight">Nguy cơ thừa cân (18.1 - 20.0)</span></div>
+          <div><span class="bmi-badge bmi-obese">Béo phì (BMI &gt; 20.0)</span></div>
+        </div>
+      </div>
+
+      <div class="comp-card">
+        <h4>Trình Tính Toán BMI Trực Tiếp (Live Real-time Calculator)</h4>
+        <p style="font-size: 12px; color: #94a3b8; margin-bottom: 10px;">
+          Tự động tính BMI = Cân nặng / (Chiều cao/100)² ngay khi người dùng gõ số đo.
+        </p>
+        <div style="background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #383e4a; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-size: 11px; color: #94a3b8;">Chiều cao: 116.5 cm • Cân nặng: 22.0 kg</div>
+            <div style="font-size: 18px; font-weight: 700; color: #f8fafc; font-family: monospace;">BMI: 16.2</div>
+          </div>
+          <span class="bmi-badge bmi-normal">Bình thường</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: TRIPARTITE CASCADE WARNINGS & K008/K010 -->
+    <h3 class="section-title">3. Cơ Chế Bảo Vệ Dữ Liệu & Khắc Phục Lỗi Di Sản (ADR-009, K008, K010)</h3>
+    <div class="comp-grid">
+      <div class="comp-card">
+        <h4>3 Cảnh Báo Tự Động Khi Chuyển Lớp (Tripartite Cascade)</h4>
+        <div class="cascade-banner">
+          <div class="cascade-item">
+            <span style="color: #60a5fa; font-weight: 700;">1. Học phí:</span>
+            <span>Biểu phí học phí lớp mới được kích hoạt từ ngày hiệu lực.</span>
+          </div>
+          <div class="cascade-item">
+            <span style="color: #60a5fa; font-weight: 700;">2. Trao đổi:</span>
+            <span>Tự động cập nhật kênh chat lớp mới cho phụ huynh học sinh.</span>
+          </div>
+          <div class="cascade-item">
+            <span style="color: #60a5fa; font-weight: 700;">3. Học tập:</span>
+            <span>Bảo lưu toàn bộ bảng điểm, hoạt động và đánh giá môn học trước đó.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="comp-card">
+        <h4>Khắc Phục Dữ Liệu Thiếu Di Sản (Resolution K008)</h4>
+        <p style="font-size: 12px; color: #94a3b8; margin-bottom: 12px;">
+          Bản ghi cũ thiếu mã học sinh hoặc CCCD hiển thị nhãn nghiêng mờ, không làm hỏng layout bảng hoặc gây crash:
+        </p>
+        <div style="background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #383e4a; display: flex; flex-direction: column; gap: 8px;">
+          <div>Mã học sinh: <span class="legacy-fallback">Chưa có mã học sinh</span></div>
+          <div>Số CCCD/Định danh: <span class="legacy-fallback">Chưa có CCCD</span></div>
+        </div>
+      </div>
+
+      <div class="comp-card">
+        <h4>Bảo Vệ Biểu Mẫu Chưa Lưu (Resolution K010 - Dirty Form Guard)</h4>
+        <p style="font-size: 12px; color: #94a3b8; margin-bottom: 12px;">
+          Khi người dùng nhập dở form tiếp nhận học sinh và bấm "Hủy bỏ", hệ thống chặn điều hướng và bật modal xác nhận:
+        </p>
+        <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid #f59e0b; border-radius: 8px; padding: 10px; font-size: 12px; color: #f8fafc;">
+          ⚠️ <strong>Bạn có thay đổi chưa lưu!</strong> Rời khỏi trang lúc này sẽ mất toàn bộ thông tin học sinh và phụ huynh đã điền.
+        </div>
+      </div>
+
+      <div class="comp-card">
+        <h4>Toast Thông Báo Toàn Cục Góc Phải Trên (Global Toast)</h4>
+        <p style="font-size: 12px; color: #94a3b8; margin-bottom: 12px;">
+          Mọi thao tác thành công (Thêm học sinh, Chuyển lớp, Đo thể trạng, Lưu ghi chú) phát tín hiệu góc phải trên:
+        </p>
+        <div class="toast-preview">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="color: #10b981; font-size: 16px;">✓</span>
+            <div>
+              <div style="font-weight: 700; font-size: 13px; color: #f8fafc;">Thao tác thành công</div>
+              <div style="font-size: 11px; color: #94a3b8;">Đã chuyển 2 học sinh sang Lớp 2A1</div>
+            </div>
+          </div>
+          <span style="color: #94a3b8; cursor: pointer; font-size: 14px;">✕</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,24 @@
+/* ECO type tokens — Typeface: Helvetica Neue (per Typography page).
+   Line height = font size × 1.5 (font-height-default). */
+:root{
+  --font-core:"Helvetica Neue",Helvetica,Arial,"Liberation Sans",sans-serif;
+  --font-legacy:Inter,"Helvetica Neue",Helvetica,Arial,sans-serif;
+  --font-mono:"SF Mono","Source Code Pro",ui-monospace,Menlo,monospace;
+
+  --font-size-5x-large:48px;
+  --font-size-4x-large:32px;
+  --font-size-3x-large:28px;
+  --font-size-2x-large:24px;
+  --font-size-x-large:20px;
+  --font-size-large:18px;
+  --font-size-medium:16px;
+  --font-size-base:14px;
+  --font-size-small:12px;
+  --font-size-x-small:10px;
+
+  --font-weight-bold:700;
+  --font-weight-medium:500;
+  --font-weight-regular:400;
+
+  --font-height-default:1.5;
+}

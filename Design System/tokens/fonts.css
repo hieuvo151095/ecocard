@@ -1,0 +1,13 @@
+/* ECO webfonts.
+   The source .fig references Helvetica Neue (core), plus Inter / Roboto in
+   older 1.0 component art. No font binaries ship inside a .fig, so no
+   @font-face rule can point at a real ECO file here — Helvetica Neue resolves
+   from the OS on Apple platforms and falls back to Helvetica / Arial /
+   Liberation Sans elsewhere. Inter is loaded from Google Fonts as the nearest
+   match for the legacy faces. Drop real WOFF2 files into assets/fonts/ and
+   replace this import with @font-face rules when available. */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap");
+
+:root{
+  --font-fallback-note:"Helvetica Neue via system; Inter via Google Fonts";
+}

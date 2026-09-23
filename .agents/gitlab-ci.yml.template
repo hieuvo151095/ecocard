@@ -1,0 +1,89 @@
+# Enterprise GitLab CI/CD for Marcus Fleet Antigravity Engine
+# V31.0: Validates specs, epic-first development ledgers, doc sync, delta RAG, and sandbox checks.
+
+stages:
+  - validate
+  - analyze
+  - sandboxed-execute
+
+image: python:3.10-slim
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+cache:
+  paths:
+    - .cache/pip
+    - .agents/venv/
+
+before_script:
+  - python -V
+  - pip install virtualenv
+  - virtualenv .agents/venv
+  - source .agents/venv/bin/activate
+  - pip install -r .agents/requirements.txt
+
+spec-governance-validation:
+  stage: validate
+  script:
+    - apt-get update && apt-get install -y git
+    - |
+      CHANGED_FILES="$(git diff --name-only HEAD~1 HEAD || true)"
+      SOURCE_CHANGES="$(printf '%s\n' "$CHANGED_FILES" | grep -E '\.(ts|tsx|js|jsx|py|go|rs|java|kt|swift|dart|cs|php|rb|vue|svelte|css|scss|sql)$' || true)"
+      REQUIRED_PLANNING_DOCS="docs/prd.md docs/tasks.md docs/knowledge.md docs/decisions.md docs/memory.md docs/planning/flows.md docs/planning/screens.md docs/planning/diagrams.md"
+      if [ -n "$SOURCE_CHANGES" ] && [ ! -d docs/development ]; then
+        echo "Behavior-changing source files were detected but docs/development is missing."
+        echo "Run /doc_reconcile for brownfield projects or scaffold /docs/development before merging."
+        exit 1
+      fi
+      if [ -n "$SOURCE_CHANGES" ]; then
+        for doc in $REQUIRED_PLANNING_DOCS; do
+          if [ ! -f "$doc" ]; then
+            echo "Behavior-changing source files were detected but required planning doc is missing: $doc"
+            echo "Run /doc_reconcile for brownfield projects or restore the planning package before merging."
+            exit 1
+          fi
+        done
+      fi
+    - python .agents/scripts/validate_specs.py
+    - |
+      if [ -d docs/research ]; then
+        python .agents/scripts/validate_planning_research.py --root .
+      else
+        echo "No docs/research directory found; skipping planning research validation."
+      fi
+    - |
+      if [ -d docs/development ]; then
+        python .agents/scripts/validate_development_docs.py --strict-counts
+        python .agents/scripts/validate_doc_sync.py --base-ref HEAD~1 --strict
+      else
+        echo "No docs/development directory found; skipping development docs validation."
+      fi
+  only:
+    - merge_requests
+    - main
+
+cognitive-delta-sync:
+  stage: analyze
+  script:
+    - echo "Calculating Delta context bounds..."
+    - apt-get update && apt-get install -y git
+    - git diff --name-only HEAD~1 HEAD > .agents/changed_files.txt
+    - |
+      if [ -s .agents/changed_files.txt ]; then
+        python .agents/adapters/trustgraph_incremental.py --files $(cat .agents/changed_files.txt)
+      else
+        echo "No changed files detected; skipping TrustGraph incremental sync."
+      fi
+  only:
+    - merge_requests
+    - main
+
+agent-safety-check:
+  stage: sandboxed-execute
+  script:
+    - chmod +x .agents/run_sandboxed.sh
+    - .agents/run_sandboxed.sh "npm config list"
+    - python .agents/adapters/telemetry_export.py --agent_id "gitlab_runner" --action "Execution_Pass"
+  only:
+    - merge_requests

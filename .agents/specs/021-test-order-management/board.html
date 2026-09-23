@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Figma Canvas Board — Order Management System (Drag & Drop + Mouse Wheel Zoom)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --canvas-bg: #e2e8f0;
+      --canvas-grid: #cbd5e1;
+      --artboard-bg: #ffffff;
+      --border-color: #cbd5e1;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --primary: #2563eb;
+      --primary-subtle: #eff6ff;
+      --success: #16a34a;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --shadow-artboard: 0 20px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.08);
+      --font-sans: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--canvas-bg);
+      background-image: radial-gradient(var(--canvas-grid) 1.5px, transparent 1.5px);
+      background-size: 24px 24px;
+      color: var(--text-primary);
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Figma Navigation Bar */
+    .figma-top-bar {
+      height: 48px;
+      background: #0f172a;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      font-size: 13px;
+      z-index: 1000;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+
+    .figma-logo-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 600;
+    }
+
+    .figma-badge {
+      background: #2563eb;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .figma-btn {
+      background: #1e293b;
+      color: white;
+      border: 1px solid #334155;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .figma-btn:hover { background: #334155; }
+    .figma-btn-primary { background: #2563eb; border-color: #2563eb; font-weight: 600; }
+    .figma-btn-primary:hover { background: #1d4ed8; }
+
+    /* Canvas Workspace (Pan & Drag Layer) */
+    .canvas-viewport {
+      position: absolute;
+      top: 48px;
+      bottom: 56px;
+      left: 0;
+      right: 0;
+      overflow: hidden;
+      cursor: grab;
+    }
+
+    .canvas-viewport:active {
+      cursor: grabbing;
+    }
+
+    .canvas-world {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 5000px;
+      height: 5000px;
+      transform-origin: 0 0;
+    }
+
+    /* SVG Connectors Overlay */
+    .svg-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    /* Artboard / Screen Frame */
+    .artboard {
+      position: absolute;
+      background: var(--artboard-bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-artboard);
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+      transition: outline 0.15s ease, box-shadow 0.15s ease;
+      cursor: default;
+    }
+
+    .artboard.selected {
+      outline: 2px solid #2563eb;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2), var(--shadow-artboard);
+      z-index: 20;
+    }
+
+    /* Artboard Header (Drag Handle) */
+    .artboard-header {
+      height: 36px;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+      border-radius: 12px 12px 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      cursor: move;
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .artboard-title-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .artboard-tag {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: #64748b;
+    }
+
+    .window-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-red { background: #ef4444; }
+    .dot-yellow { background: #f59e0b; }
+    .dot-green { background: #10b981; }
+
+    /* Screen Body (Interactive Canvas Controls) */
+    .screen-body {
+      padding: 20px;
+      background: #f8fafc;
+      overflow: hidden;
+      border-radius: 0 0 12px 12px;
+      cursor: auto;
+    }
+
+    /* Table styling inside Artboard */
+    .art-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      background: white;
+      border: 1px solid #e2e8f0;
+    }
+
+    .art-table th { background: #f1f5f9; padding: 8px 12px; text-align: left; color: #475569; font-weight: 600; }
+    .art-table td { padding: 8px 12px; border-bottom: 1px solid #e2e8f0; }
+
+    .badge-status {
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    /* Bottom Figma Canvas Toolbar */
+    .figma-bottom-bar {
+      height: 56px;
+      background: #0f172a;
+      border-top: 1px solid #1e293b;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 24px;
+      z-index: 1000;
+      color: white;
+      font-size: 13px;
+    }
+
+    .tool-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .tool-btn {
+      background: #1e293b;
+      color: white;
+      border: 1px solid #334155;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tool-btn.active {
+      background: #2563eb;
+      border-color: #2563eb;
+      font-weight: 600;
+    }
+
+    .zoom-btn {
+      background: #1e293b;
+      color: white;
+      border: 1px solid #334155;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Figma Navigation Bar -->
+  <div class="figma-top-bar">
+    <div class="figma-logo-group">
+      <span style="font-size: 16px;">❖</span>
+      <span>Figma Interactive Board — Order Management System</span>
+      <span class="figma-badge">WHEEL ZOOM + LIVE ARTIFACT INTERACTION</span>
+    </div>
+
+    <div class="top-actions">
+      <span style="color: #94a3b8; font-size: 12px;">Active System: <strong style="color:white;">erp-enterprise/DESIGN.md</strong></span>
+      <a href="prototype.html" class="figma-btn figma-btn-primary">🚀 Play Full Prototype App</a>
+      <a href="components.html" class="figma-btn">🧩 Component Spec</a>
+    </div>
+  </div>
+
+  <!-- Canvas Viewport (Supports Wheel Zoom & Pan) -->
+  <div class="canvas-viewport" id="viewport">
+    <div class="canvas-world" id="world">
+
+      <!-- Dynamic SVG Flow Connector Overlay -->
+      <svg class="svg-overlay" id="svg-overlay">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
+          </marker>
+        </defs>
+        <!-- Flow Connector Path 1 -> 2 -->
+        <path id="flow-line-1" stroke="#2563eb" stroke-width="3" fill="none" marker-end="url(#arrow)" stroke-dasharray="6,4"/>
+      </svg>
+
+      <!-- ARTBOARD 1: SCR-001 Order Fulfillment Main Grid (Live Interactive Components inside!) -->
+      <div class="artboard selected" id="artboard-1" style="left: 100px; top: 100px; width: 1050px;">
+        <div class="artboard-header" onmousedown="startDragArtboard(event, 'artboard-1')">
+          <div class="artboard-title-group">
+            <div class="window-dots">
+              <div class="dot dot-red"></div>
+              <div class="dot dot-yellow"></div>
+              <div class="dot dot-green"></div>
+            </div>
+            <span>SCR-001: Order Fulfillment Main Grid</span>
+            <span class="artboard-tag">1920 × 1080 Desktop</span>
+            <span class="artboard-tag" style="background:#dcfce7; color:#15803d;">State: populated</span>
+          </div>
+          <span style="font-size: 11px; color: #64748b;">⋮⋮ Drag Handle</span>
+        </div>
+
+        <div class="screen-body" onmousedown="event.stopPropagation()">
+          <!-- Live Interactive Filter Bar -->
+          <div style="background: white; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; gap: 12px; align-items: center; font-size: 12px;">
+              <input type="text" id="board-search-input" placeholder="Type to filter grid orders live..." style="border: 1px solid #cbd5e1; padding: 6px 10px; border-radius: 4px; width: 240px;" oninput="filterBoardTable(this.value)">
+              <select style="border: 1px solid #cbd5e1; padding: 6px 10px; border-radius: 4px;">
+                <option>Status: Pending (48)</option>
+                <option>Status: Dispatched</option>
+              </select>
+            </div>
+            <button style="background: #2563eb; color: white; border: none; padding: 7px 14px; border-radius: 4px; font-weight: 600; font-size: 12px; cursor: pointer;" onclick="highlightModalArtboard()">Run Bulk Allocation (25 Selected)</button>
+          </div>
+
+          <!-- Live Interactive Table -->
+          <table class="art-table" id="board-table">
+            <thead>
+              <tr>
+                <th><input type="checkbox" checked onclick="toggleBoardCheckboxes(this)"></th>
+                <th>Order ID</th>
+                <th>Customer / Destination</th>
+                <th>SKUs &amp; Items</th>
+                <th>Total Value</th>
+                <th>SLA Timer</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="background:#eff6ff;" class="board-row">
+                <td><input type="checkbox" checked class="row-chk"></td>
+                <td><code style="color:#2563eb;">ORD-9021</code></td>
+                <td><strong>Acme Logistics Corp</strong><br><span style="color:#64748b; font-size:10px;">Warehouse Hub A1</span></td>
+                <td>14 SKUs</td>
+                <td><strong>$4,250.00</strong></td>
+                <td><span style="color:#d97706; font-weight:600;">⏱️ 12m left</span></td>
+                <td><span class="badge-status" style="background:#fffbeb; color:#d97706;">Pending</span></td>
+              </tr>
+              <tr style="background:#eff6ff;" class="board-row">
+                <td><input type="checkbox" checked class="row-chk"></td>
+                <td><code style="color:#2563eb;">ORD-9022</code></td>
+                <td><strong>Global Supply Ltd</strong> <span style="background:#fef2f2; color:#dc2626; padding:1px 4px; border-radius:3px; font-size:9px;">Hazardous</span></td>
+                <td>8 SKUs</td>
+                <td><strong>$1,890.50</strong></td>
+                <td><span style="color:#d97706; font-weight:600;">⏱️ 18m left</span></td>
+                <td><span class="badge-status" style="background:#fffbeb; color:#d97706;">Pending</span></td>
+              </tr>
+              <tr class="board-row">
+                <td><input type="checkbox" class="row-chk"></td>
+                <td><code style="color:#2563eb;">ORD-9019</code></td>
+                <td><strong>Nexus Tech Partner</strong></td>
+                <td>22 SKUs</td>
+                <td><strong>$12,400.00</strong></td>
+                <td><span style="color:#16a34a;">⏱️ 2h 15m</span></td>
+                <td><span class="badge-status" style="background:#f0fdf4; color:#16a34a;">Dispatched</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ARTBOARD 2: SCR-002 Batch Allocation Summary Modal -->
+      <div class="artboard" id="artboard-2" style="left: 1250px; top: 100px; width: 720px;">
+        <div class="artboard-header" onmousedown="startDragArtboard(event, 'artboard-2')">
+          <div class="artboard-title-group">
+            <div class="window-dots">
+              <div class="dot dot-red"></div>
+              <div class="dot dot-yellow"></div>
+              <div class="dot dot-green"></div>
+            </div>
+            <span>SCR-002: Batch Allocation Summary Modal</span>
+            <span class="artboard-tag">720px Modal Shell</span>
+          </div>
+          <span style="font-size: 11px; color: #64748b;">⋮⋮ Drag Handle</span>
+        </div>
+
+        <div class="screen-body" style="background: rgba(15,23,42,0.04); padding: 24px;" onmousedown="event.stopPropagation()">
+          <div style="background: white; border: 1px solid #cbd5e1; border-radius: 8px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+            <h3 style="margin-top:0; font-size:15px; border-bottom:1px solid #e2e8f0; padding-bottom:10px;">📦 Bulk Inventory Allocation Review (SCR-002)</h3>
+            <p style="font-size:12px; color:#475569;">Review automated inventory allocation results for 25 selected orders before dispatch.</p>
+
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:12px; margin:14px 0; font-size:12px;">
+              <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span>Total Orders:</span><strong>25 Orders</strong></div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span>Stock Allocation:</span><strong style="color:#16a34a;">100% In Stock (248 SKUs)</strong></div>
+              <div style="display:flex; justify-content:space-between;"><span>Thermal Printer:</span><code>PRN-WH-BAY04-THERMAL</code></div>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:8px;">
+              <button style="background:#f1f5f9; border:1px solid #cbd5e1; padding:6px 12px; border-radius:4px; font-size:12px; cursor:pointer;" onclick="alert('Action: Cancelled back to SCR-001')">Cancel</button>
+              <button style="background:#2563eb; color:white; border:none; padding:6px 12px; border-radius:4px; font-size:12px; font-weight:600; cursor:pointer;" onclick="alert('✅ Action Confirmed: 25 Orders Dispatched!')">Confirm &amp; Dispatch 25 Orders</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ARTBOARD 3: Design Tokens & Component Library Spec -->
+      <div class="artboard" id="artboard-3" style="left: 2040px; top: 100px; width: 620px;">
+        <div class="artboard-header" onmousedown="startDragArtboard(event, 'artboard-3')">
+          <div class="artboard-title-group">
+            <div class="window-dots">
+              <div class="dot dot-red"></div>
+              <div class="dot dot-yellow"></div>
+              <div class="dot dot-green"></div>
+            </div>
+            <span>Design Tokens &amp; System Specs</span>
+            <span class="artboard-tag">System Spec</span>
+          </div>
+          <span style="font-size: 11px; color: #64748b;">⋮⋮ Drag Handle</span>
+        </div>
+
+        <div class="screen-body" style="background: white;" onmousedown="event.stopPropagation()">
+          <h4 style="margin-top:0; font-size:13px; border-bottom:1px solid #e2e8f0; padding-bottom:6px;">🎨 Light Mode Color Tokens</h4>
+          <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; font-size:10px; margin-bottom:16px; text-align:center;">
+            <div><div style="height:28px; background:#f8fafc; border:1px solid #ccc; border-radius:4px;"></div><code>--bg-canvas</code></div>
+            <div><div style="height:28px; background:#ffffff; border:1px solid #ccc; border-radius:4px;"></div><code>--bg-surface</code></div>
+            <div><div style="height:28px; background:#2563eb; border-radius:4px;"></div><code>--primary</code></div>
+            <div><div style="height:28px; background:#16a34a; border-radius:4px;"></div><code>--success</code></div>
+          </div>
+
+          <h4 style="font-size:13px; border-bottom:1px solid #e2e8f0; padding-bottom:6px; margin-top:0;">🛡️ Systemic Canvas Rules</h4>
+          <ul style="font-size:11px; color:#475569; padding-left:14px; margin:0;">
+            <li><strong>Mouse Wheel Zoom:</strong> Scroll wheel or trackpad pinch zooms canvas.</li>
+            <li><strong>Drag &amp; Drop Artboards:</strong> Drag headers to move artboards freely.</li>
+            <li><strong>Live Component Interaction:</strong> In-artboard buttons and inputs are fully active.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Bottom Figma Toolbar -->
+  <div class="figma-bottom-bar">
+    <div class="tool-group">
+      <button class="tool-btn active">🖐️ Pan &amp; Wheel Zoom Active</button>
+      <button class="tool-btn">↖️ Drag Artboard Handle</button>
+      <span style="color: #64748b; margin: 0 8px;">|</span>
+      <span>Use Mouse Wheel to Zoom in/out</span>
+    </div>
+
+    <div class="tool-group">
+      <button class="zoom-btn" onclick="zoomOut()">-</button>
+      <span id="zoom-level" style="font-family: var(--font-mono); font-size: 12px; width: 44px; text-align: center;">100%</span>
+      <button class="zoom-btn" onclick="zoomIn()">+</button>
+      <button class="figma-btn" style="margin-left: 12px;" onclick="resetZoom()">Reset Canvas View</button>
+    </div>
+  </div>
+
+  <!-- JavaScript Engine: Drag & Drop + Mouse Wheel Zoom + In-Artboard Interactivity + Dynamic SVG Flow Connectors -->
+  <script>
+    let scale = 1;
+    let panX = 0;
+    let panY = 0;
+    let isPanning = false;
+    let isDraggingArtboard = false;
+    let activeArtboardId = null;
+    let startX, startY;
+
+    const viewport = document.getElementById('viewport');
+    const world = document.getElementById('world');
+
+    // Artboard Selection
+    document.querySelectorAll('.artboard').forEach(card => {
+      card.addEventListener('mousedown', (e) => {
+        document.querySelectorAll('.artboard').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+      });
+    });
+
+    // Artboard Dragging
+    function startDragArtboard(e, artboardId) {
+      e.stopPropagation();
+      isDraggingArtboard = true;
+      activeArtboardId = artboardId;
+      const el = document.getElementById(artboardId);
+      startX = e.clientX - el.offsetLeft * scale;
+      startY = e.clientY - el.offsetTop * scale;
+      document.addEventListener('mousemove', onDragArtboard);
+      document.addEventListener('mouseup', stopDragArtboard);
+    }
+
+    function onDragArtboard(e) {
+      if (!isDraggingArtboard || !activeArtboardId) return;
+      const el = document.getElementById(activeArtboardId);
+      const newX = (e.clientX - startX) / scale;
+      const newY = (e.clientY - startY) / scale;
+      el.style.left = `${newX}px`;
+      el.style.top = `${newY}px`;
+      updateConnectors();
+    }
+
+    function stopDragArtboard() {
+      isDraggingArtboard = false;
+      activeArtboardId = null;
+      document.removeEventListener('mousemove', onDragArtboard);
+      document.removeEventListener('mouseup', stopDragArtboard);
+    }
+
+    // Canvas Panning Engine
+    viewport.addEventListener('mousedown', (e) => {
+      if (isDraggingArtboard) return;
+      isPanning = true;
+      startX = e.clientX - panX;
+      startY = e.clientY - panY;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isPanning) return;
+      panX = e.clientX - startX;
+      panY = e.clientY - startY;
+      updateTransform();
+    });
+
+    window.addEventListener('mouseup', () => {
+      isPanning = false;
+    });
+
+    // MOUSE WHEEL & TRACKPAD PINCH ZOOM ENGINE
+    viewport.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const zoomFactor = 0.08;
+      const delta = e.deltaY < 0 ? zoomFactor : -zoomFactor;
+      const newScale = Math.min(Math.max(0.3, scale + delta), 2.5);
+
+      // Zoom towards mouse pointer position
+      const rect = viewport.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      panX = mouseX - (mouseX - panX) * (newScale / scale);
+      panY = mouseY - (mouseY - panY) * (newScale / scale);
+      scale = newScale;
+
+      updateTransform();
+    }, { passive: false });
+
+    function updateTransform() {
+      world.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+      document.getElementById('zoom-level').innerText = `${Math.round(scale * 100)}%`;
+    }
+
+    function zoomIn() { scale = Math.min(2.5, scale + 0.15); updateTransform(); }
+    function zoomOut() { scale = Math.max(0.3, scale - 0.15); updateTransform(); }
+    function resetZoom() { scale = 1; panX = 0; panY = 0; updateTransform(); }
+
+    // Dynamic SVG Flow Connector Path Updating
+    function updateConnectors() {
+      const a1 = document.getElementById('artboard-1');
+      const a2 = document.getElementById('artboard-2');
+      if (!a1 || !a2) return;
+
+      const r1 = { left: a1.offsetLeft, top: a1.offsetTop, width: a1.offsetWidth, height: a1.offsetHeight };
+      const r2 = { left: a2.offsetLeft, top: a2.offsetTop, width: a2.offsetWidth, height: a2.offsetHeight };
+
+      const x1 = r1.left + r1.width;
+      const y1 = r1.top + 160;
+      const x2 = r2.left;
+      const y2 = r2.top + 160;
+
+      const dx = (x2 - x1) / 2;
+      const pathD = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
+      document.getElementById('flow-line-1').setAttribute('d', pathD);
+    }
+
+    // In-Artboard Live Component Interactivity
+    function filterBoardTable(query) {
+      const q = query.toLowerCase();
+      document.querySelectorAll('.board-row').forEach(row => {
+        row.style.display = row.innerText.toLowerCase().includes(q) ? '' : 'none';
+      });
+    }
+
+    function toggleBoardCheckboxes(master) {
+      document.querySelectorAll('.row-chk').forEach(c => c.checked = master.checked);
+    }
+
+    function highlightModalArtboard() {
+      document.querySelectorAll('.artboard').forEach(c => c.classList.remove('selected'));
+      const a2 = document.getElementById('artboard-2');
+      a2.classList.add('selected');
+      alert('Focusing Artboard SCR-002 (Batch Modal)!');
+    }
+
+    window.addEventListener('load', updateConnectors);
+  </script>
+
+</body>
+</html>

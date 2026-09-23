@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile Component Gallery — Fleet Driver App (022-mobile-fleet-driver)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-canvas: #f8fafc;
+      --bg-surface: #ffffff;
+      --border-color: #e2e8f0;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --primary: #2563eb;
+    }
+    body { font-family: Inter, sans-serif; background: var(--bg-canvas); color: var(--text-primary); margin: 0; padding: 32px; }
+    h1 { font-size: 22px; font-weight: 700; margin-top: 0; }
+    .comp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px; margin-top: 24px; }
+    .comp-card { background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .comp-card h3 { margin-top: 0; font-size: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+    .preview-box { background: #f1f5f9; border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; margin: 12px 0; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    code { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--primary); }
+  </style>
+</head>
+<body>
+
+  <h1>📱 Mobile Component Gallery &amp; Touch Target Specs</h1>
+  <p style="color: var(--text-secondary); font-size: 13px;">Feature: <code>022-mobile-fleet-driver</code> | Mandate: <strong>LIGHT MODE &amp; 48px ERGONOMIC TOUCH TARGETS</strong></p>
+
+  <div class="comp-grid">
+
+    <!-- Component 1: Mobile Touch Buttons -->
+    <div class="comp-card">
+      <h3>1. Mobile Touch Buttons (`48px` Min Height)</h3>
+      <p style="font-size:12px; color:var(--text-secondary);">One-thumb primary CTAs designed for field courier usage.</p>
+      <div class="preview-box">
+        <button style="background: #2563eb; color: white; border: none; padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; width: 100%;">📷 Scan Barcode CTA</button>
+        <button style="background: #16a34a; color: white; border: none; padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; width: 100%;">✅ Confirm &amp; Submit PoD</button>
+      </div>
+    </div>
+
+    <!-- Component 2: Mobile Status Pills -->
+    <div class="comp-card">
+      <h3>2. Delivery SLA Status Badges</h3>
+      <p style="font-size:12px; color:var(--text-secondary);">High-contrast status tags for outdoor readability.</p>
+      <div class="preview-box">
+        <span style="background: #fffbeb; color: #d97706; border: 1px solid rgba(217, 119, 6, 0.4); padding: 4px 12px; border-radius: 9999px; font-size: 11px; font-weight: 600;">⏱️ High SLA (14m)</span>
+        <span style="background: #dcfce7; color: #15803d; border: 1px solid rgba(22, 163, 74, 0.4); padding: 4px 12px; border-radius: 9999px; font-size: 11px; font-weight: 600;">✅ Delivered</span>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

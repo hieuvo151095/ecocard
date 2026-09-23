@@ -1,0 +1,20 @@
+# Project Memory: ECO Card Portal Rebuild
+
+## Overview
+Rebuilding the **ECO Card Portal** web application, beginning with Module **M6: Đối soát (Reconciliation & Settlement)** which encompasses:
+- **SM1: Cấu hình đối soát** (Reconciliation Configurations: School Groups, Branches, Services & Tariffs, Calculation Thresholds, Periods)
+- **SM2: Phiên đối soát** (Reconciliation Sessions: Lifecycle Draft -> Pending Approval -> Approved -> Sent to School -> Paid / Cancelled / Refunded, Service Breakdown, Snapshot Locked Configuration, Add-on Settlement / Truy thu)
+
+## Design System & UX Baseline
+- Design System: `Design System/` (ECO Design System 1.0 Consumer / Enterprise tokens, components, icons, typography, color ramps)
+- Legacy Specifications: `docs_legacy/` (`00-master-index.md`, `m6-sm1-cau-hinh-doi-soat.md`, `m6-sm2-phien-doi-soat.md`)
+- Legacy Visual Artifacts: 17 pixel-accurate screenshots in `docs_legacy/screenshots/` matching exact UI layouts, tables, modals, drawers, filters, badges, and action menus.
+
+## Active Specs & Features
+- Active Spec Workspace: `.agents/specs/032-project-planning-eco-card-portal-module-m6-reconciliation/`
+- Documentation Suite: `docs/` (`prd.md`, `tasks.md`, `knowledge.md`, `decisions.md`, `memory.md`, `planning/flows.md`, `planning/screens.md`, `planning/diagrams.md`)
+- Research Suite: `docs/research/` (`sources.jsonl`, `evidence.jsonl`, `claims.jsonl`, `contradictions.md`, `research_manifest.json`)
+
+## Session History & Decisions
+- `2026-09-23`: Brain initialized via `/init_brain`. Reviewed legacy business rules (BR01-BR11 for SM1; BR01-BR10 for SM2), screen flows, and design system components.
+- `2026-09-23`: Planning phase completed via `/planning`. Produced complete 8-document planning suite under `docs/` and 5 deep research ledgers under `docs/research/`. Established ADR-M6-001 (immutable pricing snapshot), ADR-M6-002 (0 VND validation blocker guard), and ADR-M6-003 (hierarchical truy thu modeling). All documentation and spec quality gates passed. Awaiting human oversight review before implementation.

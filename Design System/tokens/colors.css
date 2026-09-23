@@ -1,0 +1,100 @@
+/* ECO Design System 1.0 (Consumer) — colour tokens
+   Values transcribed verbatim from the ECO Figma file (Color page:
+   Primary / Global tokens / Alias tokens). */
+:root{
+  /* ---- Global: Primary Yellow ---- */
+  --color-primary-yellow10:#FFFAE6;
+  --color-primary-yellow20:#FFF4CC;
+  --color-primary-yellow30:#FFE999;
+  --color-primary-yellow40:#FFDD66;
+  --color-primary-yellow50:#FFD233;
+  --color-primary-yellow-eco:#FFC700;
+  --color-primary-yellow70:#BF9500;
+  --color-primary-yellow80:#7F6300;
+  --color-primary-yellow90:#4C3B00;
+  --color-primary-yellow100:#191300;
+
+  /* ---- Global: Primary Blue ---- */
+  --color-primary-blue10:#E6F1FB;
+  --color-primary-blue20:#CCE2F5;
+  --color-primary-blue30:#99C6EB;
+  --color-primary-blue40:#66A9E2;
+  --color-primary-blue50:#338DD8;
+  --color-primary-blue-eco:#0070CE;
+  --color-primary-blue70:#00549B;
+  --color-primary-blue80:#003867;
+  --color-primary-blue90:#001C34;
+  --color-primary-blue100:#000B15;
+
+  /* ---- Global: Ink (grayscale) ---- */
+  --color-global-white:#FFFFFF;
+  --color-global-gray10:#F4F5F6;
+  --color-global-gray20:#E8EAEC;
+  --color-global-gray30:#D1D5D9;
+  --color-global-gray40:#B9C1C7;
+  --color-global-gray50:#A2ACB4;
+  --color-global-gray60:#8B97A1;
+  --color-global-gray70:#687179;
+  --color-global-gray80:#464C51;
+  --color-global-gray90:#232628;
+  --color-global-gray100:#0E0F10;
+  --color-global-black:#000000;
+
+  /* ---- Global: legacy neutral ramp (used by 1.0 components) ---- */
+  --color-legacy-gray10:#F5F5FA;
+  --color-legacy-gray20:#EBEBF0;
+  --color-legacy-gray30:#DDDDE3;
+  --color-legacy-gray50:#A6A6B0;
+  --color-legacy-gray60:#808089;
+  --color-legacy-gray100:#27272A;
+
+  /* ---- Global: semantic hues ---- */
+  --color-global-green60:#00AB56;
+  --color-global-red60:#FF424E;
+  --color-global-red-alt:#F53743;
+  --color-global-orange50:#FF9F41;
+  --color-global-orange-light:#FFF5EB;
+  --color-global-blue60:#1A94FF;
+
+  /* ---- Alias: brand ---- */
+  --color-alias-brand:#FEC020;
+  --color-alias-brand-pressed:#FECD4D;
+  --color-alias-on-brand:#FFFFFF;
+  --color-alias-brand-cover:#F8BF15;
+
+  /* ---- Alias: status ---- */
+  --color-alias-positive:#00AB56;
+  --color-alias-on-positive:#FFFFFF;
+  --color-alias-negative:#FF424E;
+  --color-alias-on-negative:#FFFFFF;
+  --color-alias-warning:#FF9F41;
+  --color-alias-on-warning:#FFF5EB;
+  --color-alias-hyperlink:#1A94FF;
+
+  /* ---- Alias: theme surfaces ---- */
+  --color-alias-theme:#FFFFFF;
+  --color-alias-theme-variant:#F5F5FA;
+  --color-alias-primary-on-theme:#27272A;
+  --color-alias-secondary-on-theme:#808089;
+  --color-alias-reverse-theme:#27272A;
+  --color-alias-primary-on-reverse-theme:#FFFFFF;
+  --color-alias-secondary-on-reverse-theme:#A6A6B0;
+
+  /* ---- Alias: outline / disabled / skeleton ---- */
+  --color-alias-outline:#DDDDE3;
+  --color-alias-outline-variant:#EBEBF0;
+  --color-alias-outline-overlay:rgba(0,0,0,.05);
+  --color-alias-disabled:rgba(0,0,0,.05);
+  --color-alias-disabled-variant:rgba(0,0,0,.05);
+  --color-alias-reverse-disabled:rgba(255,255,255,.05);
+  --color-alias-reverse-disabled-variant:rgba(255,255,255,.05);
+  --color-alias-skeleton:rgba(0,0,0,.05);
+  --color-alias-overlay:rgba(0,0,0,.4);
+
+  /* ---- Text roles (ECO "Text" table) ---- */
+  --color-title:#232628;
+  --color-primary-text:#232628;
+  --color-secondary-text:#8B97A1;
+  --color-disable-text:#B9C1C7;
+  --color-placeholder-text:#E8EAEC;
+}

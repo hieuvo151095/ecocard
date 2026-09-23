@@ -1,0 +1,31 @@
+{
+  "run_id": "planning-20260923-1815",
+  "created_at": "2026-09-23T18:15:00Z",
+  "operator_prompt": "Let's plan out to rebuild the module Doi soat first, we have two sub-modules: Cau hinh doi soat, Phien doi soat. This stage, we only plan out but NO CODE.",
+  "current_date": "2026-09-23",
+  "research_mode": "deep",
+  "required_output_files": [
+    "docs/prd.md",
+    "docs/tasks.md",
+    "docs/knowledge.md",
+    "docs/decisions.md",
+    "docs/memory.md",
+    "docs/planning/flows.md",
+    "docs/planning/screens.md",
+    "docs/planning/diagrams.md"
+  ],
+  "optional_output_files": [
+    "docs/research/sources.jsonl",
+    "docs/research/evidence.jsonl",
+    "docs/research/claims.jsonl",
+    "docs/research/contradictions.md",
+    "docs/research/research_manifest.json"
+  ],
+  "quality_gates": {
+    "minimum_sources": 10,
+    "minimum_primary_sources": 3,
+    "minimum_evidence_items": 15,
+    "major_claims_need_evidence": true,
+    "diagram_claims_need_evidence": true
+  }
+}

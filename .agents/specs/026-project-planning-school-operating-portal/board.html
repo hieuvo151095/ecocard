@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Figma Design Canvas Board — Tài Chính: Báo Cáo Học Phí (Collection Reports)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+Chettan+2:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --eco-blue: #2563eb;
+      --eco-yellow: #f0b90b;
+      --bg-dark: #0f172a;
+      --card-bg: #1e2026;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --border-dark: #383e4a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Quicksand', 'Inter', sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      user-select: none;
+    }
+    .board-header {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 56px;
+      background: #1e2026;
+      border-bottom: 1px solid #383e4a;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 100;
+    }
+    .board-title {
+      font-family: 'Baloo Chettan 2', cursive;
+      font-size: 18px;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+    .board-controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .btn-tool {
+      background: #0f172a;
+      border: 1px solid #383e4a;
+      color: #94a3b8;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn-tool:hover { color: #f8fafc; border-color: #2563eb; }
+
+    .canvas-viewport {
+      position: absolute;
+      top: 56px; left: 0; right: 0; bottom: 0;
+      overflow: hidden;
+      cursor: grab;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+    .canvas-viewport:active { cursor: grabbing; }
+
+    .canvas-world {
+      position: absolute;
+      transform-origin: 0 0;
+      display: flex;
+      gap: 40px;
+      padding: 60px;
+    }
+
+    .artboard {
+      background: #1e2026;
+      border: 1px solid #383e4a;
+      border-radius: 16px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      flex-shrink: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .artboard-header {
+      background: #0f172a;
+      padding: 14px 20px;
+      border-bottom: 1px solid #383e4a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .artboard-title { font-size: 14px; font-weight: 700; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px; }
+    .artboard-badge { background: rgba(37, 99, 235, 0.2); color: #2563eb; border: 1px solid #2563eb; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 4px; }
+    .artboard-body { padding: 20px; overflow-y: auto; flex: 1; }
+
+    /* TOKEN ARTBOARD SPECIFIC */
+    .token-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 12px; }
+    .color-chip { width: 24px; height: 24px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); }
+
+    /* MINI PREVIEWS */
+    .mini-card { background: #0f172a; border: 1px solid #383e4a; border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+    .badge { display: inline-flex; align-items: center; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+    .badge-finviet { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; }
+    .badge-vietqr { background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid #38bdf8; }
+    .badge-cash { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid #10b981; }
+    .badge-overdue { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; }
+  </style>
+</head>
+<body>
+  <div class="board-header">
+    <div class="board-title">Figma Canvas Board — Báo Cáo Học Phí (Epic E-014)</div>
+    <div class="board-controls">
+      <button class="btn-tool" onclick="resetView()">Reset View (100%)</button>
+      <button class="btn-tool" onclick="zoomIn()">Zoom In (+)</button>
+      <button class="btn-tool" onclick="zoomOut()">Zoom Out (-)</button>
+      <span id="zoomLabel" style="font-size: 12px; color: #94a3b8; margin-left: 8px;">100%</span>
+    </div>
+  </div>
+
+  <div class="canvas-viewport" id="viewport">
+    <div class="canvas-world" id="world">
+
+      <!-- ARTBOARD 1: DESIGN TOKENS & SYSTEM SPECS -->
+      <div class="artboard" style="width: 360px; height: 600px;">
+        <div class="artboard-header">
+          <div class="artboard-title">1. Tokens & System Specs</div>
+          <span class="artboard-badge">DESIGN SYSTEM</span>
+        </div>
+        <div class="artboard-body">
+          <div style="font-size: 11px; font-weight: 700; color: #94a3b8; margin-bottom: 12px; text-transform: uppercase;">Color Tokens</div>
+          <div class="token-row">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div class="color-chip" style="background: #2563eb;"></div>
+              <span>Primary Blue</span>
+            </div>
+            <code style="color: #94a3b8;">#2563eb</code>
+          </div>
+          <div class="token-row">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div class="color-chip" style="background: #f0b90b;"></div>
+              <span>Accent Amber</span>
+            </div>
+            <code style="color: #94a3b8;">#f0b90b</code>
+          </div>
+          <div class="token-row">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div class="color-chip" style="background: #10b981;"></div>
+              <span>Success Emerald</span>
+            </div>
+            <code style="color: #94a3b8;">#10b981</code>
+          </div>
+          <div class="token-row">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div class="color-chip" style="background: #ef4444;"></div>
+              <span>Overdue Rose</span>
+            </div>
+            <code style="color: #94a3b8;">#ef4444</code>
+          </div>
+          <div class="token-row">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div class="color-chip" style="background: #38bdf8;"></div>
+              <span>VietQR Cyan</span>
+            </div>
+            <code style="color: #94a3b8;">#38bdf8</code>
+          </div>
+
+          <div style="font-size: 11px; font-weight: 700; color: #94a3b8; margin: 20px 0 12px; text-transform: uppercase;">Typography Specs</div>
+          <div style="font-size: 12px; color: #f8fafc; margin-bottom: 6px;">
+            <strong>Display:</strong> Baloo Chettan 2 (700, 800)
+          </div>
+          <div style="font-size: 12px; color: #f8fafc; margin-bottom: 6px;">
+            <strong>Body:</strong> Quicksand + Inter (500, 600)
+          </div>
+          <div style="font-size: 12px; color: #f8fafc;">
+            <strong>Tabular Numbers:</strong> Monospace + Dots (Đ)
+          </div>
+        </div>
+      </div>
+
+      <!-- ARTBOARD 2: OVERVIEW MATRIX -->
+      <div class="artboard" style="width: 480px; height: 600px;">
+        <div class="artboard-header">
+          <div class="artboard-title">2. Ma Trận Theo Lớp (BR02)</div>
+          <span class="artboard-badge">TAB 1</span>
+        </div>
+        <div class="artboard-body">
+          <div class="mini-card">
+            <div style="font-size: 12px; font-weight: 700; color: #2563eb; margin-bottom: 8px;">Cột Phân Nhóm 4 Trạng Thái Thu</div>
+            <div style="font-size: 11px; color: #94a3b8; line-height: 1.6;">
+              • Phiếu thu tổng (Số lượng + Thành tiền)<br>
+              • Đã thu (Số lượng + Thành tiền)<br>
+              • Đã thu 1 phần (Số lượng + Thành tiền)<br>
+              • Chưa thu (Số lượng + Thành tiền)<br>
+              • Còn lại & Tỉ lệ thu (%)
+            </div>
+          </div>
+
+          <div class="mini-card" style="border-left: 3px solid #f59e0b; background: rgba(245, 158, 11, 0.05);">
+            <div style="font-size: 12px; font-weight: 700; color: #f59e0b; margin-bottom: 4px;">⚠️ Hàng Học Sinh Lưu Trữ / Đã Xoá</div>
+            <div style="font-size: 11px; color: #94a3b8;">
+              Cách ly hoàn toàn khỏi danh sách các lớp học hiện thời. Dữ liệu được tính gộp vào hàng Tổng cộng toàn trường.
+            </div>
+          </div>
+
+          <div class="mini-card" style="background: #0f172a; border-top: 2px solid #383e4a;">
+            <div style="font-size: 12px; font-weight: 700; color: #f8fafc; margin-bottom: 4px;">Hàng Tổng Cộng (School Totals Footer)</div>
+            <div style="font-size: 11px; color: #10b981; font-family: monospace; font-weight: 700;">
+              Tổng: 25.185.000 Đ • Đã thu: 8.880.000 Đ • Tỉ lệ: 47.6%
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ARTBOARD 3: PAID INVOICES LEDGER -->
+      <div class="artboard" style="width: 440px; height: 600px;">
+        <div class="artboard-header">
+          <div class="artboard-title">3. Hóa Đơn Đã Thu (BR03)</div>
+          <span class="artboard-badge">TAB 2</span>
+        </div>
+        <div class="artboard-body">
+          <div class="mini-card">
+            <div style="font-size: 12px; font-weight: 700; color: #10b981; margin-bottom: 4px;">Lọc Theo Ngày Xác Nhận (paidAt)</div>
+            <div style="font-size: 11px; color: #94a3b8;">
+              Bộ lọc ngày tại tab này áp dụng theo thời điểm thực thu vào tài khoản, không phụ thuộc kỳ xuất hóa đơn.
+            </div>
+          </div>
+
+          <div class="mini-card">
+            <div style="font-size: 12px; font-weight: 700; color: #f8fafc; margin-bottom: 8px;">Huy Hiệu Phương Thức Thanh Toán</div>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+              <span class="badge badge-finviet">Ví FinViet / QR</span>
+              <span class="badge badge-vietqr">VietQR</span>
+              <span class="badge badge-cash">Tiền mặt</span>
+            </div>
+          </div>
+
+          <div class="mini-card">
+            <div style="font-size: 11px; color: #94a3b8;">Thông tin xác nhận:</div>
+            <div style="font-size: 12px; color: #f8fafc; font-weight: 600; margin-top: 4px;">
+              Người xác nhận: KT. Nguyễn Thị Thu<br>
+              Thời gian: 10/09/2026 14:20
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ARTBOARD 4: PARTIAL INVOICES & HISTORY -->
+      <div class="artboard" style="width: 440px; height: 600px;">
+        <div class="artboard-header">
+          <div class="artboard-title">4. Thu Một Phần & Lịch Sử (BR04, BR06)</div>
+          <span class="artboard-badge">TAB 3</span>
+        </div>
+        <div class="artboard-body">
+          <div class="mini-card">
+            <div style="font-size: 12px; font-weight: 700; color: #2563eb; margin-bottom: 4px;">Số Tiền Xếp Chồng (BR04)</div>
+            <div style="font-family: monospace; font-size: 14px; font-weight: 700; color: #2563eb;">2.400.000 Đ</div>
+            <div style="font-family: monospace; font-size: 11px; font-weight: 600; color: #ef4444;">Còn lại: 1.200.000 Đ</div>
+          </div>
+
+          <div class="mini-card">
+            <div style="font-size: 12px; font-weight: 700; color: #f0b90b; margin-bottom: 6px;">Modal Lịch Sử Thu Tiền 5 Cột (BR06)</div>
+            <div style="font-size: 11px; color: #94a3b8; line-height: 1.6;">
+              1. Ngày thanh toán<br>
+              2. Số tiền từng đợt<br>
+              3. Kế toán xác nhận<br>
+              4. Phương thức thanh toán<br>
+              5. Ghi chú diễn giải
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ARTBOARD 5: UNPAID & OVERDUE -->
+      <div class="artboard" style="width: 440px; height: 600px;">
+        <div class="artboard-header">
+          <div class="artboard-title">5. Chưa Thu & Quá Hạn (BR05)</div>
+          <span class="artboard-badge">TAB 4</span>
+        </div>
+        <div class="artboard-body">
+          <div class="mini-card">
+            <div style="font-size: 12px; font-weight: 700; color: #ef4444; margin-bottom: 4px;">Cảnh Báo Hạn Thanh Toán Quá Hạn</div>
+            <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px;">
+              <span style="font-family: monospace; font-size: 13px; font-weight: 700; color: #ef4444;">10/09/2026</span>
+              <span class="badge badge-overdue">(Trễ)</span>
+            </div>
+            <div style="font-size: 11px; color: #94a3b8; margin-top: 6px;">
+              Tự động bôi đỏ đậm các hóa đơn vượt quá hạn định kể cả khi không bật checkbox bộ lọc.
+            </div>
+          </div>
+
+          <div class="mini-card">
+            <div style="font-size: 12px; font-weight: 700; color: #2563eb; margin-bottom: 4px;">Giới Hạn Trạng Thái Bộ Lọc (BR05)</div>
+            <div style="font-size: 11px; color: #94a3b8;">
+              Dropdown trạng thái chỉ chứa duy nhất hai giá trị: <strong>Đã gửi</strong> và <strong>Đã tạo</strong>.
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    let scale = 1;
+    let panX = 0;
+    let panY = 0;
+    let isPanning = false;
+    let startX = 0;
+    let startY = 0;
+
+    const viewport = document.getElementById('viewport');
+    const world = document.getElementById('world');
+    const zoomLabel = document.getElementById('zoomLabel');
+
+    function updateTransform() {
+      world.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+      zoomLabel.innerText = Math.round(scale * 100) + '%';
+    }
+
+    viewport.addEventListener('mousedown', (e) => {
+      isPanning = true;
+      startX = e.clientX - panX;
+      startY = e.clientY - panY;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isPanning) return;
+      panX = e.clientX - startX;
+      panY = e.clientY - startY;
+      updateTransform();
+    });
+
+    window.addEventListener('mouseup', () => {
+      isPanning = false;
+    });
+
+    viewport.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+      scale = Math.min(Math.max(0.4, scale * zoomFactor), 2.5);
+      updateTransform();
+    });
+
+    function resetView() {
+      scale = 1;
+      panX = 0;
+      panY = 0;
+      updateTransform();
+    }
+
+    function zoomIn() {
+      scale = Math.min(2.5, scale * 1.15);
+      updateTransform();
+    }
+
+    function zoomOut() {
+      scale = Math.max(0.4, scale * 0.85);
+      updateTransform();
+    }
+  </script>
+</body>
+</html>

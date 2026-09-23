@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>20-Screen Binance Mobile Component Gallery (024-binance-mobile-20-screens)</title>
+  <style>
+    :root {
+      --binance-yellow: #F0B90B;
+      --binance-dark: #222126;
+      --crypto-green: #0ECB81;
+      --crypto-red: #F6465D;
+    }
+    body { font-family: sans-serif; background: var(--binance-dark); color: white; padding: 32px; }
+    .card { background: #2B2F36; border: 1px solid #383e4a; border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+    .btn-pill { background: var(--binance-yellow); color: #1E2026; border: none; padding: 12px 24px; border-radius: 50px; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <h1>❖ Binance Mobile Component Spec Gallery (`binance/DESIGN.md`)</h1>
+  
+  <div class="card">
+    <h3>1. 50px Pill-Shaped Primary Mobile CTA Buttons</h3>
+    <button class="btn-pill">Buy BTC with Apple Pay</button>
+  </div>
+
+  <div class="card">
+    <h3>2. Mobile Crypto Tickers &amp; Orderbook Depth Rows</h3>
+    <span style="color:var(--crypto-green); font-weight:700;">Bid #0ECB81 $64,250.00</span> | 
+    <span style="color:var(--crypto-red); font-weight:700;">Ask #F6465D $64,252.50</span>
+  </div>
+</body>
+</html>

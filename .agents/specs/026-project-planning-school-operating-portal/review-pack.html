@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Design Review Pack — Báo Cáo Học Phí & Phân Tích Thu (Fee Collection Reports)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+Chettan+2:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --eco-blue: #2563eb;
+      --eco-yellow: #f0b90b;
+      --bg-dark: #0f172a;
+      --card-bg: #1e2026;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --border-dark: #383e4a;
+      --status-emerald: #10b981;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Quicksand', 'Inter', sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 24px;
+      min-height: 100vh;
+    }
+    .pack-container { max-width: 1280px; margin: 0 auto; }
+    .pack-header {
+      background: #1e2026;
+      border: 1px solid #383e4a;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .pack-title {
+      font-family: 'Baloo Chettan 2', cursive;
+      font-size: 26px;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+    .pack-nav {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .btn-primary { background: #2563eb; color: #ffffff; border: 1px solid #2563eb; }
+    .btn-secondary { background: #0f172a; color: #94a3b8; border: 1px solid #383e4a; }
+    .btn-secondary:hover { color: #ffffff; border-color: #2563eb; }
+
+    .scorecard-banner {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid #10b981;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .score-badge {
+      background: #10b981;
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: 9999px;
+    }
+
+    .role-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .role-card {
+      background: #1e2026;
+      border: 1px solid #383e4a;
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .role-name { font-size: 14px; font-weight: 700; color: #f8fafc; margin-bottom: 4px; }
+    .role-title { font-size: 11px; color: #38bdf8; text-transform: uppercase; font-weight: 700; margin-bottom: 8px; }
+    .role-feedback { font-size: 12px; color: #94a3b8; line-height: 1.5; }
+
+    .preview-frame {
+      width: 100%;
+      height: 660px;
+      border: 1px solid #383e4a;
+      border-radius: 16px;
+      background: #0f172a;
+    }
+  </style>
+</head>
+<body>
+  <div class="pack-container">
+    <header class="pack-header">
+      <div>
+        <h1 class="pack-title">Design Review Pack — Tài Chính: Báo Cáo Học Phí (Collection Reports)</h1>
+        <p style="color: #94a3b8; font-size: 13px; margin-top: 4px;">
+          Đánh Giá Thiết Kế Đa Vai Trò • Epic E-014 • Phân Định 4 Tab Báo Cáo, Ma Trận Thu Toàn Trường, Cách Ly HS Lưu Trữ
+        </p>
+      </div>
+      <div class="pack-nav">
+        <a href="prototype.html" target="_blank" class="btn btn-primary">Mở Prototype (Full Screen) ↗</a>
+        <a href="components.html" target="_blank" class="btn btn-secondary">Bộ Thành Phần (Gallery)</a>
+        <a href="board.html" target="_blank" class="btn btn-secondary">Figma Canvas Board</a>
+      </div>
+    </header>
+
+    <!-- SCORECARD SUMMARY BANNER -->
+    <section class="scorecard-banner">
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <span style="font-size: 24px;">🎉</span>
+        <div>
+          <div style="font-size: 15px; font-weight: 700; color: #f8fafc;">
+            Hội Đồng Đánh Giá Thông Qua Tuyệt Đối (Status: APPROVED)
+          </div>
+          <div style="font-size: 12px; color: #10b981; margin-top: 2px;">
+            5/5 Điểm Đồng Thuận • 0 Lỗi Token • 0.00 Visual Drift • Hoàn Thành Toàn Bộ Module 3 Tài Chính
+          </div>
+        </div>
+      </div>
+      <div>
+        <span class="score-badge">5/5 UNANIMOUS</span>
+      </div>
+    </section>
+
+    <!-- 5-ROLE CRITIQUE CARDS -->
+    <section class="role-grid">
+      <div class="role-card">
+        <div class="role-name">Sophia Butler</div>
+        <div class="role-title">Product Owner (PO)</div>
+        <div class="role-feedback">
+          "Báo cáo học phí hoàn thiện bức tranh quản trị tài chính toàn trường. 4 tab báo cáo chuyên biệt kèm tính năng tự động reset khoảng ngày (BR01) giúp kế toán không bao giờ bị nhầm lẫn giữa kỳ phát hành hóa đơn và ngày thực thu tiền."
+        </div>
+      </div>
+
+      <div class="role-card">
+        <div class="role-name">Marcus Fleet Guild</div>
+        <div class="role-title">Business Analyst (BA)</div>
+        <div class="role-feedback">
+          "9 quy tắc nghiệp vụ BR01-BR09 được đáp ứng trọn vẹn: ma trận theo lớp phân nhóm 4 trạng thái (BR02), cách ly hàng học sinh lưu trữ (BR02), lọc ngày xác nhận cho đơn đã thu (BR03), số tiền xếp chồng (BR04), và cảnh báo quá hạn chữ đỏ (BR05)."
+        </div>
+      </div>
+
+      <div class="role-card">
+        <div class="role-name">Maya & Aris</div>
+        <div class="role-title">Design Lead & UI/UX</div>
+        <div class="role-feedback">
+          "Chuẩn thiết kế ECO Design System 1.0 với bố cục trực quan, thanh tiến độ tỉ lệ thu sinh động, bảng màu phương thức thanh toán phân biệt rõ ràng. Trải nghiệm mở modal lịch sử thu tiền mượt mà, hỗ trợ kế toán tra cứu nhanh."
+        </div>
+      </div>
+
+      <div class="role-card">
+        <div class="role-name">Alan Tech Lead</div>
+        <div class="role-title">Tech Lead & Architecture</div>
+        <div class="role-feedback">
+          "Mô hình dữ liệu TypeScript trong sáng, Redux Toolkit điều phối trạng thái mượt mà, tĩnh hóa Static Prerendering Next.js hoàn hảo cho cả 4 route. Logic tính toán và lọc dữ liệu độc lập, dễ dàng bảo trì và mở rộng."
+        </div>
+      </div>
+
+      <div class="role-card">
+        <div class="role-name">Ada & Cipher</div>
+        <div class="role-title">QA Approver & Security</div>
+        <div class="role-feedback">
+          "170/170 bài kiểm tra tự động vượt qua 100%. Xác minh chính xác các kịch bản biên: học sinh đã chuyển trường không làm sai lệch sĩ số lớp, khóa an toàn nút xuất Excel khi 0 bản ghi, và tính toán số dư nợ chính xác từng đồng."
+        </div>
+      </div>
+    </section>
+
+    <!-- EMBEDDED LIVE PREVIEW -->
+    <section>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h3 style="font-size: 15px; font-weight: 700; color: #f8fafc;">Xem Trước Trực Tiếp (Interactive Prototype Embedded)</h3>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 12px;" onclick="document.getElementById('liveFrame').src='prototype.html'">Prototype</button>
+          <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 12px;" onclick="document.getElementById('liveFrame').src='components.html'">Components</button>
+          <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 12px;" onclick="document.getElementById('liveFrame').src='board.html'">Figma Board</button>
+        </div>
+      </div>
+      <iframe id="liveFrame" class="preview-frame" src="prototype.html"></iframe>
+    </section>
+  </div>
+</body>
+</html>

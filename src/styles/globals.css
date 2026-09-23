@@ -1,0 +1,39 @@
+@import "../../Design System/styles.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --app-primary: var(--color-primary-blue-eco, #0070CE);
+  --app-yellow: var(--color-primary-yellow-eco, #FFC700);
+}
+
+body {
+  font-family: var(--font-legacy, 'Inter', sans-serif);
+  color: #232628;
+  background-color: #F4F5F6;
+  margin: 0;
+  padding: 0;
+}
+
+/* Custom Table and Scrollbar Polish */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #F4F5F6;
+}
+::-webkit-scrollbar-thumb {
+  background: #B9C1C7;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #8B97A1;
+}
+
+/* Custom styles for Vietnamese currency format */
+.font-numeric {
+  font-variant-numeric: tabular-nums;
+}

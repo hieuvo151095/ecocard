@@ -1,0 +1,55 @@
+# Developer & UAT Handoff Package — 024-binance-mobile-20-screens
+
+```yaml
+feature_id: "024-binance-mobile-20-screens"
+handoff_status: "ready"
+design_system: "binance/DESIGN.md"
+target_platform: "mobile-web"
+target_viewport: "390x844"
+screens:
+  - id: "MOB-001"
+    name: "Splash & Welcome"
+  - id: "MOB-002"
+    name: "Onboarding 1"
+  - id: "MOB-003"
+    name: "Onboarding 2"
+  - id: "MOB-004"
+    name: "Auth Login"
+  - id: "MOB-005"
+    name: "2FA Security OTP"
+  - id: "MOB-006"
+    name: "KYC Photo Upload"
+  - id: "MOB-007"
+    name: "Home Market Dashboard"
+  - id: "MOB-008"
+    name: "Search & Watchlist"
+  - id: "MOB-009"
+    name: "BTC Spot Chart Viewport"
+  - id: "MOB-010"
+    name: "Depth Orderbook & Trade Drawer"
+  - id: "MOB-011"
+    name: "Instant Fiat Buy"
+  - id: "MOB-012"
+    name: "Convert & Zero-Fee Swap"
+  - id: "MOB-013"
+    name: "Futures 125x Leverage"
+  - id: "MOB-014"
+    name: "Binance Earn Vaults"
+  - id: "MOB-015"
+    name: "Spot Wallet Overview"
+  - id: "MOB-016"
+    name: "Deposit QR Code"
+  - id: "MOB-017"
+    name: "Withdraw Address Check"
+  - id: "MOB-018"
+    name: "P2P Merchant Express"
+  - id: "MOB-019"
+    name: "Transaction History"
+  - id: "MOB-020"
+    name: "Account Security Settings"
+```
+
+## Handoff Overview
+* **Feature**: `024-binance-mobile-20-screens`
+* **Target Viewport**: iPhone 15 Pro ($390 \times 844\text{px}$)
+* **Mandate**: Binance Yellow `#F0B90B` CTAs, 50px pill buttons, Crypto Green `#0ECB81` / Red `#F6465D`.

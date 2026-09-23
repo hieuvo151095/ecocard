@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Figma Design Canvas Board — Nhà Trường: Học Sinh (Students Master Data & Profile Hub)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+Chettan+2:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --eco-blue: #2563eb;
+      --eco-yellow: #f0b90b;
+      --bg-dark: #0f172a;
+      --card-bg: #1e2026;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --border-dark: #383e4a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Quicksand', 'Inter', sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      user-select: none;
+    }
+    .board-header {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 56px;
+      background: #1e2026;
+      border-bottom: 1px solid #383e4a;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 100;
+    }
+    .board-title {
+      font-family: 'Baloo Chettan 2', cursive;
+      font-size: 18px;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+    .board-controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .btn-tool {
+      background: #0f172a;
+      border: 1px solid #383e4a;
+      color: #94a3b8;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn-tool:hover { color: #f8fafc; border-color: #2563eb; }
+
+    .canvas-viewport {
+      position: absolute;
+      top: 56px; left: 0; right: 0; bottom: 0;
+      overflow: hidden;
+      cursor: grab;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+    .canvas-viewport:active { cursor: grabbing; }
+
+    .canvas-world {
+      position: absolute;
+      transform-origin: 0 0;
+      display: flex;
+      gap: 40px;
+      padding: 60px;
+    }
+
+    .artboard {
+      background: #1e2026;
+      border: 1px solid #383e4a;
+      border-radius: 16px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      flex-shrink: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .artboard-header {
+      background: #0f172a;
+      padding: 14px 20px;
+      border-bottom: 1px solid #383e4a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .artboard-tag {
+      font-size: 11px;
+      font-weight: 700;
+      color: #38bdf8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .artboard-body {
+      padding: 24px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    /* Artboard Dimensions */
+    .ab-specs { width: 520px; }
+    .ab-screen { width: 840px; }
+    .ab-modals { width: 560px; }
+
+    /* Artboard Internal Components */
+    .token-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: #0f172a;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      border: 1px solid #383e4a;
+    }
+    .color-swatch {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .rule-box {
+      background: #0f172a;
+      border-left: 4px solid #2563eb;
+      border-top: 1px solid #383e4a;
+      border-right: 1px solid #383e4a;
+      border-bottom: 1px solid #383e4a;
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      font-size: 12px;
+      color: #f8fafc;
+    }
+    .rule-title {
+      font-weight: 700;
+      color: #38bdf8;
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+  <header class="board-header">
+    <div class="board-title">
+      🎨 Figma Design Canvas Board — Nhà Trường: Học Sinh (Students Master Data)
+    </div>
+    <div class="board-controls">
+      <button class="btn-tool" onclick="resetZoom()">100% Zoom</button>
+      <button class="btn-tool" onclick="zoomIn()">Zoom +</button>
+      <button class="btn-tool" onclick="zoomOut()">Zoom -</button>
+      <a href="prototype.html" class="btn-tool" style="background: #2563eb; color: #ffffff; text-decoration: none;">▶ Mở Prototype</a>
+      <a href="components.html" class="btn-tool" style="background: #0f172a; color: #94a3b8; text-decoration: none;">📦 Components</a>
+    </div>
+  </header>
+
+  <div class="canvas-viewport" id="viewport">
+    <div class="canvas-world" id="world">
+
+      <!-- ================= ARTBOARD 1: DESIGN TOKENS & SYSTEM SPECS ================= -->
+      <div class="artboard ab-specs">
+        <div class="artboard-header">
+          <span class="artboard-tag">Design System Specification</span>
+          <span style="font-size: 11px; color: #94a3b8;">ECO 1.0 Active Tokens</span>
+        </div>
+        <div class="artboard-body">
+          <h2 style="font-family: 'Baloo Chettan 2', cursive; font-size: 20px; font-weight: 700; color: #f8fafc; margin-bottom: 16px;">
+            Design Tokens & System Specs
+          </h2>
+
+          <h4 style="font-size: 12px; color: #94a3b8; text-transform: uppercase; margin-bottom: 10px;">1. Color Palette Tokens</h4>
+          <div class="token-row">
+            <div>
+              <div style="font-weight: 700; font-size: 12px; color: #f8fafc;">Primary Brand Blue</div>
+              <div style="font-size: 11px; color: #94a3b8;">#2563eb • Active state, main buttons, focus outline</div>
+            </div>
+            <div class="color-swatch" style="background: #2563eb;"></div>
+          </div>
+          <div class="token-row">
+            <div>
+              <div style="font-weight: 700; font-size: 12px; color: #f8fafc;">Brand Accent Amber</div>
+              <div style="font-size: 11px; color: #94a3b8;">#f0b90b • Logos, attention highlights, warnings</div>
+            </div>
+            <div class="color-swatch" style="background: #f0b90b;"></div>
+          </div>
+          <div class="token-row">
+            <div>
+              <div style="font-weight: 700; font-size: 12px; color: #f8fafc;">Success Emerald</div>
+              <div style="font-size: 11px; color: #94a3b8;">#10b981 • BMI bình thường, toast thành công</div>
+            </div>
+            <div class="color-swatch" style="background: #10b981;"></div>
+          </div>
+          <div class="token-row">
+            <div>
+              <div style="font-weight: 700; font-size: 12px; color: #f8fafc;">Destructive Rose / Red</div>
+              <div style="font-size: 11px; color: #94a3b8;">#ef4444 • BMI béo phì, nút rời khỏi form</div>
+            </div>
+            <div class="color-swatch" style="background: #ef4444;"></div>
+          </div>
+
+          <h4 style="font-size: 12px; color: #94a3b8; text-transform: uppercase; margin: 20px 0 10px;">2. Quy Chuẩn Tương Tác 3 Module Vừa Qua</h4>
+          <div class="rule-box">
+            <div class="rule-title">Menu Thao Tác ••• Thống Nhất</div>
+            <div>Mọi hàng trong bảng dùng nút ••• với menu ngữ cảnh dạng floating dropdown, tự lật lên khi ở đáy màn hình, z-index 9999.</div>
+          </div>
+          <div class="rule-box" style="border-left-color: #f59e0b;">
+            <div class="rule-title" style="color: #f59e0b;">Xác Nhận Cho Mọi Thay Đổi Logic (Modal Pop-up)</div>
+            <div>Thay đổi dữ liệu nhạy cảm (chuyển lớp, giảm trừ học phí, hủy form dở) bắt buộc bật pop-up modal xác nhận trước khi thực hiện.</div>
+          </div>
+          <div class="rule-box" style="border-left-color: #10b981;">
+            <div class="rule-title" style="color: #10b981;">Toast Thông Báo Thành Công Góc Phải Trên</div>
+            <div>Khi lưu/xác nhận thành công, luôn bật toast thông báo chuẩn ở góc phải trên (fixed top-5 right-5 z-[9999]), tự tắt sau 4s.</div>
+          </div>
+          <div class="rule-box" style="border-left-color: #38bdf8;">
+            <div class="rule-title" style="color: #38bdf8;">Tiêu Đề Bảng Viết Hoa Chữ Đầu (Sentence Case)</div>
+            <div>Tất cả tiêu đề cột bảng phải là Sentence case (Mã học sinh, Họ và tên, Lớp, Ngày sinh, Thao tác).</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= ARTBOARD 2: STUDENT DIRECTORY ================= -->
+      <div class="artboard ab-screen">
+        <div class="artboard-header">
+          <span class="artboard-tag">Screen 01 — SCR-SCH-01</span>
+          <span style="font-size: 11px; color: #94a3b8;">/[schoolCode]/school/kid</span>
+        </div>
+        <div class="artboard-body">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div>
+              <h3 style="font-family: 'Baloo Chettan 2', cursive; font-size: 20px; font-weight: 700; color: #f8fafc;">
+                Danh Sách Học Sinh Toàn Trường
+              </h3>
+              <p style="font-size: 12px; color: #94a3b8;">Bảng danh bạ học sinh với lọc đa trường, thao tác ••• và kiểm soát chuyển lớp</p>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <span style="background: #0f172a; border: 1px solid #383e4a; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; color: #94a3b8;">🔄 Chuyển lớp hàng loạt</span>
+              <span style="background: #2563eb; color: #ffffff; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 700;">+ Thêm học sinh</span>
+            </div>
+          </div>
+
+          <div style="background: #0f172a; border: 1px solid #383e4a; border-radius: 8px; padding: 12px; margin-bottom: 16px; display: flex; gap: 10px; font-size: 12px; color: #94a3b8;">
+            <div style="flex: 1; background: #1e2026; border: 1px solid #383e4a; padding: 6px 10px; border-radius: 6px; color: #f8fafc;">🔍 Tìm theo tên, mã HS, CCCD, SĐT PH...</div>
+            <div style="background: #1e2026; border: 1px solid #383e4a; padding: 6px 10px; border-radius: 6px; color: #f8fafc;">Lớp: Tất cả các lớp ▾</div>
+            <div style="background: #1e2026; border: 1px solid #383e4a; padding: 6px 10px; border-radius: 6px; color: #f8fafc;">Trạng thái: Đang học ▾</div>
+          </div>
+
+          <!-- Table Mockup -->
+          <div style="background: #0f172a; border: 1px solid #383e4a; border-radius: 8px; overflow: hidden; font-size: 12px;">
+            <div style="display: grid; grid-template-columns: 80px 2fr 1fr 100px 140px 100px 60px; padding: 10px 14px; background: #1e2026; border-bottom: 1px solid #383e4a; font-weight: 700; color: #94a3b8;">
+              <div>Mã học sinh</div>
+              <div>Họ và tên</div>
+              <div>Lớp</div>
+              <div>Ngày sinh</div>
+              <div>SĐT phụ huynh</div>
+              <div>Trạng thái</div>
+              <div style="text-align: right;">Thao tác</div>
+            </div>
+            <div style="display: grid; grid-template-columns: 80px 2fr 1fr 100px 140px 100px 60px; padding: 12px 14px; border-bottom: 1px solid #383e4a; align-items: center;">
+              <div style="font-family: monospace; color: #60a5fa; font-weight: 700;">HS-101</div>
+              <div style="font-weight: 700; color: #f8fafc;">Nguyễn Hoàng Nam (Bơ)</div>
+              <div><span style="background: #1e2026; padding: 2px 6px; border-radius: 4px; border: 1px solid #383e4a;">Lớp 1A1</span></div>
+              <div>15/05/2018</div>
+              <div>0988 123 456</div>
+              <div><span style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid #10b981; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 700;">Đang học</span></div>
+              <div style="text-align: right; color: #94a3b8;">•••</div>
+            </div>
+            <div style="display: grid; grid-template-columns: 80px 2fr 1fr 100px 140px 100px 60px; padding: 12px 14px; align-items: center;">
+              <div style="font-style: italic; color: #94a3b8;">Chưa có mã HS</div>
+              <div style="font-weight: 700; color: #f8fafc;">Trần Mai Anh (Miu)</div>
+              <div><span style="background: #1e2026; padding: 2px 6px; border-radius: 4px; border: 1px solid #383e4a;">Lớp 1A1</span></div>
+              <div>20/08/2018</div>
+              <div>0912 345 678</div>
+              <div><span style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid #10b981; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 700;">Đang học</span></div>
+              <div style="text-align: right; color: #94a3b8;">•••</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= ARTBOARD 3: 360 PROFILE HUB ================= -->
+      <div class="artboard ab-screen">
+        <div class="artboard-header">
+          <span class="artboard-tag">Screen 02 — SCR-SCH-03</span>
+          <span style="font-size: 11px; color: #94a3b8;">/[schoolCode]/school/kid/detail/[id]</span>
+        </div>
+        <div class="artboard-body">
+          <div style="background: #0f172a; border: 1px solid #383e4a; border-radius: 10px; padding: 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <div style="width: 48px; height: 48px; border-radius: 50%; background: #2563eb; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px;">NH</div>
+              <div>
+                <div style="font-size: 16px; font-weight: 700; color: #f8fafc;">Nguyễn Hoàng Nam (Bơ) <span style="font-size: 11px; color: #60a5fa; font-family: monospace;">HS-101</span></div>
+                <div style="font-size: 11px; color: #94a3b8;">Lớp 1A1 • Sinh: 15/05/2018 (6 tuổi) • Giới tính: Nam</div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <span style="background: #1e2026; border: 1px solid #383e4a; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;">⚖️ Đo thể trạng</span>
+              <span style="background: #2563eb; color: #ffffff; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;">🎁 Ưu đãi học phí</span>
+            </div>
+          </div>
+
+          <!-- 5 Tabs Strip -->
+          <div style="display: flex; gap: 6px; background: #0f172a; padding: 4px; border-radius: 8px; border: 1px solid #383e4a; margin-bottom: 16px;">
+            <span style="background: #2563eb; color: #ffffff; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 700;">1. Hồ sơ & Thể chất</span>
+            <span style="color: #94a3b8; padding: 6px 12px; font-size: 11px; font-weight: 700;">2. Hoạt động</span>
+            <span style="color: #94a3b8; padding: 6px 12px; font-size: 11px; font-weight: 700;">3. Thư viện ảnh (AI)</span>
+            <span style="color: #94a3b8; padding: 6px 12px; font-size: 11px; font-weight: 700;">4. Điểm danh</span>
+            <span style="color: #94a3b8; padding: 6px 12px; font-size: 11px; font-weight: 700;">5. Học phí & Giảm trừ</span>
+          </div>
+
+          <!-- Tab Content Mockup -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div style="background: #0f172a; border: 1px solid #383e4a; border-radius: 8px; padding: 14px;">
+              <h5 style="font-size: 12px; font-weight: 700; color: #38bdf8; margin-bottom: 8px;">Danh Sách Phụ Huynh Liên Hệ</h5>
+              <div style="font-size: 12px; color: #f8fafc; font-weight: 700;">Nguyễn Văn Hoàng (Bố)</div>
+              <div style="font-size: 11px; color: #94a3b8;">SĐT: 0988 123 456 (Đón chính)</div>
+              <div style="margin-top: 8px; font-size: 12px; color: #f8fafc; font-weight: 700;">Lê Thu Trang (Mẹ)</div>
+              <div style="font-size: 11px; color: #94a3b8;">SĐT: 0977 654 321</div>
+            </div>
+
+            <div style="background: #0f172a; border: 1px solid #383e4a; border-radius: 8px; padding: 14px;">
+              <h5 style="font-size: 12px; font-weight: 700; color: #38bdf8; margin-bottom: 8px;">Lịch Sử Đo Thể Trạng BMI</h5>
+              <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 6px;">
+                <span>01/09/2026 • 116.5cm, 22.0kg</span>
+                <span style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid #10b981; padding: 1px 6px; border-radius: 4px; font-weight: 700;">BMI: 16.2 (Bình thường)</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 11px;">
+                <span>15/05/2026 • 114.0cm, 20.5kg</span>
+                <span style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid #10b981; padding: 1px 6px; border-radius: 4px; font-weight: 700;">BMI: 15.8 (Bình thường)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= ARTBOARD 4: MODALS & TRIPARTITE CASCADE ================= -->
+      <div class="artboard ab-modals">
+        <div class="artboard-header">
+          <span class="artboard-tag">Interaction Modals</span>
+          <span style="font-size: 11px; color: #94a3b8;">Pop-ups & Cascade Invariants</span>
+        </div>
+        <div class="artboard-body">
+          <!-- Modal 1: Class Transfer -->
+          <div style="background: #0f172a; border: 1px solid #383e4a; border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+            <h4 style="font-family: 'Baloo Chettan 2', cursive; font-size: 16px; font-weight: 700; color: #f8fafc; margin-bottom: 10px;">
+              Chuyển Lớp & 3 Cảnh Báo Cascade (ADR-009)
+            </h4>
+            <div style="background: rgba(37, 99, 235, 0.1); border: 1px solid #2563eb; border-radius: 8px; padding: 10px; font-size: 11px; line-height: 1.4;">
+              <div style="color: #60a5fa; font-weight: 700; margin-bottom: 4px;">Hệ Thống Tự Động Thực Hiện 3 Cascade:</div>
+              <div>• <strong>Học phí:</strong> Áp dụng biểu phí của lớp mới từ ngày hiệu lực.</div>
+              <div>• <strong>Trao đổi:</strong> Cập nhật kênh chat lớp mới cho phụ huynh.</div>
+              <div>• <strong>Học tập:</strong> Bảo lưu bảng điểm và đánh giá lớp cũ.</div>
+            </div>
+          </div>
+
+          <!-- Modal 2: Dirty Form Cancellation (K010) -->
+          <div style="background: #0f172a; border: 1px solid #383e4a; border-radius: 10px; padding: 16px;">
+            <h4 style="font-family: 'Baloo Chettan 2', cursive; font-size: 16px; font-weight: 700; color: #f59e0b; margin-bottom: 8px;">
+              Bảo Vệ Biểu Mẫu Chưa Lưu (Resolution K010)
+            </h4>
+            <div style="font-size: 12px; color: #f8fafc; margin-bottom: 8px;">
+              ⚠️ <strong>Bạn có thay đổi chưa lưu!</strong> Nếu rời khỏi lúc này, thông tin học sinh và phụ huynh đã nhập sẽ bị mất.
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 8px;">
+              <span style="background: #1e2026; border: 1px solid #383e4a; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; color: #94a3b8;">Tiếp tục sửa</span>
+              <span style="background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid #ef4444; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;">Rời khỏi không lưu</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    let scale = 1;
+    let panX = 40;
+    let panY = 40;
+    let isDragging = false;
+    let startX, startY;
+
+    const world = document.getElementById('world');
+    const viewport = document.getElementById('viewport');
+
+    function updateTransform() {
+      world.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+    }
+
+    viewport.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      startX = e.clientX - panX;
+      startY = e.clientY - panY;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      panX = e.clientX - startX;
+      panY = e.clientY - startY;
+      updateTransform();
+    });
+
+    window.addEventListener('mouseup', () => { isDragging = false; });
+
+    viewport.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const zoomFactor = e.deltaY < 0 ? 1.08 : 0.92;
+      scale = Math.min(Math.max(0.3, scale * zoomFactor), 2.5);
+      updateTransform();
+    }, { passive: false });
+
+    function zoomIn() { scale = Math.min(2.5, scale * 1.15); updateTransform(); }
+    function zoomOut() { scale = Math.max(0.3, scale * 0.85); updateTransform(); }
+    function resetZoom() { scale = 1; panX = 40; panY = 40; updateTransform(); }
+
+    updateTransform();
+  </script>
+</body>
+</html>

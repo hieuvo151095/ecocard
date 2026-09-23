@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Figma Design Canvas Board — Nhà Trường: Giáo Viên (Teachers Directory & Profile Hub)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+Chettan+2:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --eco-blue: #2563eb;
+      --eco-yellow: #f0b90b;
+      --bg-dark: #0f172a;
+      --card-bg: #1e2026;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --border-dark: #383e4a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Quicksand', 'Inter', sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      user-select: none;
+    }
+    .board-header {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 56px;
+      background: #1e2026;
+      border-bottom: 1px solid #383e4a;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 100;
+    }
+    .board-title {
+      font-family: 'Baloo Chettan 2', cursive;
+      font-size: 18px;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+    .board-controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .btn-tool {
+      background: #0f172a;
+      border: 1px solid #383e4a;
+      color: #94a3b8;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn-tool:hover { color: #f8fafc; border-color: #2563eb; }
+    .btn-active { background: #2563eb; color: #ffffff; border-color: #2563eb; }
+
+    .canvas-viewport {
+      position: absolute;
+      top: 56px; left: 0; right: 0; bottom: 0;
+      overflow: hidden;
+      cursor: grab;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+    .canvas-viewport:active { cursor: grabbing; }
+
+    .canvas-world {
+      position: absolute;
+      transform-origin: 0 0;
+      display: flex;
+      gap: 40px;
+      padding: 60px;
+    }
+
+    .artboard {
+      background: #1e2026;
+      border: 1px solid #383e4a;
+      border-radius: 16px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      flex-shrink: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .artboard-header {
+      background: #0f172a;
+      padding: 14px 20px;
+      border-bottom: 1px solid #383e4a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .artboard-name {
+      font-weight: 700;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .artboard-badge {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: #2563eb;
+      color: #ffffff;
+      font-weight: 700;
+    }
+    .artboard-content {
+      padding: 20px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    /* Artboard 0: Tokens */
+    .token-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .token-group {
+      background: #0f172a;
+      border: 1px solid #383e4a;
+      border-radius: 10px;
+      padding: 14px;
+    }
+    .token-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #94a3b8;
+      margin-bottom: 10px;
+    }
+    .swatch {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-size: 12px;
+    }
+    .swatch-color {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      border: 1px solid #383e4a;
+    }
+
+    /* Mini Mockups */
+    .mini-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-top: 10px;
+    }
+    .mini-table th {
+      background: #0f172a;
+      padding: 10px;
+      text-align: left;
+      color: #94a3b8;
+      border-bottom: 1px solid #383e4a;
+      font-size: 11px;
+    }
+    .mini-table td {
+      padding: 10px;
+      border-bottom: 1px solid #383e4a;
+      color: #f8fafc;
+    }
+    .mini-badge {
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 700;
+      display: inline-block;
+    }
+    .badge-primary { background: rgba(37, 99, 235, 0.15); color: #60a5fa; border: 1px solid #2563eb; }
+    .badge-emerald { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid #10b981; }
+    .badge-amber { background: rgba(240, 185, 11, 0.15); color: #f0b90b; border: 1px solid #f0b90b; }
+    .badge-rose { background: rgba(220, 38, 38, 0.15); color: #ef4444; border: 1px solid #dc2626; }
+
+    .mini-form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .mini-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .mini-label { font-size: 11px; color: #94a3b8; font-weight: 600; }
+    .mini-input {
+      background: #0f172a;
+      border: 1px solid #383e4a;
+      border-radius: 6px;
+      padding: 8px 12px;
+      color: #f8fafc;
+      font-size: 12px;
+    }
+    .mini-banner {
+      background: rgba(240, 185, 11, 0.1);
+      border: 1px solid #f0b90b;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 11px;
+      color: #f0b90b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Connectors overlay */
+    svg.connectors {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .connector-line {
+      stroke: #2563eb;
+      stroke-width: 2;
+      stroke-dasharray: 6;
+      fill: none;
+      opacity: 0.6;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="board-header">
+    <div class="board-title">🎨 Figma Design Canvas — Nhà Trường: Giáo Viên (Directory & Profile Hub)</div>
+    <div class="board-controls">
+      <button class="btn-tool" onclick="zoomIn()">➕ Phóng to</button>
+      <button class="btn-tool" onclick="zoomOut()">➖ Thu nhỏ</button>
+      <button class="btn-tool" onclick="resetZoom()">↺ Reset (100%)</button>
+      <button class="btn-tool btn-active" onclick="jumpToArtboard(0)">Tokens & Specs</button>
+      <button class="btn-tool" onclick="jumpToArtboard(1)">Danh sách giáo viên</button>
+      <button class="btn-tool" onclick="jumpToArtboard(2)">Phân công lớp</button>
+      <button class="btn-tool" onclick="jumpToArtboard(3)">Tạo giáo viên</button>
+      <button class="btn-tool" onclick="jumpToArtboard(4)">Hồ sơ 360°</button>
+    </div>
+  </div>
+
+  <div class="canvas-viewport" id="viewport">
+    <div class="canvas-world" id="world">
+
+      <!-- Artboard 0: Design Tokens & System Specs -->
+      <div class="artboard" style="width: 480px; height: 720px;" id="ab-0">
+        <div class="artboard-header">
+          <div class="artboard-name">📐 Design Tokens & System Specs</div>
+          <span class="artboard-badge">ECO 1.0</span>
+        </div>
+        <div class="artboard-content">
+          <div class="token-grid">
+            <div class="token-group">
+              <div class="token-title">Màu chủ đạo (Primary)</div>
+              <div class="swatch">
+                <div class="swatch-color" style="background: #2563eb;"></div>
+                <div><strong>#2563eb</strong><br><span style="color: #94a3b8;">ECO Blue (CTA, Links)</span></div>
+              </div>
+              <div class="swatch">
+                <div class="swatch-color" style="background: #1d4ed8;"></div>
+                <div><strong>#1d4ed8</strong><br><span style="color: #94a3b8;">Blue Hover State</span></div>
+              </div>
+              <div class="swatch">
+                <div class="swatch-color" style="background: #f0b90b;"></div>
+                <div><strong>#f0b90b</strong><br><span style="color: #94a3b8;">ECO Amber (Accent, Warning)</span></div>
+              </div>
+            </div>
+
+            <div class="token-group">
+              <div class="token-title">Trạng thái (Feedback)</div>
+              <div class="swatch">
+                <div class="swatch-color" style="background: #10b981;"></div>
+                <div><strong>#10b981</strong><br><span style="color: #94a3b8;">Đang dạy / Hoạt động</span></div>
+              </div>
+              <div class="swatch">
+                <div class="swatch-color" style="background: #f59e0b;"></div>
+                <div><strong>#f59e0b</strong><br><span style="color: #94a3b8;">Chờ duyệt / Nghỉ tạm</span></div>
+              </div>
+              <div class="swatch">
+                <div class="swatch-color" style="background: #ef4444;"></div>
+                <div><strong>#ef4444</strong><br><span style="color: #94a3b8;">Đã thôi việc / Xóa</span></div>
+              </div>
+            </div>
+
+            <div class="token-group">
+              <div class="token-title">Nền & Viền (Surfaces)</div>
+              <div class="swatch">
+                <div class="swatch-color" style="background: #0f172a;"></div>
+                <div><strong>#0f172a</strong><br><span style="color: #94a3b8;">Background Dark</span></div>
+              </div>
+              <div class="swatch">
+                <div class="swatch-color" style="background: #1e2026;"></div>
+                <div><strong>#1e2026</strong><br><span style="color: #94a3b8;">Card Background</span></div>
+              </div>
+              <div class="swatch">
+                <div class="swatch-color" style="background: #383e4a;"></div>
+                <div><strong>#383e4a</strong><br><span style="color: #94a3b8;">Border Line</span></div>
+              </div>
+            </div>
+
+            <div class="token-group">
+              <div class="token-title">Kiểu chữ & Bo góc</div>
+              <div style="font-size: 11px; color: #94a3b8; line-height: 1.6;">
+                • <strong>Heading:</strong> Baloo Chettan 2<br>
+                • <strong>Body/UI:</strong> Quicksand + Inter<br>
+                • <strong>Border Radius:</strong> Card: 12-16px, Button: 8px, Tag: 12px<br>
+                • <strong>Shadow:</strong> Soft multi-layer depth<br>
+                • <strong>Headers:</strong> Strict Sentence-case
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top: 16px; padding: 12px; background: #0f172a; border-radius: 8px; border: 1px solid #383e4a; font-size: 11px; color: #94a3b8;">
+            <strong style="color: #f8fafc;">Quy tắc tương tác toàn diện:</strong><br>
+            1. Menu thao tác ba chấm (•••) lật lên trên khi ở cuối bảng.<br>
+            2. Cảnh báo xung đột giáo viên chủ nhiệm theo thời gian thực (K006).<br>
+            3. Xác nhận khi rời form đang nhập dở (K010).<br>
+            4. Phân quyền duyệt bài 2 cấp (Toàn trường vs Lớp phụ trách).
+          </div>
+        </div>
+      </div>
+
+      <!-- Artboard 1: Teacher Directory -->
+      <div class="artboard" style="width: 580px; height: 720px;" id="ab-1">
+        <div class="artboard-header">
+          <div class="artboard-name">📋 Teacher Directory & Roster</div>
+          <span class="artboard-badge">/school/teacher</span>
+        </div>
+        <div class="artboard-content">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div style="display: flex; gap: 8px; flex: 1;">
+              <input class="mini-input" placeholder="Tìm tên, mã, email, SĐT, CCCD..." style="width: 220px;" value="Nguyễn Văn">
+              <select class="mini-input" style="width: 110px;"><option>Tất cả lớp</option></select>
+              <select class="mini-input" style="width: 100px;"><option>Đang dạy</option></select>
+            </div>
+            <button style="background: #2563eb; color: #ffffff; border: none; padding: 8px 14px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer;">+ Thêm mới</button>
+          </div>
+
+          <table class="mini-table">
+            <thead>
+              <tr>
+                <th>Mã giáo viên</th>
+                <th>Họ và tên</th>
+                <th>Lớp phụ trách</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>GV-001</strong></td>
+                <td>
+                  <div style="font-weight: 700;">Nguyễn Thị Mai</div>
+                  <div style="font-size: 10px; color: #94a3b8;">mai.nguyen@finviet.edu.vn</div>
+                </td>
+                <td><span class="mini-badge badge-primary">Mầm Non 1A (CN)</span></td>
+                <td><span class="mini-badge badge-emerald">Đang dạy</span></td>
+                <td><button style="background: #0f172a; border: 1px solid #383e4a; color: #94a3b8; border-radius: 4px; padding: 2px 6px;">•••</button></td>
+              </tr>
+              <tr>
+                <td><strong>GV-002</strong></td>
+                <td>
+                  <div style="font-weight: 700;">Trần Văn Hùng</div>
+                  <div style="font-size: 10px; color: #94a3b8;">hung.tran@finviet.edu.vn</div>
+                </td>
+                <td><span class="mini-badge badge-primary">Chồi 2 (BM)</span></td>
+                <td><span class="mini-badge badge-emerald">Đang dạy</span></td>
+                <td><button style="background: #0f172a; border: 1px solid #383e4a; color: #94a3b8; border-radius: 4px; padding: 2px 6px;">•••</button></td>
+              </tr>
+              <tr>
+                <td><em style="color: #94a3b8;">Chưa có mã</em></td>
+                <td>
+                  <div style="font-weight: 700;">Lê Minh Anh</div>
+                  <div style="font-size: 10px; color: #94a3b8;">minhanh.le@gmail.com</div>
+                </td>
+                <td><span style="color: #94a3b8; font-size: 11px;">Chưa phân công</span></td>
+                <td><span class="mini-badge badge-amber">Tạm nghỉ</span></td>
+                <td><button style="background: #0f172a; border: 1px solid #383e4a; color: #94a3b8; border-radius: 4px; padding: 2px 6px;">•••</button></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div style="margin-top: 20px; padding: 12px; background: #0f172a; border-radius: 8px; border: 1px solid #383e4a;">
+            <div style="font-size: 11px; font-weight: 700; color: #60a5fa; margin-bottom: 4px;">Tính năng nổi bật:</div>
+            <ul style="font-size: 11px; color: #94a3b8; padding-left: 16px; line-height: 1.6;">
+              <li>Tìm kiếm đa trường phản hồi tức thời (Tên, Mã, Email, SĐT, CCCD).</li>
+              <li>Hỗ trợ phân trang và lọc trạng thái linh hoạt.</li>
+              <li>Menu ngữ cảnh ba chấm (•••) với cơ chế tự lật tránh tràn màn hình.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Artboard 2: Assign Class Modal -->
+      <div class="artboard" style="width: 480px; height: 720px;" id="ab-2">
+        <div class="artboard-header">
+          <div class="artboard-name">🔄 Assign Class & Conflict Warning</div>
+          <span class="artboard-badge">Modal UI (K006)</span>
+        </div>
+        <div class="artboard-content">
+          <div style="background: #0f172a; border: 1px solid #383e4a; border-radius: 12px; padding: 16px;">
+            <div style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">Phân công lớp giảng dạy</div>
+            
+            <div class="mini-form">
+              <div class="mini-input-group">
+                <span class="mini-label">Giáo viên</span>
+                <input class="mini-input" value="GV-002 • Trần Văn Hùng" readonly>
+              </div>
+
+              <div class="mini-input-group">
+                <span class="mini-label">Chọn lớp</span>
+                <select class="mini-input">
+                  <option selected>Lớp Mầm Non 1A</option>
+                  <option>Lớp Chồi 2</option>
+                </select>
+              </div>
+
+              <div class="mini-input-group">
+                <span class="mini-label">Vai trò phụ trách</span>
+                <div style="display: flex; gap: 12px; margin-top: 4px;">
+                  <label style="font-size: 11px; display: flex; align-items: center; gap: 4px;"><input type="radio" name="role" checked> Chủ nhiệm (Homeroom)</label>
+                  <label style="font-size: 11px; display: flex; align-items: center; gap: 4px;"><input type="radio" name="role"> Bộ môn (Subject)</label>
+                </div>
+              </div>
+
+              <!-- Real-time conflict banner (K006) -->
+              <div class="mini-banner">
+                <span style="font-size: 16px;">⚠️</span>
+                <div>
+                  <strong>Cảnh báo xung đột chủ nhiệm (K006):</strong><br>
+                  Lớp <strong>Mầm Non 1A</strong> hiện đã có GV chủ nhiệm là <strong>Nguyễn Thị Mai (GV-001)</strong>. Nếu tiếp tục, hệ thống sẽ tự động cập nhật cô Mai về vai trò giáo viên bộ môn.
+                </div>
+              </div>
+
+              <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px;">
+                <button style="background: #0f172a; border: 1px solid #383e4a; color: #94a3b8; padding: 6px 12px; border-radius: 6px; font-size: 11px; cursor: pointer;">Hủy</button>
+                <button style="background: #2563eb; color: #ffffff; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer;">Xác nhận phân công</button>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top: 20px; font-size: 11px; color: #94a3b8; line-height: 1.6;">
+            <strong style="color: #f8fafc;">Nghiệp vụ cốt lõi:</strong><br>
+            • Đảm bảo mỗi lớp chỉ có duy nhất 1 giáo viên chủ nhiệm chính thức tại một thời điểm.<br>
+            • Khi phân công lại, tự động hoán đổi và ghi log kiểm toán minh bạch.
+          </div>
+        </div>
+      </div>
+
+      <!-- Artboard 3: Create Teacher Wizard -->
+      <div class="artboard" style="width: 480px; height: 720px;" id="ab-3">
+        <div class="artboard-header">
+          <div class="artboard-name">📝 Onboarding Wizard & Dirty Guard</div>
+          <span class="artboard-badge">/teacher/create</span>
+        </div>
+        <div class="artboard-content">
+          <div class="mini-form">
+            <div style="font-size: 13px; font-weight: 700; color: #60a5fa; border-bottom: 1px solid #383e4a; padding-bottom: 6px;">1. Thông tin định danh cá nhân</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div class="mini-input-group">
+                <span class="mini-label">Mã giáo viên *</span>
+                <input class="mini-input" value="GV-006">
+              </div>
+              <div class="mini-input-group">
+                <span class="mini-label">Họ và tên *</span>
+                <input class="mini-input" value="Hoàng Lan Anh">
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div class="mini-input-group">
+                <span class="mini-label">Email trường *</span>
+                <input class="mini-input" value="lananh.hoang@finviet.edu.vn">
+              </div>
+              <div class="mini-input-group">
+                <span class="mini-label">Số điện thoại *</span>
+                <input class="mini-input" value="0912 345 678">
+              </div>
+            </div>
+
+            <div style="font-size: 13px; font-weight: 700; color: #60a5fa; border-bottom: 1px solid #383e4a; padding-bottom: 6px; margin-top: 8px;">2. Chuyên môn & Hợp đồng</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div class="mini-input-group">
+                <span class="mini-label">Môn giảng dạy chính</span>
+                <select class="mini-input"><option>Tiếng Anh Mầm Non</option></select>
+              </div>
+              <div class="mini-input-group">
+                <span class="mini-label">Loại hợp đồng</span>
+                <select class="mini-input"><option>Chính thức toàn thời gian</option></select>
+              </div>
+            </div>
+
+            <!-- Abandonment Modal Preview (K010) -->
+            <div style="margin-top: 14px; background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; border-radius: 8px; padding: 10px;">
+              <div style="display: flex; gap: 8px; align-items: flex-start;">
+                <span style="font-size: 16px;">🛑</span>
+                <div>
+                  <strong style="color: #ef4444; font-size: 11px;">Bảo vệ dữ liệu đang nhập (Resolution K010):</strong>
+                  <p style="font-size: 10px; color: #cbd5e1; margin-top: 2px;">
+                    Nếu người dùng bấm "Quay lại" hoặc chuyển trang khi có thay đổi chưa lưu, hệ thống chặn lại và mở hộp thoại xác nhận hủy bỏ.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px;">
+              <button style="background: #0f172a; border: 1px solid #383e4a; color: #94a3b8; padding: 8px 14px; border-radius: 6px; font-size: 11px; cursor: pointer;">Hủy bỏ</button>
+              <button style="background: #2563eb; color: #ffffff; border: none; padding: 8px 14px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer;">Lưu hồ sơ giáo viên</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Artboard 4: Profile Hub & Permissions -->
+      <div class="artboard" style="width: 520px; height: 720px;" id="ab-4">
+        <div class="artboard-header">
+          <div class="artboard-name">👤 Teacher 360° Profile & Permissions</div>
+          <span class="artboard-badge">/teacher/info/[id]</span>
+        </div>
+        <div class="artboard-content">
+          <div style="display: flex; gap: 14px; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #383e4a;">
+            <div style="width: 50px; height: 50px; border-radius: 50%; background: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700;">NM</div>
+            <div>
+              <div style="font-size: 16px; font-weight: 700;">Nguyễn Thị Mai</div>
+              <div style="font-size: 11px; color: #94a3b8;">Mã: GV-001 • Tổ trưởng Chuyên môn Mầm non</div>
+            </div>
+          </div>
+
+          <div style="background: #0f172a; border: 1px solid #383e4a; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+            <div style="font-size: 12px; font-weight: 700; color: #f0b90b; margin-bottom: 8px;">🛡️ Phân quyền duyệt bài viết (BR01)</div>
+            <div style="display: flex; flex-direction: column; gap: 8px; font-size: 11px;">
+              <label style="display: flex; align-items: center; gap: 8px;">
+                <input type="checkbox" checked style="accent-color: #2563eb;">
+                <span><strong>Quyền kiểm duyệt cấp trường:</strong> Cho phép duyệt và đăng tất cả hoạt động toàn trường.</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 8px;">
+                <input type="checkbox" checked style="accent-color: #2563eb;">
+                <span><strong>Quyền kiểm duyệt lớp phụ trách:</strong> Tự động duyệt bài viết trong lớp chủ nhiệm (Mầm Non 1A).</span>
+              </label>
+            </div>
+          </div>
+
+          <div style="background: #0f172a; border: 1px solid #383e4a; border-radius: 8px; padding: 12px;">
+            <div style="font-size: 12px; font-weight: 700; color: #60a5fa; margin-bottom: 8px;">📅 Lịch dạy & Phân công hiện tại</div>
+            <div style="display: flex; justify-content: space-between; font-size: 11px; padding: 6px 0; border-bottom: 1px solid #383e4a;">
+              <span>Lớp Mầm Non 1A</span>
+              <span class="mini-badge badge-primary">Chủ nhiệm (18 tiết/tuần)</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 11px; padding: 6px 0;">
+              <span>Lớp Chồi 2</span>
+              <span class="mini-badge badge-amber">Bộ môn Nghệ thuật (4 tiết/tuần)</span>
+            </div>
+          </div>
+
+          <div style="margin-top: 16px; display: flex; gap: 8px; justify-content: flex-end;">
+            <button style="background: #0f172a; border: 1px solid #383e4a; color: #94a3b8; padding: 6px 12px; border-radius: 6px; font-size: 11px;">Đổi Email đăng nhập</button>
+            <button style="background: rgba(220, 38, 38, 0.15); border: 1px solid #dc2626; color: #ef4444; padding: 6px 12px; border-radius: 6px; font-size: 11px;">Ngừng công tác</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    let scale = 1.0;
+    let panX = 40;
+    let panY = 30;
+    let isDragging = false;
+    let startX = 0, startY = 0;
+
+    const viewport = document.getElementById('viewport');
+    const world = document.getElementById('world');
+
+    function updateTransform() {
+      world.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+    }
+
+    viewport.addEventListener('mousedown', (e) => {
+      if (e.target.closest('.artboard-content') && e.target.tagName !== 'DIV') return;
+      isDragging = true;
+      startX = e.clientX - panX;
+      startY = e.clientY - panY;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      panX = e.clientX - startX;
+      panY = e.clientY - startY;
+      updateTransform();
+    });
+
+    window.addEventListener('mouseup', () => { isDragging = false; });
+
+    viewport.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const zoomFactor = 1.08;
+      if (e.deltaY < 0) {
+        scale = Math.min(scale * zoomFactor, 2.0);
+      } else {
+        scale = Math.max(scale / zoomFactor, 0.4);
+      }
+      updateTransform();
+    }, { passive: false });
+
+    function zoomIn() {
+      scale = Math.min(scale * 1.15, 2.0);
+      updateTransform();
+    }
+    function zoomOut() {
+      scale = Math.max(scale / 1.15, 0.4);
+      updateTransform();
+    }
+    function resetZoom() {
+      scale = 1.0;
+      panX = 40;
+      panY = 30;
+      updateTransform();
+    }
+
+    function jumpToArtboard(idx) {
+      const ab = document.getElementById(`ab-${idx}`);
+      if (!ab) return;
+      scale = 0.95;
+      panX = -ab.offsetLeft * scale + 60;
+      panY = 30;
+      updateTransform();
+    }
+
+    updateTransform();
+  </script>
+</body>
+</html>

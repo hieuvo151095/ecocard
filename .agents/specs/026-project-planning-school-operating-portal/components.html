@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Component Gallery — Tài Chính: Báo Cáo Học Phí (Collection Reports)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+Chettan+2:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --eco-blue: #2563eb;
+      --eco-yellow: #f0b90b;
+      --bg-dark: #0f172a;
+      --card-bg: #1e2026;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --border-dark: #383e4a;
+      --status-emerald: #10b981;
+      --status-amber: #f59e0b;
+      --status-rose: #ef4444;
+      --status-cyan: #38bdf8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Quicksand', 'Inter', sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 32px;
+      line-height: 1.5;
+    }
+    .gallery-container { max-width: 1200px; margin: 0 auto; }
+    .gallery-header { margin-bottom: 32px; border-bottom: 1px solid #383e4a; padding-bottom: 16px; }
+    .gallery-title { font-family: 'Baloo Chettan 2', cursive; font-size: 28px; font-weight: 700; color: #f8fafc; }
+    .section-title { font-size: 16px; font-weight: 700; color: #38bdf8; margin: 28px 0 14px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .comp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+    .comp-card { background: #1e2026; border: 1px solid #383e4a; border-radius: 12px; padding: 20px; }
+    .comp-card h4 { font-size: 13px; font-weight: 700; color: #94a3b8; margin-bottom: 12px; text-transform: uppercase; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .badge-finviet { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; }
+    .badge-vietqr { background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid #38bdf8; }
+    .badge-cash { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid #10b981; }
+    .badge-pos { background: rgba(148, 163, 184, 0.2); color: #94a3b8; border: 1px solid #383e4a; }
+    .badge-overdue { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; }
+    .badge-sent { background: rgba(37, 99, 235, 0.2); color: #60a5fa; border: 1px solid #2563eb; }
+    .badge-draft { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid #383e4a; }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .btn-export { background: #10b981; color: #ffffff; border: 1px solid #10b981; }
+    .btn-export:disabled { background: #334155; color: #94a3b8; border-color: #383e4a; cursor: not-allowed; }
+    .btn-primary { background: #2563eb; color: #ffffff; border: 1px solid #2563eb; }
+
+    .stacked-demo {
+      background: #0f172a;
+      border: 1px solid #383e4a;
+      padding: 12px;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="gallery-container">
+    <header class="gallery-header">
+      <h1 class="gallery-title">Bộ Thành Phần UI — Báo Cáo Thu Học Phí (Fee Report Components)</h1>
+      <p style="color: #94a3b8; font-size: 13px; margin-top: 4px;">
+        Thư viện thành phần trực quan hóa dữ liệu thu học phí • ECO Design System 1.0 • Chuẩn hóa BR01 - BR09
+      </p>
+    </header>
+
+    <!-- SECTION 1: TAB NAVIGATION (BR01) -->
+    <h3 class="section-title">1. Điều Hướng Phân Nhóm Báo Cáo (4-Tab Navigation & Date Reset - BR01)</h3>
+    <div class="comp-card">
+      <h4>4 Tab Báo Cáo Chuyên Biệt Tự Động Reset Khoảng Thời Gian</h4>
+      <div style="display: flex; gap: 8px; background: #0f172a; padding: 6px; border-radius: 10px; border: 1px solid #383e4a; flex-wrap: wrap;">
+        <button class="btn btn-primary" style="padding: 6px 14px; font-size: 12px;">🏢 Tổng quan theo lớp (4 Lớp)</button>
+        <button class="btn" style="background: transparent; color: #94a3b8; border: none; padding: 6px 14px; font-size: 12px;">✅ Đã thanh toán (3)</button>
+        <button class="btn" style="background: transparent; color: #94a3b8; border: none; padding: 6px 14px; font-size: 12px;">⏳ Thanh toán một phần (3)</button>
+        <button class="btn" style="background: transparent; color: #94a3b8; border: none; padding: 6px 14px; font-size: 12px;">⚠️ Chưa thanh toán (5)</button>
+      </div>
+      <p style="color: #94a3b8; font-size: 11px; margin-top: 10px;">
+        *Chuyển tab tự động khôi phục khoảng ngày về tháng hiện tại (01/09 - 30/09) để loại bỏ hiện tượng rò rỉ bộ lọc ngày.
+      </p>
+    </div>
+
+    <!-- SECTION 2: PAYMENT METHOD BADGES (BR03) -->
+    <h3 class="section-title">2. Thẻ Kênh Thanh Toán & Trạng Thái (Payment Methods & Lifecycle Badges - BR03, BR05)</h3>
+    <div class="comp-grid">
+      <div class="comp-card">
+        <h4>Kênh Thanh Toán (BR03)</h4>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div><span class="badge badge-finviet">Ví FinViet / QR</span> <span style="font-size: 11px; color: #94a3b8; margin-left: 8px;">Ví điện tử học đường FinViet</span></div>
+          <div><span class="badge badge-vietqr">VietQR</span> <span style="font-size: 11px; color: #94a3b8; margin-left: 8px;">Chuyển khoản liên ngân hàng 247</span></div>
+          <div><span class="badge badge-cash">Tiền mặt</span> <span style="font-size: 11px; color: #94a3b8; margin-left: 8px;">Thu trực tiếp tại quầy thủ quỹ</span></div>
+          <div><span class="badge badge-pos">Thẻ POS</span> <span style="font-size: 11px; color: #94a3b8; margin-left: 8px;">Quẹt thẻ thanh toán tại trường</span></div>
+        </div>
+      </div>
+
+      <div class="comp-card">
+        <h4>Trạng Thái Hóa Đơn & Cảnh Báo Quá Hạn (BR05)</h4>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div><span class="badge badge-sent">Đã gửi</span> <span style="font-size: 11px; color: #94a3b8; margin-left: 8px;">Đã phát hành thông báo đến PH</span></div>
+          <div><span class="badge badge-draft">Đã tạo</span> <span style="font-size: 11px; color: #94a3b8; margin-left: 8px;">Hóa đơn nháp chưa gửi</span></div>
+          <div>
+            <span style="font-family: monospace; color: #ef4444; font-weight: 700; margin-right: 6px;">10/09/2026</span>
+            <span class="badge badge-overdue">(Trễ)</span>
+            <span style="font-size: 11px; color: #94a3b8; margin-left: 8px;">Nổi bật chữ đỏ đậm kèm nhãn Trễ</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: STACKED AMOUNT & ARCHIVED ROW (BR02, BR04) -->
+    <h3 class="section-title">3. Hiển Thị Xếp Chồng & Phân Cách Học Sinh Lưu Trữ (BR02, BR04)</h3>
+    <div class="comp-grid">
+      <div class="comp-card">
+        <h4>Số Tiền Xếp Chồng Hóa Đơn 1 Phần (BR04)</h4>
+        <div class="stacked-demo">
+          <span style="font-size: 14px; font-weight: 700; color: #2563eb;">2.400.000 Đ</span>
+          <span style="font-size: 12px; font-weight: 600; color: #ef4444;">Còn lại: 1.200.000 Đ</span>
+        </div>
+        <p style="color: #94a3b8; font-size: 11px; margin-top: 8px;">
+          Giúp kế toán nhận biết ngay mức dư nợ chưa thu mà không cần mở bảng kê chi tiết.
+        </p>
+      </div>
+
+      <div class="comp-card">
+        <h4>Hàng Dữ Liệu Học Sinh Lưu Trữ / Đã Xoá (BR02)</h4>
+        <div style="background: rgba(245, 158, 11, 0.08); border-left: 3px solid #f59e0b; padding: 12px; border-radius: 6px;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="color: #f59e0b;">⚠️</span>
+            <strong style="color: #f59e0b; font-size: 13px;">Học sinh lưu trữ / đã xoá</strong>
+          </div>
+          <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">
+            Dữ liệu hóa đơn lịch sử HS chuyển trường hoặc nghỉ học. Cách ly khỏi danh sách lớp nhưng tính vào Tổng cộng.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 4: EXPORT BUTTON SAFETY GUARD (BR08) -->
+    <h3 class="section-title">4. Nút Xuất Excel Có Cơ Chế Khóa An Toàn 0 Bản Ghi (BR08)</h3>
+    <div class="comp-grid">
+      <div class="comp-card">
+        <h4>Trạng Thái Hoạt Động (Có Dữ Liệu)</h4>
+        <button class="btn btn-export">
+          📊 Xuất Báo Cáo Excel (5)
+        </button>
+        <p style="color: #94a3b8; font-size: 11px; margin-top: 8px;">
+          Hiển thị số bản ghi thực tế sẽ xuất ra tệp Excel (.xlsx).
+        </p>
+      </div>
+
+      <div class="comp-card">
+        <h4>Trạng Thái Khóa (0 Bản Ghi Sau Bộ Lọc)</h4>
+        <button class="btn btn-export" disabled>
+          📊 Xuất Báo Cáo Excel (0)
+        </button>
+        <p style="color: #94a3b8; font-size: 11px; margin-top: 8px;">
+          Tự động vô hiệu hóa với độ mờ mờ và con trỏ cấm bấm khi kết quả bộ lọc trả về 0 bản ghi.
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

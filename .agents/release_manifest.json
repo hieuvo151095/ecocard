@@ -1,0 +1,25 @@
+{
+  "version": "34.0.0",
+  "headline": "V34: Superpowers Discipline Layer for strict clarification, planning, TDD, and verification",
+  "highlights": [
+    "Superpowers V34 Discipline: Agents must clarify requirements, use no placeholders in planning, apply RED-GREEN-REFACTOR, debug root causes, and verify before claiming completion.",
+    "Validator Script: validate_superpowers_discipline.py enforces V34 markers across workflows, templates, and specs.",
+    "Integrated Gates: Preflight, postflight, docs gates, and execution readiness now run the V34 discipline validator as a hard requirement.",
+    "Updated Templates: Spec, plan, tasks, verification, and execution-brief templates all contain explicit V34 discipline and clarification ledgers.",
+    "Updated Workflows: All major slash commands (develop, planning, design, quick_fix, etc.) embed V34 operating rules directly."
+  ],
+  "post_update_steps": [
+    "Run /init_brain after /update_brain to reload rules, MCP registration, skill routing, and the V34 command surface.",
+    "Run `python3 .agents/scripts/validate_superpowers_discipline.py --root .` to ensure V34 compliance in your workflows.",
+    "Run `python3 .agents/scripts/build_context_index.py --root .` before broad code/docs work.",
+    "Run `python3 .agents/scripts/validate_command_surface.py --root .` after merging/updating `.agents` to confirm command contracts stayed aligned.",
+    "Check your project's active `spec.md` and `plan.md` against the new V34 markers if execution readiness fails.",
+    "Use /marcus.clarify to resolve blocking ambiguity before moving to /marcus.plan."
+  ],
+  "onboarding_prompts": [
+    "Read `V34.0_RELEASE_NOTES.md` for the full overview of the Superpowers discipline rollout.",
+    "Always clarify requirements before planning: do not invent assumptions if intent, scope, or platform constraints are unclear.",
+    "Ensure tasks follow RED-GREEN-REFACTOR and NO COMPLETION CLAIMS are made without concrete verification.",
+    "Review `SLASH_COMMAND_REGISTRY.md` to see the updated commands and their strict V34 validation gates."
+  ]
+}

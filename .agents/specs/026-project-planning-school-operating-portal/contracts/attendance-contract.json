@@ -1,0 +1,93 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Attendance API Contract",
+  "type": "object",
+  "endpoints": {
+    "getRoster": {
+      "method": "GET",
+      "path": "/{schoolCode}/api/1.0/classes/{classId}/attendance",
+      "queryParams": {
+        "date": "YYYY-MM-DD"
+      },
+      "response": {
+        "status": 200,
+        "data": {
+          "class_id": "string",
+          "date": "string",
+          "summary": {
+            "present_count": "number",
+            "excused_absent_count": "number",
+            "unexcused_absent_count": "number",
+            "unmarked_count": "number"
+          },
+          "roster": [
+            {
+              "student_id": "string",
+              "student_code": "string",
+              "full_name": "string",
+              "avatar_url": "string",
+              "arrival_time": "string | null",
+              "departure_time": "string | null",
+              "status": "present | excused_absent | unexcused_absent | unmarked",
+              "is_late": "boolean",
+              "temperature": "number | null",
+              "health_condition": "string",
+              "pickup_guardian": {
+                "id": "string",
+                "name": "string",
+                "relationship": "string"
+              },
+              "notes": "string"
+            }
+          ]
+        }
+      }
+    },
+    "checkIn": {
+      "method": "POST",
+      "path": "/{schoolCode}/api/1.0/classes/{classId}/attendance/check-in",
+      "body": {
+        "student_id": "string",
+        "date": "string",
+        "arrival_time": "string"
+      },
+      "response": {
+        "status": 200,
+        "data": {
+          "student_id": "string",
+          "arrival_time": "string",
+          "is_late": "boolean"
+        }
+      }
+    },
+    "checkOut": {
+      "method": "POST",
+      "path": "/{schoolCode}/api/1.0/classes/{classId}/attendance/check-out",
+      "body": {
+        "student_id": "string",
+        "date": "string",
+        "departure_time": "string",
+        "pickup_guardian_id": "string | null"
+      },
+      "response": {
+        "status": 200,
+        "data": {
+          "student_id": "string",
+          "departure_time": "string"
+        }
+      },
+      "errorResponses": [
+        {
+          "status": 422,
+          "error": "VALIDATION_FAILED",
+          "message": "Giờ trả học sinh phải lớn hơn giờ đón học sinh"
+        },
+        {
+          "status": 400,
+          "error": "MISSING_CHECKIN",
+          "message": "Chưa nhập thời gian đón học sinh."
+        }
+      ]
+    }
+  }
+}
