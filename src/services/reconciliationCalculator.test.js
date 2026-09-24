@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import {
   convertDaysToMonths,
   isStudentActive,
+  calculateStudentBilling,
   calculateBranchFees,
   validateZeroFeeGuard,
   createSessionSnapshot,
@@ -16,37 +17,73 @@ import {
 
 import { SESSION_STATUS, USER_ROLES } from '../data/models.js';
 
-test('convertDaysToMonths calculates surplus day threshold correctly', () => {
+test('convertDaysToMonths calculates surplus day threshold correctly (BR07)', () => {
   // Edge case: 0 days
-  assert.equal(convertDaysToMonths(0, 15), 0);
+  assert.equal(convertDaysToMonths(0, 10), 0);
 
-  // Under surplus threshold (14 days < 15 days)
-  assert.equal(convertDaysToMonths(14, 15), 0);
+  // User Student 1: 132 days -> 4 months (120 days) and 12 days. 12 >= 10 -> count as 5 months
+  assert.equal(convertDaysToMonths(132, 10), 5);
 
-  // Exactly at surplus threshold (15 days >= 15 days -> rounds to 1 month)
-  assert.equal(convertDaysToMonths(15, 15), 1);
+  // User Student 2: 128 days -> 4 months (120 days) and 8 days. 8 < 10 -> count as 4 months
+  assert.equal(convertDaysToMonths(128, 10), 4);
 
-  // 1 month 10 days (40 days) with 15-day threshold -> 1 month
-  assert.equal(convertDaysToMonths(40, 15), 1);
+  // 1 month 10 days (40 days) with 10-day threshold -> 1 month 10 days >= 10 -> 2 months
+  assert.equal(convertDaysToMonths(40, 10), 2);
 
-  // 1 month 15 days (45 days) with 15-day threshold -> 2 months
-  assert.equal(convertDaysToMonths(45, 15), 2);
-
-  // Legacy BR07 explicit test case:
-  // "4 tháng 10 ngày, cấu hình ngưỡng làm tròn 10 ngày -> tính là 5 tháng"
-  // (4 * 30 + 10 = 130 days)
-  assert.equal(convertDaysToMonths(130, 10), 5);
+  // 1 month 9 days (39 days) with 10-day threshold -> 9 < 10 -> 1 month
+  assert.equal(convertDaysToMonths(39, 10), 1);
 });
 
-test('isStudentActive determines student qualification based on minActiveMonths', () => {
-  // 15 days with threshold 15 qualifies for 1 month
-  assert.equal(isStudentActive(15, 1, 15), true);
+test('isStudentActive determines student qualification based on minActiveMonths (30 days/month standard - BR06)', () => {
+  // Standard: 1 month = 30 days. Maximum 30 days active -> does NOT get charged (Không tính phí)
+  assert.equal(isStudentActive(30, 1), false);
+  assert.equal(isStudentActive(25, 1), false);
+  assert.equal(isStudentActive(0, 1), false);
 
-  // 14 days with threshold 15 evaluates to 0 months (< 1 month)
-  assert.equal(isStudentActive(14, 1, 15), false);
+  // At least 31 days active -> gets charged (Có tính phí)
+  assert.equal(isStudentActive(31, 1), true);
+  assert.equal(isStudentActive(132, 1), true);
+  assert.equal(isStudentActive(128, 1), true);
 
-  // 75 days with threshold 15 (2 months 15 days -> 3 months) qualifies for 2 months
-  assert.equal(isStudentActive(75, 2, 15), true);
+  // 2 months threshold (60 days max non-billable): 60 days -> false; 61 days -> true
+  assert.equal(isStudentActive(60, 2), false);
+  assert.equal(isStudentActive(61, 2), true);
+});
+
+test('calculateStudentBilling correctly evaluates billed months and service fees', () => {
+  const thresholds = { minActiveMonths: 1, surplusDayThreshold: 10 };
+
+  // Student 1: 132 days (5 months), Camera AI (5.000đ)
+  const student1 = calculateStudentBilling(
+    { actualDays: 132, serviceId: 'cameraAi' },
+    thresholds,
+    5000
+  );
+  assert.equal(student1.thresholdMonths, 5);
+  assert.equal(student1.billedMonths, 5);
+  assert.equal(student1.periodFee, 25000); // 5 * 5000 = 25000đ
+  assert.equal(student1.result, 'Có tính phí');
+
+  // Student 2: 128 days (4 months), Camera AI (5.000đ)
+  const student2 = calculateStudentBilling(
+    { actualDays: 128, serviceId: 'cameraAi' },
+    thresholds,
+    5000
+  );
+  assert.equal(student2.thresholdMonths, 4);
+  assert.equal(student2.billedMonths, 4);
+  assert.equal(student2.periodFee, 20000); // 4 * 5000 = 20000đ
+  assert.equal(student2.result, 'Có tính phí');
+
+  // Student 3: 25 days (<= 30 days max), Camera AI (5.000đ)
+  const student3 = calculateStudentBilling(
+    { actualDays: 25, serviceId: 'cameraAi' },
+    thresholds,
+    5000
+  );
+  assert.equal(student3.billedMonths, 0);
+  assert.equal(student3.periodFee, 0); // 0đ
+  assert.equal(student3.result, 'Không tính phí');
 });
 
 test('calculateBranchFees accurately computes service totals and arrears', () => {

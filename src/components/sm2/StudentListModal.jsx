@@ -57,9 +57,9 @@ export default function StudentListModal({ isOpen, onClose, branchData, sessionD
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-2xs p-4 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-2xs p-3 overflow-y-auto">
       <div 
-        className="bg-white rounded-xl shadow-2xl w-full max-w-[1100px] max-h-[92vh] border border-gray-200 overflow-hidden flex flex-col my-auto animate-in fade-in zoom-in-95 duration-150"
+        className="bg-white rounded-xl shadow-2xl w-full max-w-[1100px] max-h-[96vh] border border-gray-200 overflow-hidden flex flex-col my-auto animate-in fade-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -156,7 +156,13 @@ export default function StudentListModal({ isOpen, onClose, branchData, sessionD
                       </td>
 
                       <td className="py-2 px-4 text-center">
-                        <span className="px-2 py-0.5 text-xs text-[#0070CE] bg-[#E6F4FF] border border-[#91CAFF] rounded font-medium inline-block">
+                        <span
+                          className={`px-2 py-0.5 text-xs rounded font-medium inline-block ${
+                            item.billedMonths > 0
+                              ? 'text-[#0070CE] bg-[#E6F4FF] border border-[#91CAFF]'
+                              : 'text-gray-400 bg-gray-100 border border-gray-200'
+                          }`}
+                        >
                           {item.billedMonths} tháng
                         </span>
                       </td>
@@ -176,9 +182,15 @@ export default function StudentListModal({ isOpen, onClose, branchData, sessionD
                       </td>
 
                       <td className="py-2 px-4 text-center">
-                        <span className="px-2 py-0.5 text-xs text-[#00AB56] bg-[#E6F9F0] border border-[#A3E9C7] rounded font-medium inline-block">
-                          {item.result || 'Có tính phí'}
-                        </span>
+                        {item.result === 'Không tính phí' ? (
+                          <span className="px-2 py-0.5 text-xs text-[#687179] bg-[#F4F5F7] border border-[#DFE1E6] rounded font-medium inline-block">
+                            Không tính phí
+                          </span>
+                        ) : (
+                          <span className="px-2 py-0.5 text-xs text-[#00AB56] bg-[#E6F9F0] border border-[#A3E9C7] rounded font-medium inline-block">
+                            Có tính phí
+                          </span>
+                        )}
                       </td>
 
                       <td className="py-2 px-4 text-right font-bold font-numeric text-gray-900">

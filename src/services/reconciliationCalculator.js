@@ -6,28 +6,70 @@
 import { RECONCILIATION_SERVICES } from '../data/models.js';
 
 /**
- * Calculates qualified active student months based on days and surplus threshold
+ * Calculates qualified active student months based on days and surplus threshold (Image 1 BR07)
+ * 1 month is standard 30 days.
+ * If surplus days >= surplusThresholdDays, round up +1 month.
  * @param {number} totalActiveDays
- * @param {number} surplusThresholdDays (e.g., 15)
+ * @param {number} surplusThresholdDays (e.g., 10 days)
  * @returns {number} evaluated months
  */
-export function convertDaysToMonths(totalActiveDays, surplusThresholdDays = 15) {
+export function convertDaysToMonths(totalActiveDays, surplusThresholdDays = 10) {
   if (!totalActiveDays || totalActiveDays <= 0) return 0;
   const baseMonths = Math.floor(totalActiveDays / 30);
   const remainingDays = totalActiveDays % 30;
-  return remainingDays >= surplusThresholdDays ? baseMonths + 1 : baseMonths;
+  return remainingDays >= Number(surplusThresholdDays) ? baseMonths + 1 : baseMonths;
 }
 
 /**
- * Determines whether a student meets the minimum active month requirement
+ * Determines whether a student meets the minimum active month requirement (Image 1 BR06)
+ * One month is equal to 30 days standard.
+ * If active maximum minActiveMonths * 30 days -> does NOT qualify (Không tính phí).
+ * Only qualifies if active at least minActiveMonths * 30 + 1 days (i.e. > minActiveMonths * 30).
  * @param {number} totalActiveDays
  * @param {number} minActiveMonths (e.g., 1)
- * @param {number} surplusThresholdDays (e.g., 15)
  * @returns {boolean}
  */
-export function isStudentActive(totalActiveDays, minActiveMonths = 1, surplusThresholdDays = 15) {
-  const months = convertDaysToMonths(totalActiveDays, surplusThresholdDays);
-  return months >= minActiveMonths;
+export function isStudentActive(totalActiveDays, minActiveMonths = 1) {
+  if (!totalActiveDays || totalActiveDays <= 0) return false;
+  const nonBillableMaxDays = Number(minActiveMonths) * 30;
+  return totalActiveDays > nonBillableMaxDays;
+}
+
+/**
+ * Calculates student billing details per service:
+ * - Evaluated months based on surplus day rounding
+ * - Charging qualification based on minActiveMonths (30 days/month standard)
+ * - Monthly fee = billedMonths * unitPrice
+ * @param {Object} student
+ * @param {Object} thresholds - { minActiveMonths, surplusDayThreshold }
+ * @param {number} unitPrice - monthly tariff for the service
+ * @returns {Object} evaluated student billing details
+ */
+export function calculateStudentBilling(student, thresholds = {}, unitPrice = 0) {
+  const minActiveMonths = Number(thresholds.minActiveMonths ?? 1);
+  const surplusThresholdDays = Number(thresholds.surplusDayThreshold ?? 10);
+  const actualDays = Number(student.actualDays || 0);
+
+  // Billable if active > minActiveMonths * 30 days
+  const isCharged = isStudentActive(actualDays, minActiveMonths);
+  const thresholdMonths = convertDaysToMonths(actualDays, surplusThresholdDays);
+  const billedMonths = isCharged ? thresholdMonths : 0;
+  const periodFee = isCharged ? billedMonths * Number(unitPrice || 0) : 0;
+  const arrearsFee = Number(student.arrearsFee || 0);
+  const totalFee = periodFee + arrearsFee;
+  const result = isCharged ? 'Có tính phí' : 'Không tính phí';
+
+  return {
+    ...student,
+    actualDays,
+    thresholdMonths,
+    billedMonths,
+    isCharged,
+    periodFee,
+    arrearsFee,
+    totalFee,
+    result,
+  };
 }
 
 /**
