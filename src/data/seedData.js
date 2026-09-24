@@ -5,6 +5,7 @@
 
 import { generatePeriodSchedule, createSessionSnapshot } from '../services/reconciliationCalculator.js';
 import { SESSION_STATUS, ARREARS_STATUS, SETTLEMENT_SCOPES } from './models.js';
+import { EXACT_AUTO_ECO_STUDENTS } from '../services/studentDataGenerator.js';
 
 export const INITIAL_GROUPS = [
   {
@@ -70,7 +71,7 @@ export const INITIAL_GROUPS = [
   {
     id: 'G-TESTUAT',
     code: 'TESTUAT',
-    name: 'Hệ thống Giáo dục UAT School',
+    name: 'TestUAT',
     taxCode: '0398765432',
     bankName: 'Ngân hàng Quân đội (MBBank)',
     bankAccount: '088812345678',
@@ -88,12 +89,12 @@ export const INITIAL_GROUPS = [
     periods: generatePeriodSchedule('2026-09-01', '2027-05-31', 9),
     branches: [
       {
-        id: 'BR-TESTUAT-MN',
-        code: 'TESTUAT_MN',
-        name: 'Mầm non UAT Sunshine',
-        studentCount: 60,
+        id: 'BR-AUTO-SCHOOL-01',
+        code: 'AUTO_SCHOOL_01',
+        name: 'Auto_Eco_School',
+        studentCount: 10,
         isActive: true,
-        emails: ['sunshine@uat.edu.vn'],
+        emails: ['auto_school_01@uat.edu.vn'],
         services: {
           managementSoftware: true,
           cameraAi: true,
@@ -101,7 +102,7 @@ export const INITIAL_GROUPS = [
           canteen: false,
         },
         tariffs: {
-          'Kỳ 1': { managementSoftware: 12000, cameraAi: 6000, studentCard: 0, canteen: 0 },
+          'Kỳ 1': { managementSoftware: 50000, cameraAi: 25000, studentCard: 0, canteen: 0 },
         },
       },
     ],
@@ -148,23 +149,69 @@ export const INITIAL_GROUPS = [
 ];
 
 // Mark initial period hasActiveSession
-INITIAL_GROUPS[0].periods[0].hasActiveSession = true; // HIEUTEST Kỳ 1 has REC-B7A17279166
+// Mark initial period hasActiveSession
+INITIAL_GROUPS[0].periods[0].hasActiveSession = true; // HIEUTEST Kỳ 1
 INITIAL_GROUPS[0].periods[1].hasActiveSession = true; // HIEUTEST Kỳ 2 has REC-8A9C11029F
-INITIAL_GROUPS[1].periods[0].hasActiveSession = true; // TESTUAT Kỳ 1 has REC-518BB66CE4
+INITIAL_GROUPS[1].periods[0].hasActiveSession = true; // TESTUAT Kỳ 1 has REC-B7A17279166
 
 const groupHieu = INITIAL_GROUPS[0];
 const groupUat = INITIAL_GROUPS[1];
 
 export const INITIAL_SESSIONS = [
+  // 1. Session matching exact Screenshot media_1790233021836.png & media_1790233021842.png
   {
     id: 'REC-B7A17279166',
     sessionCode: 'REC-B7A17279166',
+    groupId: groupUat.id,
+    groupCode: groupUat.code,
+    groupName: groupUat.name,
+    settlementScope: groupUat.settlementScope,
+    periodId: 'Kỳ 1',
+    periodName: 'Kỳ 1',
+    periodRange: '05/09/2026 – 31/01/2027',
+    cutOffDate: '2026-09-22',
+    createdAt: '2026-09-22T08:30:00Z',
+    updatedAt: '2026-09-22T08:30:00Z',
+    status: SESSION_STATUS.DRAFT, // Nháp
+    arrearsStatus: ARREARS_STATUS.NORMAL,
+    isReleased: false,
+    isArrears: false,
+    parentSessionId: null,
+    totalActiveStudents: 10,
+    periodFee: 750000,
+    arrearsFee: 0,
+    totalFee: 750000,
+    snapshot: createSessionSnapshot(groupUat, groupUat.branches, groupUat.periods[0], groupUat.thresholds),
+    branchesSummary: [
+      {
+        branchId: 'BR-AUTO-SCHOOL-01',
+        branchCode: 'AUTO_SCHOOL_01',
+        branchName: 'Auto_Eco_School',
+        sessionCode: 'REC-7A17279167',
+        studentCount: 10,
+        activeStudents: 10,
+        periodFee: 750000,
+        arrearsFee: 0,
+        totalFee: 750000,
+        serviceBreakdown: [
+          { serviceId: 'cameraAi', serviceName: 'Camera AI', isEnabled: true, activeStudents: 10, unitPrice: 25000, totalFee: 250000 },
+          { serviceId: 'managementSoftware', serviceName: 'Phần mềm quản lý nhà trường', isEnabled: true, activeStudents: 10, unitPrice: 50000, totalFee: 500000 },
+        ],
+        students: EXACT_AUTO_ECO_STUDENTS,
+      },
+    ],
+  },
+  // 2. Paid session for HIEUTEST with Arrears support (BR07)
+  {
+    id: 'REC-HIEU-PAID',
+    sessionCode: 'REC-HIEU-PAID',
     groupId: groupHieu.id,
     groupCode: groupHieu.code,
     groupName: groupHieu.name,
     settlementScope: groupHieu.settlementScope,
     periodId: 'Kỳ 1',
     periodName: 'Kỳ 1 - Tháng 9/2026',
+    periodRange: '01/09/2026 – 30/09/2026',
     cutOffDate: '2026-09-30',
     createdAt: '2026-09-23T08:30:00Z',
     updatedAt: '2026-09-23T14:20:00Z',
@@ -183,6 +230,7 @@ export const INITIAL_SESSIONS = [
         branchId: 'BR-HIEUTEST-1',
         branchCode: 'HIEUTEST_1',
         branchName: 'Tiểu học Hieutest Cơ sở 1',
+        sessionCode: 'REC-HIEU-BR1',
         studentCount: 120,
         activeStudents: 120,
         periodFee: 3360000,
@@ -199,9 +247,10 @@ export const INITIAL_SESSIONS = [
         branchId: 'BR-HIEUTEST-2',
         branchCode: 'HIEUTEST_2',
         branchName: 'THCS Hieutest Cơ sở 2',
+        sessionCode: 'REC-HIEU-BR2',
         studentCount: 95,
         activeStudents: 95,
-        periodFee: 1500000, // Reduced demo tariff
+        periodFee: 1500000,
         arrearsFee: 0,
         totalFee: 1500000,
         serviceBreakdown: [
@@ -213,16 +262,17 @@ export const INITIAL_SESSIONS = [
       },
     ],
   },
-  // Child nested truy thu session under REC-B7A17279166
+  // Child nested truy thu session under REC-HIEU-PAID
   {
-    id: 'REC-B7A17279166-TT1',
-    sessionCode: 'REC-B7A17279166-TT1',
+    id: 'REC-HIEU-PAID-TT1',
+    sessionCode: 'REC-HIEU-PAID-TT1',
     groupId: groupHieu.id,
     groupCode: groupHieu.code,
     groupName: groupHieu.name,
     settlementScope: groupHieu.settlementScope,
     periodId: 'Kỳ 1',
     periodName: 'Kỳ 1 - Tháng 9/2026',
+    periodRange: '01/09/2026 – 30/09/2026',
     cutOffDate: '2026-10-05',
     createdAt: '2026-10-05T09:15:00Z',
     updatedAt: '2026-10-05T10:00:00Z',
@@ -230,7 +280,7 @@ export const INITIAL_SESSIONS = [
     arrearsStatus: ARREARS_STATUS.NORMAL,
     isReleased: false,
     isArrears: true,
-    parentSessionId: 'REC-B7A17279166',
+    parentSessionId: 'REC-HIEU-PAID',
     targetBranchId: 'BR-HIEUTEST-1',
     targetBranchName: 'Tiểu học Hieutest Cơ sở 1',
     totalActiveStudents: 15,
@@ -243,6 +293,7 @@ export const INITIAL_SESSIONS = [
         branchId: 'BR-HIEUTEST-1',
         branchCode: 'HIEUTEST_1',
         branchName: 'Tiểu học Hieutest Cơ sở 1',
+        sessionCode: 'REC-HIEU-BR1-TT',
         studentCount: 15,
         activeStudents: 15,
         periodFee: 0,

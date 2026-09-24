@@ -6,9 +6,9 @@ import { transitionSessionState } from '../services/sessionLifecycle.js';
 const PortalContext = createContext(null);
 
 const STORAGE_KEYS = {
-  GROUPS: 'eco_portal_groups_v1',
-  SESSIONS: 'eco_portal_sessions_v1',
-  ROLE: 'eco_portal_role_v1',
+  GROUPS: 'eco_portal_groups_v2',
+  SESSIONS: 'eco_portal_sessions_v2',
+  ROLE: 'eco_portal_role_v2',
 };
 
 export function PortalProvider({ children }) {
