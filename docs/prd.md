@@ -50,6 +50,23 @@ Module M6 resolves these challenges through automated student activity scanning,
 - **FR-SM1-05 (Threshold & Day Rounding Rules)**: The system shall compute student active thresholds using configured minimum active months (`Ngưỡng thu (tháng)`) and convert surplus active days exceeding the threshold (`Ngày dư làm tròn lên 1 tháng`) into a full billing month (BR06, BR07).
 - **FR-SM1-06 (Multi-Service Tariff Matrix)**: The system shall allow each branch to select from 4 supported services (*Phần mềm quản lý nhà trường*, *Camera AI*, *Thẻ học sinh*, *Căn tin học đường*) and assign independent unit prices (VND/student/month) across each billing period (BR08, BR09).
 - **FR-SM1-07 (Hierarchical Status Control)**: The system shall maintain independent active switches for school groups and individual branches (BR10).
+- **FR-SM1-08 (Mật khẩu file đối soát & Cơ chế gửi email)**: 
+  - Tại bảng danh sách nhóm trường (`SM1`), menu thao tác `•••` cung cấp chức năng **"Gửi mật khẩu"** (nếu chưa từng gửi) hoặc **"Cập nhật mật khẩu"** (nếu đã gửi ít nhất 1 lần, duy trì trạng thái vĩnh viễn).
+  - Khi mở Right-Sheet, người dùng nhập `Add password` và `Confirm password` (không áp đặt bất kỳ ràng buộc độ khó/ký tự nào, người dùng tự do thiết lập theo ý muốn).
+  - Nhấn nút "Gửi" sẽ mở một pop-up modal yêu cầu xác nhận trước khi tiến hành gửi.
+  - **Địa chỉ nhận email**:
+    - **To**: Email của trường/nhóm trường đã được thiết lập trước đó.
+    - **Cc**: `edu@finviet.com.vn; phongketoan@finviet.com.vn`.
+  - **Mẫu nội dung email gửi mật khẩu**:
+    - **Tiêu đề**: `[FINVIET] Mật khẩu file đối soát`
+    - **Nội dung email**:
+      ```text
+      Kính gửi Quý nhà trường,
+      FINVIET gửi Quý nhà trường mật khẩu mở file đối soát.
+      Mật khẩu: [MẬT KHẨU]
+      Quý nhà trường vui lòng sử dụng mật khẩu trên để mở file đối soát.
+      Trân trọng,
+      ```
 
 ### 5.2 Reconciliation Sessions (SM2)
 - **FR-SM2-01 (Single Active Session Per Period)**: The system shall allow only one active reconciliation session per period for any given group or branch, flagging periods that already possess an active session with `Đã có phiên` (BR01).

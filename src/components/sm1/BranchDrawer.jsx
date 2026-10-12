@@ -1,10 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { RECONCILIATION_SERVICES, SETTLEMENT_SCOPE_LABELS } from '../../data/models.js';
+import { RECONCILIATION_SERVICES, SETTLEMENT_SCOPE_LABELS, SETTLEMENT_SCOPES } from '../../data/models.js';
 import { MASTER_SCHOOLS } from '../../data/masterData.js';
 
-export function BranchDrawer({ isOpen, onClose, group, branch, onSave }) {
+export function BranchDrawer({ isOpen, onClose, group, branch, onSave, onOpenGroupConfig }) {
   const isEditing = Boolean(branch);
   const dropdownRef = useRef(null);
+
+  const isGroupScope = group?.settlementScope === SETTLEMENT_SCOPES.GROUP;
+  const groupEmailsString = Array.isArray(group?.emails) ? group.emails.join(', ') : (group?.emails || '');
+
+  const groupCycleType = group?.cycleType || (group?.periodsCount === 1 || (group?.periods && group.periods.length === 1) ? 'YEARLY' : 'PERIODIC');
+  const [activeTariffTab, setActiveTariffTab] = useState(groupCycleType);
 
   const [formData, setFormData] = useState({
     code: '',
@@ -20,6 +26,7 @@ export function BranchDrawer({ isOpen, onClose, group, branch, onSave }) {
       canteen: false,
     },
     tariffs: {},
+    yearlyTariffs: {},
   });
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -37,9 +44,11 @@ export function BranchDrawer({ isOpen, onClose, group, branch, onSave }) {
 
   const serviceYearText = group?.serviceYear?.startDate && group?.serviceYear?.endDate
     ? `${group.serviceYear.startDate} – ${group.serviceYear.endDate}`
-    : (periods.length > 0
-        ? `${periods[0].startDate} – ${periods[periods.length - 1].endDate}`
-        : '05/09/2026 – 20/05/2027');
+    : (group?.serviceYearStart && group?.serviceYearEnd
+        ? `${group.serviceYearStart} – ${group.serviceYearEnd}`
+        : (periods.length > 0
+            ? `${periods[0].startDate} – ${periods[periods.length - 1].endDate}`
+            : '05/09/2026 – 20/05/2027'));
 
   // Handle outside click to close master data dropdown
   useEffect(() => {
@@ -58,13 +67,21 @@ export function BranchDrawer({ isOpen, onClose, group, branch, onSave }) {
   useEffect(() => {
     if (!isOpen) return;
 
+    setActiveTariffTab(groupCycleType);
+
     if (branch) {
+      const initialYearly = branch.yearlyTariffs
+        ? JSON.parse(JSON.stringify(branch.yearlyTariffs))
+        : (branch.tariffs?.['YEARLY'] || branch.tariffs?.['Năm học'] || {});
+
+      const branchEmails = Array.isArray(branch.emails) ? branch.emails.join(', ') : (branch.emails || '');
+
       setFormData({
         code: branch.code || '',
         name: branch.name || '',
         startDate: branch.startDate || '15/09/2026',
         contractDate: branch.contractDate || '',
-        emails: Array.isArray(branch.emails) ? branch.emails.join(', ') : (branch.emails || ''),
+        emails: isGroupScope ? groupEmailsString : branchEmails,
         studentCount: branch.studentCount ?? 100,
         services: {
           managementSoftware: Boolean(branch.services?.managementSoftware),
@@ -73,19 +90,20 @@ export function BranchDrawer({ isOpen, onClose, group, branch, onSave }) {
           canteen: Boolean(branch.services?.canteen),
         },
         tariffs: branch.tariffs ? JSON.parse(JSON.stringify(branch.tariffs)) : {},
+        yearlyTariffs: initialYearly,
       });
       setSearchQuery(`${branch.code} · ${branch.name}`);
       setBranchSelectError(false);
       setEmailError(false);
       setDropdownOpen(false);
     } else {
-      // New branch setup matching Image 1
+      // New branch setup
       setFormData({
         code: '',
         name: '',
         startDate: '',
         contractDate: '',
-        emails: '',
+        emails: isGroupScope ? groupEmailsString : '',
         studentCount: 0,
         services: {
           managementSoftware: false,
@@ -94,13 +112,14 @@ export function BranchDrawer({ isOpen, onClose, group, branch, onSave }) {
           canteen: false,
         },
         tariffs: {},
+        yearlyTariffs: {},
       });
       setSearchQuery('');
       setBranchSelectError(false);
       setEmailError(false);
       setDropdownOpen(false);
     }
-  }, [branch, group, isOpen]);
+  }, [branch, group, isOpen, groupCycleType, isGroupScope, groupEmailsString]);
 
   if (!isOpen) return null;
 
@@ -116,7 +135,7 @@ export function BranchDrawer({ isOpen, onClose, group, branch, onSave }) {
       ...prev,
       code: school.code,
       name: school.name,
-      emails: prev.emails || school.email || '',
+      emails: isGroupScope ? groupEmailsString : (prev.emails || school.email || ''),
       studentCount: prev.studentCount === 0 || prev.studentCount === '' ? (school.defaultStudents || 100) : prev.studentCount,
     }));
     setSearchQuery(`${school.code} · ${school.name}`);
@@ -143,21 +162,32 @@ export function BranchDrawer({ isOpen, onClose, group, branch, onSave }) {
         [serviceId]: willEnable,
       };
 
-      // Set default tariff values when service is enabled if not already set
       const updatedTariffs = { ...prev.tariffs };
+      const updatedYearlyTariffs = { ...prev.yearlyTariffs };
+
       if (willEnable) {
-        const defaultTariffMap = {
+        const defaultMonthlyTariffMap = {
           managementSoftware: 10000,
           cameraAi: 5000,
           studentCard: 5000,
           canteen: 10000,
         };
+        const defaultYearlyTariffMap = {
+          managementSoftware: 120000,
+          cameraAi: 60000,
+          studentCard: 60000,
+          canteen: 120000,
+        };
+
+        if (updatedYearlyTariffs[serviceId] === undefined) {
+          updatedYearlyTariffs[serviceId] = defaultYearlyTariffMap[serviceId] || 100000;
+        }
+
         periods.forEach((p, idx) => {
           const pKey = p.name || p.id;
           if (!updatedTariffs[pKey]) updatedTariffs[pKey] = {};
           if (updatedTariffs[pKey][serviceId] === undefined) {
-            // Period 2 slightly higher as example or standard rate
-            const baseRate = defaultTariffMap[serviceId] || 10000;
+            const baseRate = defaultMonthlyTariffMap[serviceId] || 10000;
             updatedTariffs[pKey][serviceId] = idx === 1 ? baseRate + (serviceId === 'managementSoftware' ? 2000 : 1000) : baseRate;
           }
         });
@@ -167,6 +197,7 @@ export function BranchDrawer({ isOpen, onClose, group, branch, onSave }) {
         ...prev,
         services: nextServices,
         tariffs: updatedTariffs,
+        yearlyTariffs: updatedYearlyTariffs,
       };
     });
   };
@@ -179,6 +210,17 @@ export function BranchDrawer({ isOpen, onClose, group, branch, onSave }) {
       updated[periodKey][serviceId] = num;
       return { ...prev, tariffs: updated };
     });
+  };
+
+  const handleYearlyTariffInputChange = (serviceId, rawVal) => {
+    const num = Number(String(rawVal).replace(/\./g, '').replace(/[^\d]/g, '')) || 0;
+    setFormData((prev) => ({
+      ...prev,
+      yearlyTariffs: {
+        ...prev.yearlyTariffs,
+        [serviceId]: num,
+      },
+    }));
   };
 
   const formatTariffDisplay = (val) => {
@@ -199,17 +241,29 @@ export function BranchDrawer({ isOpen, onClose, group, branch, onSave }) {
       hasError = true;
     }
 
-    if (!formData.emails.trim()) {
+    const effectiveEmailString = isGroupScope ? groupEmailsString : formData.emails;
+
+    if (!isGroupScope && !effectiveEmailString.trim()) {
       setEmailError(true);
       hasError = true;
     }
 
     if (hasError) return;
 
-    const emailList = formData.emails
+    const emailList = effectiveEmailString
       .split(/[,;]/)
       .map((e) => e.trim())
       .filter(Boolean);
+
+    const finalTariffs = { ...formData.tariffs };
+    if (groupCycleType === 'YEARLY') {
+      finalTariffs['YEARLY'] = formData.yearlyTariffs || {};
+      finalTariffs['Năm học'] = formData.yearlyTariffs || {};
+      periods.forEach((p) => {
+        const pKey = p.name || p.id;
+        finalTariffs[pKey] = formData.yearlyTariffs || {};
+      });
+    }
 
     const payload = {
       id: branch?.id || `BR-${formData.code}`,
@@ -220,7 +274,8 @@ export function BranchDrawer({ isOpen, onClose, group, branch, onSave }) {
       contractDate: formData.contractDate || '',
       emails: emailList,
       services: formData.services,
-      tariffs: formData.tariffs,
+      tariffs: finalTariffs,
+      yearlyTariffs: formData.yearlyTariffs,
       isActive: branch?.isActive ?? true,
     };
 
@@ -480,27 +535,47 @@ export function BranchDrawer({ isOpen, onClose, group, branch, onSave }) {
               {/* Row 3: Email nhận biên bản + Số học sinh đăng ký */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-[#232628] mb-1.5">
-                    <span className="text-red-500 mr-0.5">*</span>Email nhận biên bản
+                  <label className="block text-xs font-semibold text-[#232628] mb-1.5 flex items-center justify-between">
+                    <div>
+                      <span className="text-red-500 mr-0.5">*</span>Email nhận biên bản
+                    </div>
+                    {isGroupScope && (
+                      <span className="text-[10px] font-semibold text-[#0070CE] bg-[#E6F1FB] px-1.5 py-0.5 rounded border border-[#BEE0FF]">
+                        Đồng bộ từ nhóm trường
+                      </span>
+                    )}
                   </label>
                   <input
                     type="text"
-                    value={formData.emails}
+                    value={isGroupScope ? groupEmailsString : formData.emails}
+                    disabled={isGroupScope}
                     onChange={(e) => {
+                      if (isGroupScope) return;
                       setFormData({ ...formData, emails: e.target.value });
                       if (emailError) setEmailError(false);
                     }}
-                    placeholder="Nhập email nhận biên bản"
-                    className={`w-full px-3 py-2 text-xs border rounded-lg text-gray-800 focus:outline-none focus:ring-1 ${
-                      emailError
-                        ? 'border-red-500 focus:ring-red-500/20'
-                        : 'border-gray-300 focus:ring-[#0070CE] focus:border-[#0070CE]'
+                    placeholder={isGroupScope ? "Email tự động lấy theo cấu hình nhóm trường" : "Nhập email nhận biên bản"}
+                    className={`w-full px-3 py-2 text-xs border rounded-lg focus:outline-none focus:ring-1 ${
+                      isGroupScope
+                        ? 'bg-[#F5F7F9] text-gray-500 border-gray-200 cursor-not-allowed font-medium'
+                        : emailError
+                        ? 'border-red-500 focus:ring-red-500/20 text-gray-800'
+                        : 'border-gray-300 focus:ring-[#0070CE] focus:border-[#0070CE] text-gray-800'
                     }`}
                   />
-                  <p className="text-[11px] text-[#687179] mt-1">
-                    Tối đa 3 email, cách nhau bằng dấu phẩy hoặc chấm phẩy.
-                  </p>
-                  {emailError && (
+                  {isGroupScope ? (
+                    <p className="text-[11px] text-[#0070CE] mt-1 font-medium flex items-center gap-1">
+                      <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Tự động kế thừa từ cấu hình nhóm trường (Theo nhóm trường) và không thể chỉnh sửa tại chi nhánh.
+                    </p>
+                  ) : (
+                    <p className="text-[11px] text-[#687179] mt-1">
+                      Tối đa 3 email, cách nhau bằng dấu phẩy hoặc chấm phẩy.
+                    </p>
+                  )}
+                  {!isGroupScope && emailError && (
                     <p className="text-xs text-[#FF424E] mt-1">Vui lòng nhập email nhận biên bản.</p>
                   )}
                 </div>
@@ -574,88 +649,229 @@ export function BranchDrawer({ isOpen, onClose, group, branch, onSave }) {
               </div>
             </div>
 
-            {/* Biểu phí theo lịch nhóm trường */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-[#232628]">
-                  Biểu phí theo lịch nhóm trường
-                </span>
-                <span className="text-xs text-[#687179]">
-                  Đơn giá / học sinh / tháng (VNĐ)
-                </span>
-              </div>
+            {/* Tariff Mode Tabs */}
+            <div className="flex border-b border-gray-200 mb-4 gap-2">
+              <button
+                type="button"
+                onClick={() => setActiveTariffTab('YEARLY')}
+                className={`pb-2.5 px-4 text-xs font-semibold transition border-b-2 flex items-center gap-2 cursor-pointer ${
+                  activeTariffTab === 'YEARLY'
+                    ? 'border-[#0070CE] text-[#0070CE] font-bold'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <span>Học phí theo năm</span>
+                {groupCycleType === 'YEARLY' && (
+                  <span className="px-1.5 py-0.2 rounded text-[10px] bg-blue-50 text-[#0070CE] font-medium border border-blue-100">
+                    Mặc định
+                  </span>
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTariffTab('PERIODIC')}
+                className={`pb-2.5 px-4 text-xs font-semibold transition border-b-2 flex items-center gap-2 cursor-pointer ${
+                  activeTariffTab === 'PERIODIC'
+                    ? 'border-[#0070CE] text-[#0070CE] font-bold'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <span>Học phí theo tháng</span>
+                {groupCycleType === 'PERIODIC' && (
+                  <span className="px-1.5 py-0.2 rounded text-[10px] bg-blue-50 text-[#0070CE] font-medium border border-blue-100">
+                    Mặc định
+                  </span>
+                )}
+              </button>
+            </div>
 
-              {/* State A: When NO services selected - Gray notice + empty cards */}
-              {selectedServices.length === 0 ? (
-                <div className="space-y-3">
-                  <div className="bg-[#F8FAFC] border border-[#E8EAEC] rounded-lg p-3 text-xs text-[#687179]">
-                    Chọn dịch vụ ở trên để nhập đơn giá cho từng kỳ.
+            {/* Warning banner with 'Điều chỉnh ngay' when active tab doesn't match group's cycle setup */}
+            {activeTariffTab !== groupCycleType ? (
+              <div className="p-5 bg-amber-50/90 border border-amber-200 rounded-xl space-y-3 animate-in fade-in duration-150">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center shrink-0 text-amber-600 mt-0.5">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1 space-y-1">
+                    <div className="text-xs font-bold text-amber-900">
+                      Chưa thiết lập hình thức {activeTariffTab === 'YEARLY' ? 'Học phí theo năm' : 'Học phí theo tháng'}
+                    </div>
+                    <p className="text-xs text-amber-800 leading-relaxed">
+                      Nhóm trường <strong>{group?.name || group?.code}</strong> đang được thiết lập chu kỳ <strong>{groupCycleType === 'YEARLY' ? '1. Đối soát theo năm' : '2. Đối soát theo kỳ'}</strong> tại mục <em>"Lịch kỳ đối soát & Năm sử dụng dịch vụ"</em>.
+                    </p>
+                    <p className="text-[11px] text-amber-700">
+                      Để nhập biểu phí theo <strong>{activeTariffTab === 'YEARLY' ? 'năm' : 'tháng'}</strong> cho các chi nhánh, vui lòng điều chỉnh lại thiết lập chu kỳ của nhóm trường.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-amber-200/60 flex items-center justify-end">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (onOpenGroupConfig) {
+                        onOpenGroupConfig(group);
+                      }
+                    }}
+                    className="px-3.5 py-1.5 bg-[#0070CE] hover:bg-[#00549B] text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-xs transition cursor-pointer"
+                  >
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                    Điều chỉnh ngay
+                  </button>
+                </div>
+              </div>
+            ) : (
+              /* TAB ACTIVE MATCHING GROUP CYCLE: Show pricing inputs */
+              activeTariffTab === 'YEARLY' ? (
+                /* TAB 1: HỌC PHÍ THEO NĂM */
+                <div>
+                  <div className="mb-2">
+                    <span className="text-xs font-bold text-[#232628]">
+                      Biểu phí trọn gói theo năm
+                    </span>
                   </div>
 
-                  {periods.map((p) => (
-                    <div
-                      key={p.id || p.name}
-                      className="border border-[#E4E7EB] rounded-lg p-3.5 bg-white flex items-center"
-                    >
-                      <span className="text-xs font-bold text-[#232628] mr-3">
-                        {p.name}
-                      </span>
-                      <span className="text-xs text-[#687179]">
-                        Hiệu lực: {p.startDate} – {p.endDate}
-                      </span>
+                  {/* State A: When NO services selected */}
+                  {selectedServices.length === 0 ? (
+                    <div className="space-y-3">
+                      <div className="bg-[#F8FAFC] border border-[#E8EAEC] rounded-lg p-3 text-xs text-[#687179]">
+                        Chọn dịch vụ ở trên để nhập đơn giá trọn năm học.
+                      </div>
+                      <div className="border border-[#E4E7EB] rounded-lg p-3.5 bg-white flex items-center">
+                        <span className="text-xs font-bold text-[#232628] mr-3">
+                          Năm học
+                        </span>
+                        <span className="text-xs text-[#687179]">
+                          Hiệu lực: {serviceYearText}
+                        </span>
+                      </div>
                     </div>
-                  ))}
+                  ) : (
+                    /* State B: When services are selected */
+                    <div className="border border-[#E4E7EB] rounded-lg p-4 bg-[#FCFCFD] space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-[#232628]">
+                          Đơn giá cả năm học
+                        </span>
+                        <span className="text-xs text-[#687179]">
+                          Hiệu lực: {serviceYearText}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        {selectedServices.map((srv) => (
+                          <div key={srv.id}>
+                            <label className="block text-xs font-semibold text-[#232628] mb-1.5">
+                              <span className="text-red-500 mr-0.5">*</span>{srv.name}
+                            </label>
+                            <div className="relative">
+                              <input
+                                type="text"
+                                inputMode="numeric"
+                                value={formatTariffDisplay(formData.yearlyTariffs?.[srv.id])}
+                                onChange={(e) =>
+                                  handleYearlyTariffInputChange(srv.id, e.target.value)
+                                }
+                                placeholder="120.000"
+                                className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg pr-32 text-left font-medium text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#0070CE] focus:border-[#0070CE]"
+                              />
+                              <span className="absolute right-3 top-2 text-xs text-gray-400 pointer-events-none">
+                                đ/học sinh/ năm
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : (
-                /* State B: When services are selected - Editable price inputs per period */
-                <div className="space-y-3">
-                  {periods.map((p) => {
-                    const periodKey = p.name || p.id;
-                    const periodTariff = formData.tariffs[periodKey] || {};
-                    return (
-                      <div
-                        key={periodKey}
-                        className="border border-[#E4E7EB] rounded-lg p-4 bg-[#FCFCFD] space-y-3"
-                      >
-                        <div className="flex items-center">
-                          <span className="text-xs font-bold text-[#232628]">
+                /* TAB 2: HỌC PHÍ THEO THÁNG */
+                <div>
+                  <div className="mb-2">
+                    <span className="text-xs font-bold text-[#232628]">
+                      Biểu phí theo lịch nhóm trường
+                    </span>
+                  </div>
+
+                  {/* State A: When NO services selected - Gray notice + empty cards */}
+                  {selectedServices.length === 0 ? (
+                    <div className="space-y-3">
+                      <div className="bg-[#F8FAFC] border border-[#E8EAEC] rounded-lg p-3 text-xs text-[#687179]">
+                        Chọn dịch vụ ở trên để nhập đơn giá cho từng kỳ.
+                      </div>
+
+                      {periods.map((p) => (
+                        <div
+                          key={p.id || p.name}
+                          className="border border-[#E4E7EB] rounded-lg p-3.5 bg-white flex items-center"
+                        >
+                          <span className="text-xs font-bold text-[#232628] mr-3">
                             {p.name}
                           </span>
-                          <span className="text-xs text-[#687179] ml-3">
+                          <span className="text-xs text-[#687179]">
                             Hiệu lực: {p.startDate} – {p.endDate}
                           </span>
                         </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                          {selectedServices.map((srv) => (
-                            <div key={srv.id}>
-                              <label className="block text-xs font-semibold text-[#232628] mb-1.5">
-                                <span className="text-red-500 mr-0.5">*</span>{srv.name}
-                              </label>
-                              <div className="relative">
-                                <input
-                                  type="text"
-                                  inputMode="numeric"
-                                  value={formatTariffDisplay(periodTariff[srv.id])}
-                                  onChange={(e) =>
-                                    handleTariffInputChange(periodKey, srv.id, e.target.value)
-                                  }
-                                  placeholder="10.000"
-                                  className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg pr-7 text-left font-medium text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#0070CE] focus:border-[#0070CE]"
-                                />
-                                <span className="absolute right-3 top-2 text-xs text-gray-400 pointer-events-none">
-                                  đ
-                                </span>
-                              </div>
+                      ))}
+                    </div>
+                  ) : (
+                    /* State B: When services are selected - Editable price inputs per period */
+                    <div className="space-y-3">
+                      {periods.map((p) => {
+                        const periodKey = p.name || p.id;
+                        const periodTariff = formData.tariffs[periodKey] || {};
+                        return (
+                          <div
+                            key={periodKey}
+                            className="border border-[#E4E7EB] rounded-lg p-4 bg-[#FCFCFD] space-y-3"
+                          >
+                            <div className="flex items-center">
+                              <span className="text-xs font-bold text-[#232628]">
+                                {p.name}
+                              </span>
+                              <span className="text-xs text-[#687179] ml-3">
+                                Hiệu lực: {p.startDate} – {p.endDate}
+                              </span>
                             </div>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
+
+                            <div className="grid grid-cols-2 gap-4">
+                              {selectedServices.map((srv) => (
+                                <div key={srv.id}>
+                                  <label className="block text-xs font-semibold text-[#232628] mb-1.5">
+                                    <span className="text-red-500 mr-0.5">*</span>{srv.name}
+                                  </label>
+                                  <div className="relative">
+                                    <input
+                                      type="text"
+                                      inputMode="numeric"
+                                      value={formatTariffDisplay(periodTariff[srv.id])}
+                                      onChange={(e) =>
+                                        handleTariffInputChange(periodKey, srv.id, e.target.value)
+                                      }
+                                      placeholder="10.000"
+                                      className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg pr-32 text-left font-medium text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#0070CE] focus:border-[#0070CE]"
+                                    />
+                                    <span className="absolute right-3 top-2 text-xs text-gray-400 pointer-events-none">
+                                      đ/học sinh/ tháng
+                                    </span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+              )
+            )}
           </div>
 
           {/* Sticky Actions Footer */}

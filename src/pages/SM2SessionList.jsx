@@ -6,8 +6,10 @@ import {
   SESSION_STATUS,
   SESSION_STATUS_CONFIG,
   ARREARS_STATUS,
+  SETTLEMENT_SCOPE_LABELS,
 } from '../data/models.js';
 import CreateSessionModal from '../components/sm2/CreateSessionModal.jsx';
+import { FileDown, Plus } from 'lucide-react';
 
 export function SM2SessionList({ onSelectSession }) {
   const { sessions, groups } = usePortal();
@@ -26,6 +28,70 @@ export function SM2SessionList({ onSelectSession }) {
     setFilterGroupId('ALL');
     setFilterStatus('ALL');
     setFilterArrears('ALL');
+  };
+
+  const handleExportSessionsHistory = () => {
+    const headers = [
+      'STT',
+      'Mã phiên đối soát',
+      'Mã nhóm trường',
+      'Tên nhóm trường',
+      'Đơn vị đối soát',
+      'Kỳ đối soát',
+      'Ngày chốt số liệu',
+      'Số lượng HS active',
+      'Phí kỳ này (VND)',
+      'Phí truy thu (VND)',
+      'Tổng phải thu (VND)',
+      'Trạng thái phiên',
+      'Trạng thái truy thu',
+      'Ngày tạo',
+      'Email đã gửi',
+      'Ngày gửi email',
+      'Ngày thanh toán',
+      'Mã giao dịch / UNC',
+      'Ghi chú'
+    ];
+
+    const rows = filteredSessions.map((s, idx) => {
+      const statusConf = SESSION_STATUS_CONFIG[s.status] || SESSION_STATUS_CONFIG.DRAFT;
+      const emailSentTo = (s.emailDetails?.to || []).join('; ');
+      const emailSentAt = s.emailDetails?.sentAt ? formatDate(s.emailDetails.sentAt) : '--';
+      const paidDate = s.paymentDetails?.paymentDate ? formatDate(s.paymentDetails.paymentDate) : '--';
+      const refCode = s.paymentDetails?.referenceCode || '--';
+      const notes = s.paymentDetails?.notes || s.reason || '';
+
+      return [
+        idx + 1,
+        `"${s.sessionCode}"`,
+        `"${s.groupCode}"`,
+        `"${s.groupName}"`,
+        `"${SETTLEMENT_SCOPE_LABELS[s.settlementScope] || s.settlementScope}"`,
+        `"${s.periodName}"`,
+        `"${formatDate(s.cutOffDate)}"`,
+        s.totalActiveStudents,
+        s.periodFee,
+        s.arrearsFee || 0,
+        s.totalFee,
+        `"${statusConf.label}"`,
+        `"${s.arrearsStatus === ARREARS_STATUS.HAS_ARREARS ? 'Đã có truy thu' : 'Bình thường'}"`,
+        `"${formatDate(s.createdAt)}"`,
+        `"${emailSentTo}"`,
+        `"${emailSentAt}"`,
+        `"${paidDate}"`,
+        `"${refCode}"`,
+        `"${notes.replace(/"/g, '""')}"`
+      ];
+    });
+
+    const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `Lich_su_phien_doi_soat_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   // Filter logic
@@ -241,16 +307,24 @@ export function SM2SessionList({ onSelectSession }) {
             </span>
           </div>
 
-          <button
-            onClick={() => setCreateModalOpen(true)}
-            className="px-4 py-2 text-xs font-semibold text-white bg-[#0070CE] hover:bg-[#00549B] rounded-lg flex items-center gap-1.5 shadow-sm transition"
-          >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-            Tạo phiên đối soát
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleExportSessionsHistory}
+              className="px-3.5 py-2 text-xs font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg flex items-center gap-1.5 shadow-2xs transition"
+              title="Xuất danh sách phiên đối soát ra file CSV"
+            >
+              <FileDown className="w-4 h-4 text-gray-500" />
+              <span>Xuất Excel / CSV</span>
+            </button>
+
+            <button
+              onClick={() => setCreateModalOpen(true)}
+              className="px-4 py-2 text-xs font-semibold text-white bg-[#0070CE] hover:bg-[#00549B] rounded-lg flex items-center gap-1.5 shadow-sm transition"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Tạo phiên đối soát</span>
+            </button>
+          </div>
         </div>
 
         {/* Table */}

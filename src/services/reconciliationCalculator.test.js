@@ -9,6 +9,9 @@ import {
   validateZeroFeeGuard,
   createSessionSnapshot,
   generatePeriodSchedule,
+  calculateArrearsImmediateModeA,
+  calculateArrearsRetroactiveModeB,
+  calculateCycleTariff,
 } from './reconciliationCalculator.js';
 
 import {
@@ -199,6 +202,97 @@ test('generatePeriodSchedule divides school year into N periods correctly', () =
   assert.equal(periods[0].isFeeCollected, true);
 });
 
+test('calculateArrearsImmediateModeA computes month T+1 settlement correctly', () => {
+  // Term of 5 months, fee 50.000đ/term, student active with 3 remaining months
+  const feeTerm = calculateArrearsImmediateModeA({
+    serviceFee: 50000,
+    totalCycleMonths: 5,
+    remainingMonths: 3,
+  });
+  // (50000 / 5) * 3 = 30000đ
+  assert.equal(feeTerm, 30000);
+
+  // Year of 10 months, fee 100.000đ/year, student active with 4 remaining months
+  const feeYear = calculateArrearsImmediateModeA({
+    serviceFee: 100000,
+    totalCycleMonths: 10,
+    remainingMonths: 4,
+  });
+  // (100000 / 10) * 4 = 40000đ
+  assert.equal(feeYear, 40000);
+});
+
+test('calculateArrearsRetroactiveModeB evaluates usage threshold correctly', () => {
+  // Case 1: Student used service >= 1 month in prior period -> Arrears charged
+  const resultCharged = calculateArrearsRetroactiveModeB({
+    serviceFee: 50000,
+    totalCycleMonths: 5,
+    priorUsageMonths: 2,
+    minActiveMonths: 1,
+  });
+  assert.equal(resultCharged.isArrearsCharged, true);
+  assert.equal(resultCharged.arrearsFeePerStudent, 20000); // (50000 / 5) * 2 = 20000đ
+  assert.equal(resultCharged.includeInNextPeriod, true);
+
+  // Case 2: Student used service < 1 month (0 months) in prior period -> No arrears, but included in next period base
+  const resultNotCharged = calculateArrearsRetroactiveModeB({
+    serviceFee: 50000,
+    totalCycleMonths: 5,
+    priorUsageMonths: 0,
+    minActiveMonths: 1,
+  });
+  assert.equal(resultNotCharged.isArrearsCharged, false);
+  assert.equal(resultNotCharged.arrearsFeePerStudent, 0); // 0đ
+  assert.equal(resultNotCharged.includeInNextPeriod, true);
+});
+
+test('calculateCycleTariff computes fees for month, term, and year cycles correctly', () => {
+  // 1. By Month: 100 students x 10.000 VNĐ/tháng
+  const monthFee = calculateCycleTariff({
+    activeStudents: 100,
+    unitPrice: 10000,
+    pricingUnit: 'PER_MONTH',
+    cycleMonths: 1,
+  });
+  assert.equal(monthFee, 1000000);
+
+  // 2. By Term TH1: 100 students x 10.000 VNĐ/tháng x 5 tháng
+  const termMonthlyFee = calculateCycleTariff({
+    activeStudents: 100,
+    unitPrice: 10000,
+    pricingUnit: 'PER_MONTH',
+    cycleMonths: 5,
+  });
+  assert.equal(termMonthlyFee, 5000000);
+
+  // 3. By Term TH2: 100 students x 50.000 VNĐ/kỳ
+  const termFlatFee = calculateCycleTariff({
+    activeStudents: 100,
+    unitPrice: 50000,
+    pricingUnit: 'PER_PERIOD',
+    cycleMonths: 5,
+  });
+  assert.equal(termFlatFee, 5000000);
+
+  // 4. By Year TH1: 100 students x 10.000 VNĐ/tháng x 10 tháng
+  const yearMonthlyFee = calculateCycleTariff({
+    activeStudents: 100,
+    unitPrice: 10000,
+    pricingUnit: 'PER_MONTH',
+    cycleMonths: 10,
+  });
+  assert.equal(yearMonthlyFee, 10000000);
+
+  // 5. By Year TH2: 100 students x 100.000 VNĐ/năm
+  const yearFlatFee = calculateCycleTariff({
+    activeStudents: 100,
+    unitPrice: 100000,
+    pricingUnit: 'PER_YEAR',
+    cycleMonths: 10,
+  });
+  assert.equal(yearFlatFee, 10000000);
+});
+
 test('transitionSessionState enforces state machine and role permissions', () => {
   const draftSession = {
     id: 'REC-001',
@@ -236,3 +330,4 @@ test('transitionSessionState enforces state machine and role permissions', () =>
   const unauthorizedRes = transitionSessionState(submitRes.updatedSession, 'APPROVE', USER_ROLES.FINANCE_OFFICER);
   assert.equal(unauthorizedRes.success, false);
 });
+

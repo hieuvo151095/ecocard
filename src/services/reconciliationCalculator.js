@@ -90,7 +90,7 @@ export function calculateBranchFees(
   includeArrears = false,
   previousArrearsAmount = 0
 ) {
-  const periodTariffs = tariffs[periodId] || {};
+  const periodTariffs = tariffs[periodId] || tariffs['YEARLY'] || tariffs['Năm học'] || branch?.yearlyTariffs || {};
   const activeServices = branch.services || {};
 
   const serviceBreakdown = RECONCILIATION_SERVICES.map((srv) => {
@@ -244,3 +244,81 @@ export function generatePeriodSchedule(startDateString, endDateString, numberOfP
 
   return periods;
 }
+
+/**
+ * Mode A: Thu liền sau kỳ đối soát (vào tháng T+1)
+ * Phí dịch vụ cần thu/user = (Phí dịch vụ / số tháng của kỳ hoặc năm) x Số tháng sử dụng còn lại
+ * @param {Object} params
+ * @param {number} params.serviceFee - Tổng phí dịch vụ kỳ hoặc năm
+ * @param {number} params.totalCycleMonths - Tổng số tháng của kỳ hoặc năm (ví dụ 5 tháng, 9 tháng, 12 tháng)
+ * @param {number} params.remainingMonths - Số tháng sử dụng còn lại trong kỳ/năm
+ * @returns {number} Fee to collect in month T+1
+ */
+export function calculateArrearsImmediateModeA({ serviceFee = 0, totalCycleMonths = 1, remainingMonths = 1 }) {
+  if (totalCycleMonths <= 0 || remainingMonths <= 0 || serviceFee <= 0) return 0;
+  const monthlyRate = serviceFee / totalCycleMonths;
+  return Math.round(monthlyRate * remainingMonths);
+}
+
+/**
+ * Mode B: Truy thu ngược vào đợt đối soát tiếp theo (Roll-forward settlement)
+ * - Nếu thời gian sử dụng trong kỳ trước >= n tháng (minActiveMonths):
+ *   Phí truy thu/học sinh = (Phí dịch vụ / số tháng của kỳ hoặc năm) x Số tháng sử dụng thực tế kỳ trước
+ * - Nếu thời gian sử dụng trong kỳ trước < n tháng:
+ *   Phí truy thu = 0đ (không truy thu kỳ trước, nhưng tính vào danh sách học sinh active kỳ tiếp theo)
+ * @param {Object} params
+ * @param {number} params.serviceFee - Tổng phí dịch vụ kỳ hoặc năm
+ * @param {number} params.totalCycleMonths - Tổng số tháng của kỳ hoặc năm
+ * @param {number} params.priorUsageMonths - Số tháng học sinh đã sử dụng thực tế trong kỳ trước
+ * @param {number} params.minActiveMonths - Ngưỡng tối thiểu để tính phí truy thu (mặc định 1)
+ * @returns {Object} { isArrearsCharged: boolean, arrearsFeePerStudent: number, includeInNextPeriod: boolean }
+ */
+export function calculateArrearsRetroactiveModeB({
+  serviceFee = 0,
+  totalCycleMonths = 1,
+  priorUsageMonths = 0,
+  minActiveMonths = 1,
+}) {
+  const isArrearsCharged = priorUsageMonths >= Number(minActiveMonths);
+  let arrearsFeePerStudent = 0;
+
+  if (isArrearsCharged && totalCycleMonths > 0 && serviceFee > 0) {
+    const monthlyRate = serviceFee / totalCycleMonths;
+    arrearsFeePerStudent = Math.round(monthlyRate * priorUsageMonths);
+  }
+
+  return {
+    isArrearsCharged,
+    arrearsFeePerStudent,
+    includeInNextPeriod: true, // Always included in the next cycle's active base
+  };
+}
+
+/**
+ * Calculates reconciliation cycle fee based on pricing unit
+ * Supports:
+ * - By Term: user active x VNĐ/tháng x số tháng của kỳ OR user active x VNĐ/kỳ
+ * - By Month: user active x VNĐ/tháng
+ * - By Year: user active x VNĐ/tháng x số tháng năm OR user active x VNĐ/năm
+ * @param {Object} params
+ * @param {number} params.activeStudents
+ * @param {number} params.unitPrice - Unit price amount
+ * @param {string} params.pricingUnit - 'PER_MONTH' | 'PER_PERIOD' | 'PER_YEAR'
+ * @param {number} params.cycleMonths - Number of months in the cycle (e.g. 5 for term, 1 for month, 12 for year)
+ * @returns {number} calculated total fee
+ */
+export function calculateCycleTariff({
+  activeStudents = 0,
+  unitPrice = 0,
+  pricingUnit = 'PER_MONTH',
+  cycleMonths = 1,
+}) {
+  if (activeStudents <= 0 || unitPrice <= 0) return 0;
+
+  if (pricingUnit === 'PER_MONTH') {
+    return Math.round(activeStudents * unitPrice * (cycleMonths > 0 ? cycleMonths : 1));
+  }
+  // If PER_PERIOD or PER_YEAR, unitPrice is already the flat rate per student for the entire cycle
+  return Math.round(activeStudents * unitPrice);
+}
+

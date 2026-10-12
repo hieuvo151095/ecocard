@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { usePortal } from '../context/PortalContext.jsx';
 import {
   formatVND,
@@ -7,8 +7,9 @@ import {
   SETTLEMENT_SCOPE_LABELS,
   USER_ROLES,
 } from '../data/models.js';
-import TruyThuModal from '../components/sm2/TruyThuModal.jsx';
 import StudentListModal from '../components/sm2/StudentListModal.jsx';
+import SendEmailModal from '../components/sm2/SendEmailModal.jsx';
+import ConfirmPaymentModal from '../components/sm2/ConfirmPaymentModal.jsx';
 import { getBranchStudentList } from '../services/studentDataGenerator.js';
 import {
   ArrowLeft,
@@ -23,6 +24,9 @@ import {
   Lock,
   Plus,
   Minus,
+  Mail,
+  CreditCard,
+  CheckCircle2,
 } from 'lucide-react';
 
 export function SM2SessionDetail({ sessionId, onBack }) {
@@ -30,7 +34,9 @@ export function SM2SessionDetail({ sessionId, onBack }) {
   const session = sessions.find((s) => s.id === sessionId);
 
   const [activeTab, setActiveTab] = useState('FEES'); // 'FEES' | 'SNAPSHOT'
-  const [truyThuModalOpen, setTruyThuModalOpen] = useState(false);
+  const [sendEmailModalOpen, setSendEmailModalOpen] = useState(false);
+  const [confirmPaymentModalOpen, setConfirmPaymentModalOpen] = useState(false);
+
   const [expandedBranchIds, setExpandedBranchIds] = useState([]);
   const [activeActionBranchId, setActiveActionBranchId] = useState(null);
   const [selectedBranchForStudents, setSelectedBranchForStudents] = useState(null);
@@ -84,6 +90,18 @@ export function SM2SessionDetail({ sessionId, onBack }) {
     setTimeout(() => setCopiedCode(false), 2000);
   };
 
+  const handleSendEmailSuccess = (emailMeta) => {
+    executeSessionTransition(session.id, 'SEND_TO_SCHOOL', {
+      emailDetails: emailMeta,
+    });
+  };
+
+  const handleConfirmPaymentSuccess = (paymentMeta) => {
+    executeSessionTransition(session.id, 'CONFIRM_PAYMENT', {
+      paymentDetails: paymentMeta,
+    });
+  };
+
   const handleOpenStudentList = (branch) => {
     const students = getBranchStudentList(branch, session);
     setSelectedBranchForStudents({ ...branch, students });
@@ -104,7 +122,7 @@ export function SM2SessionDetail({ sessionId, onBack }) {
       'Phí kỳ này (VND)',
       'Truy thu (VND)',
       'Kết quả',
-      'Tổng tiền (VND)'
+      'Tổng tiền (VND)',
     ];
     const rows = students.map((s, idx) => [
       idx + 1,
@@ -117,13 +135,18 @@ export function SM2SessionDetail({ sessionId, onBack }) {
       s.periodFee,
       s.arrearsFee || 0,
       `"${s.result || 'Có tính phí'}"`,
-      s.totalFee
+      s.totalFee,
     ]);
-    const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+    const csvContent =
+      'data:text/csv;charset=utf-8,\uFEFF' +
+      [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `Danh_sach_hoc_sinh_${branch.branchCode || 'branch'}_${session.sessionCode}.csv`);
+    link.setAttribute(
+      'download',
+      `Danh_sach_hoc_sinh_${branch.branchCode || 'branch'}_${session.sessionCode}.csv`
+    );
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -143,7 +166,7 @@ export function SM2SessionDetail({ sessionId, onBack }) {
         </button>
       </div>
 
-      {/* 2. Top Card: Thông tin phiên (Pixel-Accurate to Image 1) */}
+      {/* 2. Top Card: Thông tin phiên */}
       <div className="bg-white rounded-xl border border-[#E8EAEC] p-5 shadow-xs space-y-4">
         {/* Top Header inside Card */}
         <div className="flex items-center justify-between">
@@ -160,7 +183,9 @@ export function SM2SessionDetail({ sessionId, onBack }) {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold ${statusConfig.color}`}>
+            <span
+              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold ${statusConfig.color}`}
+            >
               <span className={`w-1.5 h-1.5 rounded-full ${statusConfig.dotColor}`} />
               {statusConfig.label}
             </span>
@@ -180,13 +205,19 @@ export function SM2SessionDetail({ sessionId, onBack }) {
             <div>
               <span className="block text-[11px] text-gray-400 mb-0.5">Mã phiên</span>
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-gray-900 font-mono text-xs">{session.sessionCode}</span>
+                <span className="font-semibold text-gray-900 font-mono text-xs">
+                  {session.sessionCode}
+                </span>
                 <button
                   onClick={() => handleCopyCode(session.sessionCode)}
                   className="text-gray-400 hover:text-gray-600 transition"
                   title="Sao chép mã phiên"
                 >
-                  {copiedCode ? <Check className="w-3.5 h-3.5 text-green-600" /> : <Copy className="w-3.5 h-3.5" />}
+                  {copiedCode ? (
+                    <Check className="w-3.5 h-3.5 text-green-600" />
+                  ) : (
+                    <Copy className="w-3.5 h-3.5" />
+                  )}
                 </button>
               </div>
             </div>
@@ -234,9 +265,41 @@ export function SM2SessionDetail({ sessionId, onBack }) {
             </div>
           </div>
         </div>
+
+        {/* Email Sent / Payment Recorded Audit Banners */}
+        {session.emailDetails && (
+          <div className="p-3 bg-blue-50/70 border border-blue-200 rounded-lg flex items-center justify-between text-xs text-[#003867]">
+            <div className="flex items-center gap-2">
+              <Mail className="w-4 h-4 text-[#0070CE]" />
+              <span>
+                <strong>Đã gửi email biên bản:</strong> {formatDate(session.emailDetails.sentAt)} (Người nhận: {(session.emailDetails.to || []).join(', ')})
+              </span>
+            </div>
+            <button
+              onClick={() => setSendEmailModalOpen(true)}
+              className="text-[#0070CE] font-semibold hover:underline text-[11px]"
+            >
+              Gửi lại email
+            </button>
+          </div>
+        )}
+
+        {session.paymentDetails && (
+          <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center justify-between text-xs text-emerald-900">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <span>
+                <strong>Ghi nhận thanh toán:</strong> {formatVND(session.paymentDetails.amountReceived)} • Mã giao dịch: <span className="font-mono font-bold">{session.paymentDetails.referenceCode}</span> • Ngày nhận: {formatDate(session.paymentDetails.paymentDate)}
+              </span>
+            </div>
+            <span className="px-2 py-0.5 rounded bg-white text-emerald-800 font-bold text-[10px] border border-emerald-300">
+              ĐÃ KHỚP SỔ CÁI
+            </span>
+          </div>
+        )}
       </div>
 
-      {/* 3. 4 KPI Counter Cards (Exact Match to Image 1) */}
+      {/* 3. 4 KPI Counter Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Học sinh tính phí */}
         <div className="bg-white rounded-xl border border-[#E8EAEC] p-4 shadow-xs">
@@ -254,17 +317,21 @@ export function SM2SessionDetail({ sessionId, onBack }) {
         {/* Card 3: Truy thu kỳ trước */}
         <div className="bg-white rounded-xl border border-[#E8EAEC] p-4 shadow-xs">
           <span className="text-xs text-gray-500 font-medium">Truy thu kỳ trước</span>
-          <div className="text-2xl font-bold text-red-600 mt-1">{formatVND(session.arrearsFee || 0)}</div>
+          <div className="text-2xl font-bold text-red-600 mt-1">
+            {formatVND(session.arrearsFee || 0)}
+          </div>
         </div>
 
         {/* Card 4: Tổng phải thu */}
         <div className="bg-white rounded-xl border border-[#E8EAEC] p-4 shadow-xs">
           <span className="text-xs text-gray-500 font-medium">Tổng phải thu</span>
-          <div className="text-2xl font-bold text-[#0070CE] mt-1">{formatVND(session.totalFee)}</div>
+          <div className="text-2xl font-bold text-[#0070CE] mt-1">
+            {formatVND(session.totalFee)}
+          </div>
         </div>
       </div>
 
-      {/* 4. Tabs Row with Actions on the Right (Pixel-Accurate to Image 1) */}
+      {/* 4. Tabs Row with Actions on the Right */}
       <div className="flex flex-wrap items-center justify-between border-b border-gray-200 bg-white px-6 pt-3 rounded-t-xl shadow-xs gap-4">
         {/* Left: Tab Selectors */}
         <div className="flex items-center gap-6">
@@ -343,10 +410,11 @@ export function SM2SessionDetail({ sessionId, onBack }) {
           {session.status === 'APPROVED' && (
             <>
               <button
-                onClick={() => handleAction('SEND_TO_SCHOOL')}
-                className="px-4 py-1.5 text-xs font-bold text-white bg-[#1A94FF] hover:bg-blue-600 rounded-lg shadow-sm transition"
+                onClick={() => setSendEmailModalOpen(true)}
+                className="px-4 py-1.5 text-xs font-bold text-white bg-[#1A94FF] hover:bg-blue-600 rounded-lg shadow-sm transition flex items-center gap-1.5"
               >
-                Gửi biên bản
+                <Mail className="w-3.5 h-3.5" />
+                <span>Gửi email cho trường</span>
               </button>
               <button
                 onClick={handleDownload}
@@ -360,10 +428,18 @@ export function SM2SessionDetail({ sessionId, onBack }) {
           {session.status === 'SENT_TO_SCHOOL' && (
             <>
               <button
-                onClick={() => handleAction('CONFIRM_PAYMENT')}
-                className="px-4 py-1.5 text-xs font-bold text-white bg-[#00AB56] hover:bg-emerald-700 rounded-lg shadow-sm transition"
+                onClick={() => setConfirmPaymentModalOpen(true)}
+                className="px-4 py-1.5 text-xs font-bold text-white bg-[#00AB56] hover:bg-emerald-700 rounded-lg shadow-sm transition flex items-center gap-1.5"
               >
-                Xác nhận thanh toán
+                <CreditCard className="w-3.5 h-3.5" />
+                <span>Xác nhận thanh toán</span>
+              </button>
+              <button
+                onClick={() => setSendEmailModalOpen(true)}
+                className="px-3 py-1.5 text-xs font-semibold text-blue-700 border border-blue-200 hover:bg-blue-50 rounded-lg transition flex items-center gap-1"
+              >
+                <Mail className="w-3 h-3 text-[#0070CE]" />
+                <span>Gửi lại email</span>
               </button>
               <button
                 onClick={handleDownload}
@@ -376,14 +452,6 @@ export function SM2SessionDetail({ sessionId, onBack }) {
 
           {session.status === 'PAID' && (
             <>
-              {!session.isArrears && (
-                <button
-                  onClick={() => setTruyThuModalOpen(true)}
-                  className="px-3.5 py-1.5 text-xs font-bold text-amber-900 bg-[#FFC700] hover:bg-amber-400 rounded-lg shadow-sm transition"
-                >
-                  + Tạo phiên truy thu
-                </button>
-              )}
               <button
                 onClick={handleDownload}
                 className="px-3 py-1.5 text-xs font-semibold text-gray-700 border hover:bg-gray-50 rounded-lg transition"
@@ -401,7 +469,7 @@ export function SM2SessionDetail({ sessionId, onBack }) {
         </div>
       </div>
 
-      {/* 5. TAB 1: CHI TIẾT PHÍ (With Dropdown Action & Student Pop-up Trigger) */}
+      {/* 5. TAB 1: CHI TIẾT PHÍ */}
       {activeTab === 'FEES' && (
         <div className="bg-white rounded-b-xl border border-t-0 border-[#E8EAEC] p-6 shadow-sm space-y-6">
           <div className="border border-gray-200 rounded-xl overflow-visible shadow-2xs">
@@ -411,10 +479,14 @@ export function SM2SessionDetail({ sessionId, onBack }) {
                   <th className="py-3 px-3 w-8 text-center"></th>
                   <th className="py-3 px-4 font-semibold min-w-[140px]">Mã phiên</th>
                   <th className="py-3 px-4 font-semibold min-w-[200px]">Tên đơn vị</th>
-                  <th className="py-3 px-4 text-center font-semibold min-w-[120px]">Học sinh tính phí</th>
+                  <th className="py-3 px-4 text-center font-semibold min-w-[120px]">
+                    Học sinh tính phí
+                  </th>
                   <th className="py-3 px-4 text-right font-semibold min-w-[110px]">Phí kỳ này</th>
                   <th className="py-3 px-4 text-right font-semibold min-w-[100px]">Truy thu</th>
-                  <th className="py-3 px-4 text-right font-semibold min-w-[110px]">Tổng phải thu</th>
+                  <th className="py-3 px-4 text-right font-semibold min-w-[110px]">
+                    Tổng phải thu
+                  </th>
                   <th className="py-3 px-4 text-center font-semibold w-24">Thao tác</th>
                 </tr>
               </thead>
@@ -431,7 +503,11 @@ export function SM2SessionDetail({ sessionId, onBack }) {
                             onClick={() => toggleExpandBranch(b.branchId)}
                             className="w-5 h-5 rounded border border-gray-300 hover:border-[#0070CE] hover:text-[#0070CE] flex items-center justify-center text-xs font-bold transition bg-white"
                           >
-                            {isExpanded ? <Minus className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
+                            {isExpanded ? (
+                              <Minus className="w-3 h-3" />
+                            ) : (
+                              <Plus className="w-3 h-3" />
+                            )}
                           </button>
                         </td>
 
@@ -439,9 +515,7 @@ export function SM2SessionDetail({ sessionId, onBack }) {
                           <div className="font-semibold text-[#0070CE] cursor-pointer hover:underline">
                             {b.sessionCode || session.sessionCode}
                           </div>
-                          <div className="text-[11px] text-gray-400 mt-0.5">
-                            1 chi nhánh
-                          </div>
+                          <div className="text-[11px] text-gray-400 mt-0.5">1 chi nhánh</div>
                         </td>
 
                         <td className="py-3 px-4">
@@ -470,22 +544,22 @@ export function SM2SessionDetail({ sessionId, onBack }) {
                         <td className="py-3 px-4 text-center relative">
                           <button
                             data-testid="branch-more-btn"
-                            onClick={() => setActiveActionBranchId(isMenuOpen ? null : b.branchId)}
+                            onClick={() =>
+                              setActiveActionBranchId(isMenuOpen ? null : b.branchId)
+                            }
                             className="w-7 h-7 rounded border border-gray-300 hover:border-gray-400 hover:bg-gray-50 flex items-center justify-center text-gray-600 mx-auto transition"
                           >
                             <MoreHorizontal className="w-4 h-4" />
                           </button>
 
-                          {/* Dropdown Action Menu (Exact match to Image 1) */}
+                          {/* Dropdown Action Menu */}
                           {isMenuOpen && (
                             <>
                               <div
                                 className="fixed inset-0 z-20 cursor-default"
                                 onClick={() => setActiveActionBranchId(null)}
                               />
-                              <div
-                                className="absolute right-4 top-10 z-30 w-36 bg-white rounded-lg shadow-xl border border-gray-200 py-1 text-left text-xs animate-in fade-in zoom-in-95 duration-100"
-                              >
+                              <div className="absolute right-4 top-10 z-30 w-36 bg-white rounded-lg shadow-xl border border-gray-200 py-1 text-left text-xs animate-in fade-in zoom-in-95 duration-100">
                                 <button
                                   data-testid="view-student-list-btn"
                                   onClick={() => handleOpenStudentList(b)}
@@ -529,8 +603,13 @@ export function SM2SessionDetail({ sessionId, onBack }) {
                                   </thead>
                                   <tbody className="divide-y divide-gray-100">
                                     {(b.serviceBreakdown || []).map((srv) => (
-                                      <tr key={srv.serviceId} className={srv.isEnabled ? '' : 'opacity-40'}>
-                                        <td className="py-2 px-3 font-medium text-gray-800">{srv.serviceName}</td>
+                                      <tr
+                                        key={srv.serviceId}
+                                        className={srv.isEnabled ? '' : 'opacity-40'}
+                                      >
+                                        <td className="py-2 px-3 font-medium text-gray-800">
+                                          {srv.serviceName}
+                                        </td>
                                         <td className="py-2 px-3 text-center">
                                           {srv.isEnabled ? (
                                             <span className="px-1.5 py-0.5 rounded text-[10px] bg-green-50 text-green-700 font-semibold">
@@ -542,8 +621,12 @@ export function SM2SessionDetail({ sessionId, onBack }) {
                                             </span>
                                           )}
                                         </td>
-                                        <td className="py-2 px-3 text-center">{srv.activeStudents}</td>
-                                        <td className="py-2 px-3 text-right">{formatVND(srv.unitPrice)}</td>
+                                        <td className="py-2 px-3 text-center">
+                                          {srv.activeStudents}
+                                        </td>
+                                        <td className="py-2 px-3 text-right">
+                                          {formatVND(srv.unitPrice)}
+                                        </td>
                                         <td className="py-2 px-3 text-right font-semibold text-gray-900">
                                           {formatVND(srv.totalFee)}
                                         </td>
@@ -610,7 +693,7 @@ export function SM2SessionDetail({ sessionId, onBack }) {
         </div>
       )}
 
-      {/* 7. Modal Pop-up "Danh sách học sinh" (Image 2) */}
+      {/* 7. Modal Pop-up "Danh sách học sinh" */}
       <StudentListModal
         isOpen={isStudentModalOpen}
         onClose={() => setIsStudentModalOpen(false)}
@@ -618,11 +701,20 @@ export function SM2SessionDetail({ sessionId, onBack }) {
         sessionData={session}
       />
 
-      {/* 8. Modal Tạo phiên truy thu (BR07) */}
-      <TruyThuModal
-        isOpen={truyThuModalOpen}
-        onClose={() => setTruyThuModalOpen(false)}
-        parentSession={session}
+      {/* 8. Modal Gửi Email cho Nhà trường */}
+      <SendEmailModal
+        isOpen={sendEmailModalOpen}
+        onClose={() => setSendEmailModalOpen(false)}
+        session={session}
+        onSendSuccess={handleSendEmailSuccess}
+      />
+
+      {/* 10. Modal Ghi nhận thanh toán Finviet */}
+      <ConfirmPaymentModal
+        isOpen={confirmPaymentModalOpen}
+        onClose={() => setConfirmPaymentModalOpen(false)}
+        session={session}
+        onConfirmSuccess={handleConfirmPaymentSuccess}
       />
     </div>
   );

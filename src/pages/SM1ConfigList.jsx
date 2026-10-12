@@ -3,6 +3,7 @@ import { usePortal } from '../context/PortalContext.jsx';
 import { formatDate, SETTLEMENT_SCOPE_LABELS } from '../data/models.js';
 import GroupDrawer from '../components/sm1/GroupDrawer.jsx';
 import BranchDrawer from '../components/sm1/BranchDrawer.jsx';
+import PasswordDrawer from '../components/sm1/PasswordDrawer.jsx';
 
 export function SM1ConfigList() {
   const {
@@ -19,8 +20,8 @@ export function SM1ConfigList() {
   const [filterBranchQuery, setFilterBranchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('ALL');
 
-  // Expanded Rows State
-  const [expandedGroupIds, setExpandedGroupIds] = useState(['G-HIEUTEST']); // default expanded
+  // Expanded Rows State (All collapsed by default)
+  const [expandedGroupIds, setExpandedGroupIds] = useState([]);
 
   // Drawer States
   const [groupDrawerOpen, setGroupDrawerOpen] = useState(false);
@@ -28,6 +29,10 @@ export function SM1ConfigList() {
 
   const [branchDrawerOpen, setBranchDrawerOpen] = useState(false);
   const [activeBranchContext, setActiveBranchContext] = useState(null); // { group, branch }
+
+  const [passwordDrawerOpen, setPasswordDrawerOpen] = useState(false);
+  const [selectedGroupForPassword, setSelectedGroupForPassword] = useState(null);
+  const [toastMessage, setToastMessage] = useState(null);
 
   // Action Menu Dropdown State
   const [openActionMenuId, setOpenActionMenuId] = useState(null);
@@ -137,9 +142,9 @@ export function SM1ConfigList() {
       </div>
 
       {/* 2. MASTER TABLE CARD */}
-      <div className="bg-white rounded-xl border border-[#E8EAEC] shadow-sm overflow-hidden">
+      <div className="bg-white rounded-xl border border-[#E8EAEC] shadow-sm">
         {/* Table Top Toolbar */}
-        <div className="px-6 py-4 border-b border-[#E8EAEC] flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-[#E8EAEC] flex items-center justify-between rounded-t-xl bg-white">
           <div className="flex items-center gap-2">
             <h2 className="text-sm font-bold text-[#232628]">Danh sách nhóm trường</h2>
             <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#E6F1FB] text-[#0070CE]">
@@ -163,7 +168,7 @@ export function SM1ConfigList() {
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto min-h-[260px]">
           <table className="w-full text-left text-xs">
             <thead className="bg-[#F8FAFC] text-[#687179] font-semibold border-b border-[#E8EAEC]">
               <tr>
@@ -186,9 +191,10 @@ export function SM1ConfigList() {
                   </td>
                 </tr>
               ) : (
-                filteredGroups.map((g) => {
+                filteredGroups.map((g, idx) => {
                   const isExpanded = expandedGroupIds.includes(g.id);
                   const isMenuOpen = openActionMenuId === g.id;
+                  const openUpwards = idx >= Math.max(1, filteredGroups.length - 2);
 
                   return (
                     <React.Fragment key={g.id}>
@@ -269,36 +275,60 @@ export function SM1ConfigList() {
                           </button>
 
                           {isMenuOpen && (
-                            <div className="absolute right-4 top-10 w-44 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20 text-left">
-                              <button
-                                onClick={() => {
-                                  setOpenActionMenuId(null);
-                                  setActiveBranchContext({ group: g, branch: null });
-                                  setBranchDrawerOpen(true);
-                                }}
-                                className="w-full px-3 py-2 text-xs text-gray-700 hover:bg-blue-50 hover:text-[#0070CE] flex items-center gap-2"
+                            <>
+                              <div
+                                className="fixed inset-0 z-30 cursor-default"
+                                onClick={() => setOpenActionMenuId(null)}
+                              />
+                              <div
+                                className={`absolute right-4 ${
+                                  openUpwards ? 'bottom-10 origin-bottom-right' : 'top-10 origin-top-right'
+                                } w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-40 text-left transition-all duration-150 animate-in fade-in`}
                               >
-                                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                  <line x1="12" y1="5" x2="12" y2="19"></line>
-                                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                                </svg>
-                                Thêm chi nhánh
-                              </button>
-                              <button
-                                onClick={() => {
-                                  setOpenActionMenuId(null);
-                                  setEditingGroup(g);
-                                  setGroupDrawerOpen(true);
-                                }}
-                                className="w-full px-3 py-2 text-xs text-gray-700 hover:bg-blue-50 hover:text-[#0070CE] flex items-center gap-2"
-                              >
-                                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                </svg>
-                                Chỉnh sửa nhóm
-                              </button>
-                            </div>
+                                <button
+                                  onClick={() => {
+                                    setOpenActionMenuId(null);
+                                    setActiveBranchContext({ group: g, branch: null });
+                                    setBranchDrawerOpen(true);
+                                  }}
+                                  className="w-full px-3 py-2 text-xs text-gray-700 hover:bg-blue-50 hover:text-[#0070CE] flex items-center gap-2 cursor-pointer"
+                                >
+                                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                  </svg>
+                                  Thêm chi nhánh
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setOpenActionMenuId(null);
+                                    setEditingGroup(g);
+                                    setGroupDrawerOpen(true);
+                                  }}
+                                  className="w-full px-3 py-2 text-xs text-gray-700 hover:bg-blue-50 hover:text-[#0070CE] flex items-center gap-2 cursor-pointer"
+                                >
+                                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                  </svg>
+                                  Chỉnh sửa nhóm
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setOpenActionMenuId(null);
+                                    setSelectedGroupForPassword(g);
+                                    setPasswordDrawerOpen(true);
+                                  }}
+                                  className="w-full px-3 py-2 text-xs text-gray-700 hover:bg-blue-50 hover:text-[#0070CE] flex items-center gap-2 border-t border-gray-100 cursor-pointer"
+                                >
+                                  <svg className="w-3.5 h-3.5 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                  </svg>
+                                  <span>{g.passwordSent ? 'Cập nhật mật khẩu' : 'Gửi mật khẩu'}</span>
+                                </button>
+                              </div>
+                            </>
                           )}
                         </td>
                       </tr>
@@ -449,6 +479,12 @@ export function SM1ConfigList() {
         }}
         group={activeBranchContext?.group}
         branch={activeBranchContext?.branch}
+        onOpenGroupConfig={(groupToEdit) => {
+          setBranchDrawerOpen(false);
+          setActiveBranchContext(null);
+          setEditingGroup(groupToEdit);
+          setGroupDrawerOpen(true);
+        }}
         onSave={(branchData) => {
           if (!activeBranchContext?.group) return;
           const groupId = activeBranchContext.group.id;
@@ -461,6 +497,50 @@ export function SM1ConfigList() {
           }
         }}
       />
+
+      <PasswordDrawer
+        isOpen={passwordDrawerOpen}
+        onClose={() => {
+          setPasswordDrawerOpen(false);
+          setSelectedGroupForPassword(null);
+        }}
+        group={selectedGroupForPassword}
+        onSavePassword={(newPassword) => {
+          if (!selectedGroupForPassword) return;
+          const isUpdate = Boolean(selectedGroupForPassword.passwordSent);
+          updateGroup(selectedGroupForPassword.id, {
+            password: newPassword,
+            passwordSent: true,
+            passwordSentAt: new Date().toISOString(),
+          });
+          setToastMessage(
+            isUpdate
+              ? `Đã cập nhật và gửi mật khẩu file đối soát cho ${selectedGroupForPassword.name} thành công!`
+              : `Đã gửi mật khẩu mở file đối soát cho ${selectedGroupForPassword.name} thành công!`
+          );
+          setTimeout(() => setToastMessage(null), 4000);
+        }}
+      />
+
+      {/* Success Notification Toast */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 z-50 animate-bounceIn">
+          <div className="bg-[#0070CE] text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 border border-white/20 text-xs">
+            <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <span className="font-semibold">{toastMessage}</span>
+            <button
+              onClick={() => setToastMessage(null)}
+              className="ml-2 hover:bg-white/20 rounded p-1 transition"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

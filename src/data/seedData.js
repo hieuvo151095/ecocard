@@ -4,7 +4,7 @@
  */
 
 import { generatePeriodSchedule, createSessionSnapshot } from '../services/reconciliationCalculator.js';
-import { SESSION_STATUS, ARREARS_STATUS, SETTLEMENT_SCOPES } from './models.js';
+import { SESSION_STATUS, ARREARS_STATUS, SETTLEMENT_SCOPES, ARREARS_MODES } from './models.js';
 import { EXACT_AUTO_ECO_STUDENTS } from '../services/studentDataGenerator.js';
 
 export const INITIAL_GROUPS = [
@@ -17,8 +17,10 @@ export const INITIAL_GROUPS = [
     bankAccount: '0071001234567',
     bankAccountName: 'HE THONG TRUONG HIEUTEST',
     settlementScope: SETTLEMENT_SCOPES.GROUP, // Theo nhóm trường
+    arrearsMode: ARREARS_MODES.ROLL_FORWARD, // Option 1: Gồm truy thu ngược đợt sau
     emails: ['finance@hieutest.edu.vn', 'ketoan@hieutest.edu.vn'],
     isActive: true,
+    cycleType: 'PERIODIC',
     serviceYearStart: '2026-09-01',
     serviceYearEnd: '2027-05-31',
     periodsCount: 9,
@@ -77,8 +79,10 @@ export const INITIAL_GROUPS = [
     bankAccount: '088812345678',
     bankAccountName: 'CONG TY GIAO DUC UAT',
     settlementScope: SETTLEMENT_SCOPES.BRANCH, // Theo từng trường
+    arrearsMode: ARREARS_MODES.ROLL_FORWARD, // Option 1: Gồm truy thu ngược đợt sau
     emails: ['uat-accounting@uat.edu.vn'],
     isActive: true,
+    cycleType: 'PERIODIC',
     serviceYearStart: '2026-09-01',
     serviceYearEnd: '2027-05-31',
     periodsCount: 9,
@@ -116,8 +120,10 @@ export const INITIAL_GROUPS = [
     bankAccount: '19033344455566',
     bankAccountName: 'TRUONG LIEN CAP THUAN TEST',
     settlementScope: SETTLEMENT_SCOPES.GROUP,
+    arrearsMode: ARREARS_MODES.IMMEDIATE_T1, // Option 2: Truy thu liền vào tháng tiếp theo
     emails: ['thuantest@gmail.com'],
     isActive: true,
+    cycleType: 'PERIODIC',
     serviceYearStart: '2026-09-01',
     serviceYearEnd: '2027-05-31',
     periodsCount: 9,
@@ -142,6 +148,67 @@ export const INITIAL_GROUPS = [
         },
         tariffs: {
           'Kỳ 1': { managementSoftware: 10000, cameraAi: 0, studentCard: 3000, canteen: 0 },
+        },
+      },
+    ],
+  },
+  {
+    id: 'G-VINASCHOOL',
+    code: 'VINASCHOOL',
+    name: 'Hệ thống Trường Quốc tế VinaSchool',
+    taxCode: '0309991234',
+    bankName: 'BIDV',
+    bankAccount: '1241000123456',
+    bankAccountName: 'HE THONG QUOC TE VINASCHOOL',
+    settlementScope: SETTLEMENT_SCOPES.GROUP,
+    arrearsMode: ARREARS_MODES.ROLL_FORWARD,
+    emails: ['finance@vinaschool.edu.vn'],
+    isActive: true,
+    cycleType: 'YEARLY',
+    serviceYearStart: '2026-09-01',
+    serviceYearEnd: '2027-05-31',
+    periodsCount: 1,
+    thresholds: {
+      minActiveMonths: 1,
+      surplusDayThreshold: 15,
+    },
+    periods: [
+      {
+        id: 'Kỳ 1',
+        name: 'Năm học 2026 - 2027',
+        startDate: '2026-09-01',
+        endDate: '2027-05-31',
+        isFeeCollected: true,
+        hasActiveSession: false,
+      },
+    ],
+    branches: [
+      {
+        id: 'BR-VINA-01',
+        code: 'VINA_01',
+        name: 'Tiểu học VinaSchool Quận 1',
+        studentCount: 150,
+        isActive: true,
+        emails: ['cs1@vinaschool.edu.vn'],
+        services: {
+          managementSoftware: true,
+          cameraAi: true,
+          studentCard: true,
+          canteen: false,
+        },
+        yearlyTariffs: {
+          managementSoftware: 150000,
+          cameraAi: 80000,
+          studentCard: 50000,
+          canteen: 0,
+        },
+        tariffs: {
+          'Năm học 2026 - 2027': {
+            managementSoftware: 150000,
+            cameraAi: 80000,
+            studentCard: 50000,
+            canteen: 0,
+          },
         },
       },
     ],
@@ -397,6 +464,74 @@ export const INITIAL_SESSIONS = [
         serviceBreakdown: [
           { serviceId: 'managementSoftware', serviceName: 'Phần mềm quản lý nhà trường', isEnabled: true, activeStudents: 95, unitPrice: 15000, totalFee: 1425000 },
           { serviceId: 'cameraAi', serviceName: 'Camera AI', isEnabled: true, activeStudents: 95, unitPrice: 8000, totalFee: 760000 },
+        ],
+      },
+    ],
+  },
+  // 4. Roll-Forward session for HIEUTEST Kỳ 3 (Gồm truy thu ngược đợt sau)
+  {
+    id: 'REC-HIEU-KY3-ROLLFORWARD',
+    sessionCode: 'REC-HIEU-KY3-ROLLFORWARD',
+    groupId: groupHieu.id,
+    groupCode: groupHieu.code,
+    groupName: groupHieu.name,
+    settlementScope: groupHieu.settlementScope,
+    periodId: 'Kỳ 3',
+    periodName: 'Kỳ 3 - Tháng 10/2026',
+    periodRange: '01/10/2026 – 31/10/2026',
+    cutOffDate: '2026-10-31',
+    createdAt: '2026-10-25T08:30:00Z',
+    updatedAt: '2026-10-25T08:30:00Z',
+    status: SESSION_STATUS.DRAFT, // Nháp
+    arrearsStatus: ARREARS_STATUS.HAS_ARREARS,
+    arrearsOption: 'ROLL_FORWARD',
+    isReleased: false,
+    isArrears: false,
+    parentSessionId: null,
+    totalActiveStudents: 130,
+    currentPeriodStudents: 130,
+    arrearsStudents: 25,
+    periodFee: 5200000,
+    arrearsFee: 600000,
+    totalFee: 5800000,
+    snapshot: createSessionSnapshot(groupHieu, groupHieu.branches, groupHieu.periods[2] || groupHieu.periods[1], groupHieu.thresholds),
+    branchesSummary: [
+      {
+        branchId: 'BR-HIEUTEST-1',
+        branchCode: 'HIEUTEST_1',
+        branchName: 'Tiểu học Hieutest Cơ sở 1',
+        sessionCode: 'REC-HIEU-BR1-K3',
+        studentCount: 70,
+        activeStudents: 70,
+        currentPeriodStudents: 70,
+        arrearsStudents: 15,
+        arrearsOption: 'ROLL_FORWARD',
+        periodFee: 2800000,
+        arrearsFee: 350000,
+        totalFee: 3150000,
+        serviceBreakdown: [
+          { serviceId: 'managementSoftware', serviceName: 'Phần mềm quản lý nhà trường', isEnabled: true, activeStudents: 70, unitPrice: 15000, totalFee: 1050000 },
+          { serviceId: 'cameraAi', serviceName: 'Camera AI', isEnabled: true, activeStudents: 70, unitPrice: 15000, totalFee: 1050000 },
+          { serviceId: 'studentCard', serviceName: 'Thẻ học sinh', isEnabled: true, activeStudents: 70, unitPrice: 10000, totalFee: 700000 },
+        ],
+      },
+      {
+        branchId: 'BR-HIEUTEST-2',
+        branchCode: 'HIEUTEST_2',
+        branchName: 'THCS Hieutest Cơ sở 2',
+        sessionCode: 'REC-HIEU-BR2-K3',
+        studentCount: 60,
+        activeStudents: 60,
+        currentPeriodStudents: 60,
+        arrearsStudents: 10,
+        arrearsOption: 'ROLL_FORWARD',
+        periodFee: 2400000,
+        arrearsFee: 250000,
+        totalFee: 2650000,
+        serviceBreakdown: [
+          { serviceId: 'managementSoftware', serviceName: 'Phần mềm quản lý nhà trường', isEnabled: true, activeStudents: 60, unitPrice: 15000, totalFee: 900000 },
+          { serviceId: 'cameraAi', serviceName: 'Camera AI', isEnabled: true, activeStudents: 60, unitPrice: 15000, totalFee: 900000 },
+          { serviceId: 'studentCard', serviceName: 'Thẻ học sinh', isEnabled: true, activeStudents: 60, unitPrice: 10000, totalFee: 600000 },
         ],
       },
     ],

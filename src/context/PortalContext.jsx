@@ -6,25 +6,61 @@ import { transitionSessionState } from '../services/sessionLifecycle.js';
 const PortalContext = createContext(null);
 
 const STORAGE_KEYS = {
-  GROUPS: 'eco_portal_groups_v2',
-  SESSIONS: 'eco_portal_sessions_v2',
-  ROLE: 'eco_portal_role_v2',
+  GROUPS: 'eco_portal_groups_v5',
+  SESSIONS: 'eco_portal_sessions_v5',
+  ROLE: 'eco_portal_role_v5',
 };
+
+function sanitizeGroup(g) {
+  const derivedCycleType = g.cycleType || (g.periods && g.periods.length > 1 ? 'PERIODIC' : 'YEARLY');
+  if (derivedCycleType === 'YEARLY' && g.periods && g.periods.length > 1) {
+    return {
+      ...g,
+      cycleType: 'YEARLY',
+      periodsCount: 1,
+      periods: [
+        {
+          id: 'Kỳ 1',
+          name: g.periods[0]?.name || 'Năm học',
+          startDate: g.serviceYearStart || '2026-09-01',
+          endDate: g.serviceYearEnd || '2027-05-31',
+          isFeeCollected: true,
+          hasActiveSession: false,
+        },
+      ],
+    };
+  }
+  return {
+    ...g,
+    cycleType: derivedCycleType,
+  };
+}
 
 export function PortalProvider({ children }) {
   const [groups, setGroups] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.GROUPS);
-      return saved ? JSON.parse(saved) : INITIAL_GROUPS;
+      const raw = saved ? JSON.parse(saved) : INITIAL_GROUPS;
+      return raw.map(sanitizeGroup);
     } catch {
-      return INITIAL_GROUPS;
+      return INITIAL_GROUPS.map(sanitizeGroup);
     }
   });
 
   const [sessions, setSessions] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.SESSIONS);
-      return saved ? JSON.parse(saved) : INITIAL_SESSIONS;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Ensure Kỳ 3 session is always present
+        const hasKy3 = parsed.some(s => s.id === 'REC-HIEU-KY3-ROLLFORWARD');
+        if (!hasKy3) {
+          const ky3Seed = INITIAL_SESSIONS.find(s => s.id === 'REC-HIEU-KY3-ROLLFORWARD');
+          if (ky3Seed) return [ky3Seed, ...parsed];
+        }
+        return parsed;
+      }
+      return INITIAL_SESSIONS;
     } catch {
       return INITIAL_SESSIONS;
     }
@@ -126,14 +162,19 @@ export function PortalProvider({ children }) {
     );
   };
 
-  const executeSessionTransition = (sessionId, actionKey) => {
+  const executeSessionTransition = (sessionId, actionKey, extraPayload = {}) => {
     const session = sessions.find((s) => s.id === sessionId);
     if (!session) return { success: false, error: 'Phiên không tồn tại' };
 
     const result = transitionSessionState(session, actionKey, currentRole);
     if (result.success) {
+      const mergedSession = {
+        ...result.updatedSession,
+        ...extraPayload,
+      };
+
       setSessions((prev) =>
-        prev.map((s) => (s.id === sessionId ? result.updatedSession : s))
+        prev.map((s) => (s.id === sessionId ? mergedSession : s))
       );
 
       // If cancelled, free up period active session status if no other active sessions exist

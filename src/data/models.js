@@ -73,6 +73,16 @@ export const ARREARS_STATUS = {
   HAS_ARREARS: 'HAS_ARREARS', // Đã có truy thu
 };
 
+export const ARREARS_MODES = {
+  ROLL_FORWARD: 'ROLL_FORWARD', // Gồm truy thu ngược đợt sau
+  IMMEDIATE_T1: 'IMMEDIATE_T1', // Truy thu liền vào tháng tiếp theo
+};
+
+export const ARREARS_MODE_LABELS = {
+  [ARREARS_MODES.ROLL_FORWARD]: 'Gồm truy thu ngược đợt sau',
+  [ARREARS_MODES.IMMEDIATE_T1]: 'Truy thu liền vào tháng tiếp theo',
+};
+
 export const USER_ROLES = {
   OPS_ADMIN: 'OPS_ADMIN', // Quản trị viên Vận hành
   FINANCE_OFFICER: 'FINANCE_OFFICER', // Nhân viên Tài chính

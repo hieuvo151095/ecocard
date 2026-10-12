@@ -19,20 +19,35 @@ export function SubNav({ activeSubModule, onSelectSubModule }) {
             </span>
           </div>
 
-          <button
-            onClick={() => {
-              if (window.confirm('Khôi phục dữ liệu mẫu ban đầu từ kịch bản thiết kế?')) {
-                resetToDefaultSeed();
-              }
-            }}
-            className="text-[11px] text-[#687179] hover:text-[#0070CE] flex items-center gap-1 transition"
-            title="Đặt lại dữ liệu mẫu theo đúng ảnh chụp màn hình"
-          >
-            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-            Khôi phục dữ liệu mẫu
-          </button>
+          <div className="flex items-center gap-4">
+            <a
+              href="/docs/PRD_Doi_Soat_Module_M6_VI.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[11px] font-semibold text-[#0070CE] hover:text-[#00549B] flex items-center gap-1.5 transition bg-blue-50/80 px-2.5 py-1 rounded-md border border-blue-200 shadow-2xs cursor-pointer"
+              title="Xem và tải tài liệu PRD Phân hệ Đối soát (Bản tiếng Việt 2.0)"
+            >
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <span>Tài liệu PRD (PDF/MD)</span>
+            </a>
+
+            <button
+              onClick={() => {
+                if (window.confirm('Khôi phục dữ liệu mẫu ban đầu từ kịch bản thiết kế?')) {
+                  resetToDefaultSeed();
+                }
+              }}
+              className="text-[11px] text-[#687179] hover:text-[#0070CE] flex items-center gap-1 transition cursor-pointer"
+              title="Đặt lại dữ liệu mẫu theo đúng ảnh chụp màn hình"
+            >
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              Khôi phục dữ liệu mẫu
+            </button>
+          </div>
         </div>
 
         {/* Tab row */}

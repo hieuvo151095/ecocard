@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tài Liệu Yêu Cầu Sản Phẩm (PRD) — Phân Hệ Đối Soát (Module M6) — FINVIET</title>
+  <!-- Tailwind CSS CDN for styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Marked.js for Markdown parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- Mermaid.js for Diagrams -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white !important; color: black !important; }
+      .print-container { max-width: 100% !important; margin: 0 !important; padding: 0 !important; box-shadow: none !important; }
+    }
+    .markdown-body h1 { font-size: 1.875rem; font-weight: 800; color: #111827; margin-top: 1.5rem; margin-bottom: 1rem; border-bottom: 2px solid #E5E7EB; padding-bottom: 0.5rem; }
+    .markdown-body h2 { font-size: 1.5rem; font-weight: 700; color: #1F2937; margin-top: 2rem; margin-bottom: 0.75rem; border-bottom: 1px solid #E5E7EB; padding-bottom: 0.375rem; }
+    .markdown-body h3 { font-size: 1.25rem; font-weight: 700; color: #374151; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+    .markdown-body h4 { font-size: 1.1rem; font-weight: 600; color: #4B5563; margin-top: 1rem; margin-bottom: 0.25rem; }
+    .markdown-body p { margin-bottom: 1rem; line-height: 1.75; color: #374151; }
+    .markdown-body blockquote { border-left: 4px solid #0070CE; background-color: #F0F7FF; padding: 0.75rem 1rem; border-radius: 0 0.5rem 0.5rem 0; margin-bottom: 1.25rem; color: #1E40AF; }
+    .markdown-body table { width: 100%; border-collapse: collapse; margin-top: 1rem; margin-bottom: 1.5rem; font-size: 0.875rem; }
+    .markdown-body th { background-color: #F8FAFC; border: 1px solid #E2E8F0; padding: 0.75rem 1rem; font-weight: 700; color: #1E293B; text-align: left; }
+    .markdown-body td { border: 1px solid #E2E8F0; padding: 0.75rem 1rem; color: #334155; }
+    .markdown-body tr:nth-child(even) { background-color: #F8FAFC; }
+    .markdown-body pre { background-color: #0F172A; color: #F8FAFC; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1.25rem; font-size: 0.85rem; }
+    .markdown-body code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; background-color: #F1F5F9; color: #0070CE; padding: 0.15rem 0.35rem; border-radius: 0.25rem; font-size: 0.875em; }
+    .markdown-body pre code { background-color: transparent; color: inherit; padding: 0; }
+    .markdown-body ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; line-height: 1.75; }
+    .markdown-body ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1rem; line-height: 1.75; }
+    .markdown-body hr { border: 0; height: 1px; background: #E5E7EB; margin: 2rem 0; }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen text-gray-900 font-sans">
+
+  <!-- Sticky Top Action Bar -->
+  <header class="no-print sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-xs px-6 py-3">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <a href="/" class="flex items-center gap-2 text-sm font-bold text-[#0070CE] hover:text-[#00549B] transition">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-line-cap="round" stroke-line-join="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Cổng ECO Card Portal
+        </a>
+        <span class="text-gray-300">|</span>
+        <span class="text-xs font-semibold text-gray-600 bg-gray-100 px-2 py-0.5 rounded">PRD Phân Hệ Đối Soát</span>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <a
+          href="/docs/PRD_Doi_Soat_Module_M6_VI.md"
+          download="PRD_Doi_Soat_Module_M6_VI.md"
+          class="px-4 py-2 text-xs font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition shadow-xs flex items-center gap-2 cursor-pointer"
+        >
+          <svg class="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-line-cap="round" stroke-line-join="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          Tải Markdown (.md)
+        </a>
+
+        <button
+          onclick="window.print()"
+          class="px-4 py-2 text-xs font-semibold text-white bg-[#0070CE] hover:bg-[#00549B] rounded-lg shadow-sm transition flex items-center gap-2 cursor-pointer"
+        >
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-line-cap="round" stroke-line-join="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+          </svg>
+          In / Lưu PDF
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Document Body Container -->
+  <main class="max-w-5xl mx-auto my-8 px-4 sm:px-8">
+    <div class="print-container bg-white rounded-2xl border border-gray-200 shadow-sm p-8 sm:p-12">
+      <div id="content" class="markdown-body">
+        <div class="flex items-center justify-center py-20 text-gray-400 gap-3">
+          <svg class="animate-spin h-6 w-6 text-[#0070CE]" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span>Đang tải nội dung tài liệu PRD...</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    mermaid.initialize({ startOnLoad: false, theme: 'default' });
+
+    // Fetch and render markdown
+    fetch('/docs/PRD_Doi_Soat_Module_M6_VI.md')
+      .then(res => {
+        if (!res.ok) throw new Error('Không thể tải file PRD');
+        return res.text();
+      })
+      .then(markdown => {
+        // Render markdown with Marked
+        const html = marked.parse(markdown);
+        document.getElementById('content').innerHTML = html;
+
+        // Render any mermaid diagrams
+        document.querySelectorAll('pre code.language-mermaid').forEach((el, index) => {
+          const pre = el.parentElement;
+          const container = document.createElement('div');
+          container.className = 'mermaid my-6 flex justify-center';
+          container.id = 'mermaid-' + index;
+          container.textContent = el.textContent;
+          pre.replaceWith(container);
+        });
+
+        mermaid.run();
+      })
+      .catch(err => {
+        document.getElementById('content').innerHTML = `
+          <div class="p-6 bg-red-50 border border-red-200 rounded-xl text-red-600">
+            <h3 class="font-bold text-base mb-2">Lỗi tải tài liệu PRD</h3>
+            <p class="text-sm">${err.message}</p>
+          </div>
+        `;
+      });
+  </script>
+</body>
+</html>
