@@ -31,9 +31,83 @@ Xây dựng phân hệ **Quản Trị Đối Soát & Quyết Toán (Module M6)**
 
 ---
 
-## 2. Kiến Trúc Vận Hành Nghiệp Vụ & Luồng Dữ Liệu Liên Thông
+## 2. Tổng Quan Nghiệp Vụ & Quy Tắc Cốt Lõi
 
-Phân hệ Đối Soát vận hành theo mô hình khép kín giữa **Cấu hình (SM1)**, **Động cơ Tính toán (Calculation Engine)**, **Phiên Đối Soát (SM2)** và **Công cụ Kiểm toán (Audit Hub)**:
+### 2.1 Mô hình hóa nghiệp vụ (Luồng liên thông đa tác nhân – RECONCILE USER SCHOOL)
+
+Phân hệ Đối soát (Module M6) đóng vai trò là mắt xích tài chính cốt lõi trong toàn bộ vòng đời hợp tác dịch vụ giữa FINVIET và Đối tác Nhà trường. Toàn bộ quy trình đối soát và quyết toán người dùng/học sinh (RECONCILE USER SCHOOL) được mô hình hóa theo chuẩn BPMN Swimlane với sự tham gia phối hợp xuyên suốt của 3 tác nhân (Làn bơi – Swimlanes):
+
+1. **Làn Vận hành FV (Finviet Operations / Ops Admin):** Chịu trách nhiệm ký kết hợp đồng dịch vụ, khởi tạo hồ sơ pháp nhân nhóm trường (SchoolGroup) và các chi nhánh cơ sở (SchoolBranch) ban đầu trên Cổng vận hành.
+2. **Làn Trường học (School Partner / Đối tác Nhà trường):** Chịu trách nhiệm tạo Master Data học sinh, giáo viên, lớp học; triển khai đưa dịch vụ vào sử dụng; liên tục cập nhật biến động trạng thái học sinh (Active / Inactive) qua cổng phân nhánh song song (+); đối chiếu bảng kê và thực hiện thanh toán chi phí dịch vụ cho Finviet.
+3. **Làn ECO Card (Hệ thống ECO Card Portal & Kế toán Finviet):** Tự động đồng bộ Master Data; cấu hình danh mục dịch vụ và ma trận biểu phí (SM1); định kỳ tạo phiên đối soát (SM2) kèm bộ chốt an toàn 0 VNĐ (MSG-01); đóng băng Snapshot bất biến (ADR-M6-001); gửi mail biên bản kèm mật khẩu bảo mật; ghi nhận thanh toán và hoàn tất phiên đối soát.
+
+![Sơ đồ luồng nghiệp vụ đối soát liên thông đa tác nhân (BPMN Swimlane: RECONCILE USER SCHOOL)](docs/images/flow_reconcile_user_school.png)
+*Hình 2.1: Sơ đồ luồng nghiệp vụ đối soát liên thông đa tác nhân (BPMN Swimlane: RECONCILE USER SCHOOL)*
+
+#### Sơ đồ luồng Mermaid BPMN Swimlane:
+
+```mermaid
+flowchart TD
+    subgraph FV_OPS["LÀN 1: VẬN HÀNH FV (OPS ADMIN)"]
+        A1["01. Ký hợp đồng dịch vụ"] --> A2["02. Tạo trường & các chi nhánh của trường"]
+    end
+
+    subgraph SCHOOL["LÀN 2: TRƯỜNG HỌC (SCHOOL PARTNER)"]
+        B1["03. Tạo master data trường học (HS, GV, Lớp...)"]
+        B2["08. Triển khai & sử dụng dịch vụ"]
+        B3{"08+. Cập nhật thông tin HS\n(Active / Inactive)"}
+        B4["11. Trường đối chiếu & thanh toán phí DV cho FV"]
+    end
+
+    subgraph ECO_SYS["LÀN 3: ECO CARD (HỆ THỐNG & KẾ TOÁN FV)"]
+        C1["04. Đồng bộ trường học & Học sinh (Lớp, GV...)"]
+        C2["05. Hiển thị danh sách & trạng thái người dùng"]
+        C3["06. Cấu hình dịch vụ trường học"]
+        C4["07. Cấu hình biểu phí dịch vụ (SM1)"]
+        C5["09. KT tạo phiên đối soát thu phí dịch vụ (SM2)"]
+        C6["10. KT kiểm tra, điều chỉnh & gửi mail biên bản đối soát"]
+        C7["12. FV ghi nhận & cập nhật phiên ĐÃ HOÀN TẤT đối soát (PAID)"]
+        C8(["13. Hoàn tất phiên đối soát (End Event)"])
+    end
+
+    %% Luồng liên thông giữa các tác nhân
+    A2 --> B1
+    B1 --> C1
+    C1 --> C2
+    C2 --> C3
+    C3 --> C4
+    C4 --> B2
+    B2 --> B3
+    B3 -. Cập nhật liên tục .-> C5
+    C4 --> C5
+    C5 --> C6
+    C6 --> B4
+    B4 --> C7
+    C7 --> C8
+```
+
+#### Bảng phân tích chi tiết 13 bước trong luồng RECONCILE USER SCHOOL:
+
+| Bước | Tác nhân (Swimlane) | Hành động / Nghiệp vụ | Mô tả chi tiết luồng xử lý | Dữ liệu & Chứng từ |
+| :---: | :--- | :--- | :--- | :--- |
+| **01** | **Vận hành FV** | **Ký hợp đồng dịch vụ** | Finviet và Nhà trường hoàn tất đàm phán, thống nhất điều khoản và ký hợp đồng cung cấp dịch vụ giải pháp thẻ ECO và các tiện ích số trường học. | Hợp đồng dịch vụ, Phụ lục biểu phí |
+| **02** | **Vận hành FV** | **Tạo trường & các chi nhánh của trường** | Chuyên viên Vận hành khởi tạo hồ sơ pháp nhân nhóm trường (Mã nhóm duy nhất, bất biến) và các chi nhánh cơ sở trực thuộc trên hệ thống Cổng vận hành. | Tạo SchoolGroup & SchoolBranch |
+| **03** | **Trường học** | **Tạo master data trường học (HS, GV, Lớp...)** | Ban giám hiệu hoặc Quản trị viên trường học thiết lập danh mục lớp học, hồ sơ học sinh, giáo viên và phân lớp giảng dạy trên hệ thống quản lý trường. | Master Data học sinh, giáo viên, lớp |
+| **04** | **ECO Card** | **Đồng bộ trường học và Học sinh (Lớp, GV...)** | Hệ thống ECO Card Portal tự động kết nối và đồng bộ hai chiều toàn bộ danh mục trường, lớp học, hồ sơ học sinh và giáo viên vào cơ sở dữ liệu đối soát. | Dữ liệu đồng bộ (Sync Database) |
+| **05** | **ECO Card** | **Hiển thị danh sách & trạng thái người dùng** | Hệ thống hiển thị danh bạ người dùng, mã định danh thẻ UID, trạng thái tài khoản và thông tin lớp học phục vụ theo dõi vận hành. | Danh sách người dùng & Thẻ học sinh |
+| **06** | **ECO Card** | **Cấu hình dịch vụ trường học** | Chuyên viên thiết lập danh mục dịch vụ số áp dụng cho từng chi nhánh: Phần mềm quản lý nhà trường, Camera AI, Thẻ học sinh, Căn tin học đường. | Danh mục dịch vụ kích hoạt |
+| **07** | **ECO Card** | **Cấu hình biểu phí dịch vụ (SM1)** | Thiết lập đơn vị đối soát (GROUP vs BRANCH), chu kỳ (Năm vs Kỳ), ma trận đơn giá (đ/HS/năm hoặc đ/HS/tháng), lịch kỳ và ngưỡng thu phí (BR01 – BR08). | Cấu hình biểu phí hoàn chỉnh (SM1) |
+| **08** | **Trường học** | **Triển khai & sử dụng dịch vụ** | Nhà trường đưa dịch vụ vào vận hành thực tế. Học sinh quẹt thẻ điểm danh thông minh, ăn bán trú, vào thư viện và sử dụng tiện ích hàng ngày. | Nhật ký quẹt thẻ thực tế (Log) |
+| **08+** | **Trường học** | **Cập nhật thông tin HS (Active / Inactive)** | **[Cổng phân nhánh song song +]:** Trong quá trình sử dụng, nhà trường liên tục cập nhật trạng thái học sinh chuyển trường, nghỉ ốm, bảo lưu (Inactive) hoặc nhập học mới (Active). Mốc chốt số liệu được ghi nhận theo thời gian thực. | Biến động trạng thái Active / Inactive |
+| **09** | **ECO Card** | **KT tạo phiên đối soát thu phí dịch vụ (SM2)** | Định kỳ, Kế toán Finviet khởi tạo phiên đối soát bằng Wizard 3 bước: Chọn nhóm/chi nhánh, chọn kỳ, chốt ngày quét số liệu. Động cơ tính phí chuẩn 30 ngày/tháng, kiểm tra ngưỡng (BR06), làm tròn ngày dư (BR07). Bộ chốt an toàn khóa tạo phiên nếu tổng phí = 0đ (MSG-01 / BR10). Đóng băng Snapshot bất biến (ADR-M6-001). | Phiên đối soát (DRAFT) & Snapshot JSON |
+| **10** | **ECO Card** | **KT kiểm tra, điều chỉnh & gửi mail biên bản đối soát** | Kế toán kiểm tra số liệu, kiểm toán đối chiếu Log song song (Side-by-Side Audit), gửi duyệt cấp quản lý. Sau khi duyệt, hệ thống phát hành email biên bản đối soát kèm mật khẩu file bảo mật đến trường. | Biên bản đối soát & Mật khẩu file |
+| **11** | **Trường học** | **Trường đối chiếu & thanh toán phí dịch vụ cho FV** | Kế toán nhà trường mở file đối soát bằng mật khẩu, đối chiếu số ngày hoạt động thực tế của từng học sinh và thực hiện chuyển khoản thanh toán phí dịch vụ cho Finviet. | Biên bản ký duyệt & Ủy nhiệm chi (UNC) |
+| **12** | **ECO Card** | **FV ghi nhận & cập nhật phiên ĐÃ HOÀN TẤT đối soát** | Kế toán Finviet kiểm tra sao kê ngân hàng, xác nhận tiền về và cập nhật trạng thái phiên đối soát sang ĐÃ THANH TOÁN (PAID). Mở quyền tạo phiên truy thu con nếu phát sinh học sinh mới. | Cập nhật trạng thái PAID |
+| **13** | **ECO Card** | **Hoàn tất phiên đối soát** | Phiên đối soát chính thức khép lại vòng đời (End Event), toàn bộ chứng từ được lưu trữ an toàn phục vụ thanh tra tài chính, hoàn tất chu kỳ đối soát. | Hồ sơ quyết toán lưu trữ hoàn tất |
+
+### 2.2 Kiến trúc vận hành tam giác khép kín giữa các phân hệ
+
+Phân hệ Đối Soát vận hành theo mô hình tam giác khép kín giữa **Cấu hình (SM1)**, **Động cơ Tính toán (Calculation Engine)**, **Phiên Đối Soát (SM2)** và **Công cụ Kiểm toán (Audit Hub)**:
 
 ```
                       ┌───────────────────────────────────────────────┐
@@ -70,9 +144,9 @@ Phân hệ Đối Soát vận hành theo mô hình khép kín giữa **Cấu hì
 └──────────────────────────────────┘      └──────────────────────────────────┘
 ```
 
-1. **Từ Cấu hình (SM1) $\rightarrow$ Phiên đối soát (SM2):** Khi tạo phiên, toàn bộ đơn vị đối soát, danh sách chi nhánh, dịch vụ và đơn giá hiệu lực được sao chép vào một **Snapshot JSON bất biến**. Mọi thay đổi về sau trong SM1 không làm sai lệch số liệu của các phiên đã tạo.
-2. **Từ Động cơ tính phí $\rightarrow$ Chốt chặn an toàn (0đ Guard):** Trong bước xem trước số liệu, nếu có chi nhánh phát sinh tổng tiền thanh toán bằng 0 VNĐ, hệ thống khóa nút tạo phiên và hiển thị cảnh báo `MSG-01`.
-3. **Từ Phiên đối soát (SM2) $\rightarrow$ Kiểm toán & Đối chiếu (Audit Hub):** Kế toán viên có thể mở trực tiếp bảng chi tiết từng học sinh theo chi nhánh, bật chế độ đối chiếu Log hoạt động song song để giải trình với nhà trường trước khi thực hiện phê duyệt hoặc xuất biên bản.
+1. **Từ Cấu hình (SM1) → Phiên đối soát (SM2):** Khi tạo phiên, toàn bộ đơn vị đối soát, danh sách chi nhánh, dịch vụ và đơn giá hiệu lực được sao chép vào một **Snapshot JSON bất biến**. Mọi thay đổi về sau trong SM1 không làm sai lệch số liệu của các phiên đã tạo.
+2. **Từ Động cơ tính phí → Chốt chặn an toàn (0đ Guard):** Trong bước xem trước số liệu, nếu có chi nhánh phát sinh tổng tiền thanh toán bằng 0 VNĐ, hệ thống khóa nút tạo phiên và hiển thị cảnh báo `MSG-01`.
+3. **Từ Phiên đối soát (SM2) → Kiểm toán & Đối chiếu (Audit Hub):** Kế toán viên có thể mở trực tiếp bảng chi tiết từng học sinh theo chi nhánh, bật chế độ đối chiếu Log hoạt động song song để giải trình với nhà trường trước khi thực hiện phê duyệt hoặc xuất biên bản.
 
 ---
 
